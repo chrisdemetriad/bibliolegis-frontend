@@ -3,6 +3,7 @@
 ## Git and PRs
 - Conventional commits only, for commit messages and PR titles
 - Always open a PR first, never commit straight to main
+- Short and concise commit names and PR titles
 
 ## Writing style (comments, docs, PR descriptions, commit messages)
 
@@ -24,12 +25,6 @@ All written output, code comments, README content, PR descriptions, commit messa
 - No bold text used for emphasis mid paragraph, bold only for genuine structure like headings
 - Don't stack hedge words, one "may" or "could" is fine if something's genuinely uncertain, three in a row isn't
 - No summary paragraph at the end that just restates what was already said
-
-## Voice reference
-
-Match this general rhythm and vocabulary level, slightly more polished but not corporate:
-
-<Chris to paste 2 or 3 real examples of his own PR descriptions, commit messages or code comments here, so future edits can calibrate against them directly>
 
 ## General conduct
 - Keep responses and explanations to a minimum, state what changed and why, skip the narration
