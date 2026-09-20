@@ -9,7 +9,7 @@
 
 All written output, code comments, README content, PR descriptions, commit messages, must read like it was written by a person, not generated. Apply these rules to everything you write, no exceptions.
 
-- No Oxford comma, ever. "bla bla, and bla bla" not "bla bla, and, bla bla"
+- No Oxford comma in lists, ever. "apples, pears and plums" not "apples, pears, and plums". This doesn't apply to two independent clauses joined by "and", keep the comma there, e.g. "She walked to the shop, and he waited outside"
 - No hyphenated compound words. Write them open. "real time" not "real-time", "re renders" not "re-renders"
 - No cliche or corporate buzzwords. Banned words include but aren't limited to: mission critical, seamless, robust, leverage, streamline, unlock, elevate, game changer, cutting edge, best in class, synergy
 - No words a normal person wouldn't actually say out loud in conversation. If it sounds like it belongs in a press release, cut it
