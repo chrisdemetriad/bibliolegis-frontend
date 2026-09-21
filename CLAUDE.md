@@ -5,6 +5,7 @@
 - Always open a PR first, never commit straight to main
 - When told to commit, push, add to main or get it in, branch off main, commit, open a PR and merge it in. Once CI/CD exists, only merge after it passes. If told to commit but not push, just commit locally and stop there
 - Short and concise commit names and PR titles
+- Prefer several small PRs over one large PR for a batch of work, one coherent change per PR even when individual changes are minor. This makes each PR easy to track and review on its own later
 
 ## Writing style (comments, docs, PR descriptions, commit messages)
 
