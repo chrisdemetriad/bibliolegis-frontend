@@ -1,0 +1,9 @@
+node_modules
+.git
+.github
+.output
+.nitro
+.tanstack
+.vscode
+src/routeTree.gen.ts
+*.md

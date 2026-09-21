@@ -11,7 +11,7 @@ This can start against a stubbed or partially built API. It doesn't need to wait
 - [x] TanStack Start scaffold with TypeScript
 - [x] Biome config
 - [x] GitHub Actions workflow: install, lint, type check, build on every PR
-- [ ] Dockerfile for the frontend, used for local Docker runs and as the Railway build source
+- [x] Dockerfile for the frontend, used for local Docker runs and as the Railway build source
 - [ ] README with local setup steps, including how it points at the backend API url
 
 The frontend deploys as its own service inside the same Railway project as the api and Postgres, set up in bibliolegis-api's PLAN.md, rather than a separate project. That gives it private network access to the api service and shared environment variables.
