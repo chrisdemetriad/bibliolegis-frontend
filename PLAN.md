@@ -94,8 +94,15 @@ Clerk's TanStack Start integration (`@clerk/tanstack-start`) handles the login U
 
 ## Phase 7: deployment
 
+The domain and environment layout is product wide and lives in bibliolegis-api's
+PLAN.md, under "Environments and domains". Production on the domain, development on
+a `dev.` subdomain, each a Railway environment inside the one project. TLS is free
+and automatic on Railway, so the domain is the only thing bought.
+
 - [ ] Frontend service added to the shared Railway project (see bibliolegis-api's PLAN.md Phase 0), built from this repo's Dockerfile for parity with local Docker runs
-- [ ] Backend API url read from a project level shared variable rather than duplicated per service
+- [ ] Backend API url read from a shared variable rather than duplicated per service. Railway scopes shared variables per environment, so the same name resolves to the production api in one and the development api in the other
 - [ ] Environment variables for anything frontend specific (Clerk publishable key) set in the deployment platform, not committed anywhere
+- [ ] `VITE_API_URL` is read at build time and baked into the bundle, not read at runtime, so it has to be present when the image is built rather than only when it starts. Getting this wrong gives a development frontend pointing at the production api, which is the failure worth designing against
+- [ ] Development build uses the development Clerk application's publishable key, not production's. Both are `VITE_` prefixed and so are readable by anyone using the app, which is fine for a publishable key and would not be for a secret one
 - [ ] Error tracking wired up (Sentry or similar)
 - [ ] Smoke test after each deploy against a deployed backend: login, upload, query returns a cited answer (coordinate with a backend deploy, see that repo's PLAN.md)
