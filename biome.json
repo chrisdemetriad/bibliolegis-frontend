@@ -11,7 +11,9 @@
 			"**/src/**/*",
 			"**/.vscode/**/*",
 			"**/index.html",
-			"**/vite.config.ts",
+			"**/*.config.ts",
+			"**/tsconfig.json",
+			"**/tsr.config.json",
 			"!**/src/routeTree.gen.ts",
 			"!**/src/styles.css"
 		]
@@ -20,7 +22,13 @@
 		"enabled": true,
 		"indentStyle": "tab"
 	},
-	"assist": { "actions": { "source": { "organizeImports": "on" } } },
+	"assist": {
+		"actions": {
+			"source": {
+				"organizeImports": "on"
+			}
+		}
+	},
 	"linter": {
 		"enabled": true,
 		"rules": {
