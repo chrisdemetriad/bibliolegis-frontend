@@ -16,6 +16,22 @@ This can start against a stubbed or partially built API. It doesn't need to wait
 
 The frontend deploys as its own service inside the same Railway project as the api and Postgres, set up in bibliolegis-api's PLAN.md, rather than a separate project. That gives it private network access to the api service and shared environment variables.
 
+## UI foundation
+
+Not numbered, because it doesn't sit in the phase order. It needs to land before
+the document and query pages in Phases 3 and 4, and it can be done any time before
+that.
+
+Tailwind v4 is already here, it came with the scaffold rather than being chosen, so
+this is the point where it's either confirmed or swapped. Confirming it.
+
+- [ ] Run `shadcn init` with the `start` template, which is its first class TanStack Start setup, and commit `components.json`
+- [ ] Decide the base component library, shadcn offers base, radix or aria. Worth a moment rather than taking the default, since a legal product has accessibility obligations and this choice is what the keyboard and screen reader behaviour is inherited from
+- [ ] Theming through CSS variables rather than hardcoded Tailwind classes, so the firm's colours are changed in one place if they ever want their own branding
+- [ ] Add components one at a time as a page needs them, rather than bulk adding the whole registry. shadcn copies source into the repo, so anything added is ours to maintain whether or not it's used
+- [ ] Decide how Biome treats the copied components. They land formatted to shadcn's style, not ours, so either they get formatted to our config on the way in and every later `shadcn add` produces a diff, or they're excluded from Biome and drift from the rest of the codebase. Pick one and write it down rather than discovering it on the first upgrade
+- [ ] Decide whether dark mode is wanted. It's close to free at this stage and awkward to retrofit once components carry hardcoded colours
+
 ## Phase 1: API types
 
 - [ ] TypeScript type generation from the backend's exported OpenAPI schema (openapi-typescript or similar)
