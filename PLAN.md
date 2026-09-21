@@ -16,7 +16,7 @@ CI running lint, typecheck and build on every PR, a two stage Dockerfile and a
 README. Nothing else exists yet, there are no components, no API client and one
 holding route.
 
-**Next:** either of two, both unblocked.
+**Next:** either of two, both unblocked, plus Phase 7 out of order.
 
 Phase 1, the API types, is the one that unlocks everything after it. The backend
 now commits `openapi.json` at the root of the bibliolegis-api repo, with a test
@@ -27,6 +27,13 @@ staleness check and have them working before there's anything interesting to typ
 
 The UI foundation section below is the other, and it doesn't depend on the backend
 at all.
+
+Phase 7, deployment, can also start now even though Phases 1 to 6 aren't done.
+The domain is bought and Cloudflare sits in front of it already (see the api
+repo's PLAN.md, "Environments and domains"), but nothing is actually deployed to
+Railway yet, checked directly on 2026-09-21: the shared project holds only
+Postgres. The current holding route is enough to prove the pipeline end to end,
+deploy that now rather than waiting for real pages to exist first
 
 **Things worth knowing before starting:**
 
@@ -133,9 +140,10 @@ Clerk's TanStack Start integration (`@clerk/tanstack-start`) handles the login U
 ## Phase 7: deployment
 
 The domain and environment layout is product wide and lives in bibliolegis-api's
-PLAN.md, under "Environments and domains". Production on the domain, development on
-a `dev.` subdomain, each a Railway environment inside the one project. TLS is free
-and automatic on Railway, so the domain is the only thing bought.
+PLAN.md, under "Environments and domains". Production on `app.bibliolegis.com`,
+development on `dev.bibliolegis.com`, each a Railway environment inside the one
+project. The bare root is reserved for a separate marketing homepage, not this app.
+TLS is free and automatic on Railway, so the domain is the only thing bought.
 
 - [ ] Frontend service added to the shared Railway project (see bibliolegis-api's PLAN.md Phase 0), built from this repo's Dockerfile for parity with local Docker runs
 - [ ] Backend API url read from a shared variable rather than duplicated per service. Railway scopes shared variables per environment, so the same name resolves to the production api in one and the development api in the other
