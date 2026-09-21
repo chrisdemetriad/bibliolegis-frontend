@@ -6,6 +6,44 @@ Items are checkboxes so progress can be tracked directly in this file. Nothing h
 
 This can start against a stubbed or partially built API. It doesn't need to wait for the backend's generation phase to be finished, only for the endpoints a given page calls to exist.
 
+## Where things stand
+
+Last updated 2026-09-21. Keep this block current, it's what a fresh session reads
+to work out where to pick up.
+
+**Done:** Phase 0. TanStack Start with React, Biome for linting and formatting,
+CI running lint, typecheck and build on every PR, a two stage Dockerfile and a
+README. Nothing else exists yet, there are no components, no API client and one
+holding route.
+
+**Next:** either of two, both unblocked.
+
+Phase 1, the API types, is the one that unlocks everything after it. The backend
+now commits `openapi.json` at the root of the bibliolegis-api repo, with a test
+there that fails when it goes stale, so there's a real file to generate from. It
+describes one endpoint, `GET /health`, because the backend's own auth phase is
+still being built. That's enough to set up the generation, the client and the CI
+staleness check and have them working before there's anything interesting to type.
+
+The UI foundation section below is the other, and it doesn't depend on the backend
+at all.
+
+**Things worth knowing before starting:**
+
+- `VITE_API_URL` is in `.env.example` and nothing reads it yet. The client that
+  will is Phase 1. Vite bakes `VITE_` variables into the bundle at build time, so
+  they're readable by anyone using the app and no secret goes in one
+- `src/routeTree.gen.ts` is generated and gitignored. Vite rebuilds it on dev and
+  build, and `pnpm typecheck` runs `tsr generate` first, so `tsc` has something to
+  resolve the router import against
+- Biome has no Markdown or YAML support, so those files aren't formatted by
+  anything. Prettier was tried and dropped, it only overlapped Biome
+- Auth is Clerk, and the application, an organization for the firm and a
+  development user all exist already. The publishable key for the development
+  instance is `pk_test_YWRhcHRlZC1veC04MTI2LmNsZXJrLmFjY291bnRzLmRldiQ`. Get it
+  from `clerk env pull` rather than copying it from here, and see the api repo's
+  PLAN.md status block for the rest
+
 ## Phase 0: repo and tooling
 
 - [x] TanStack Start scaffold with TypeScript
