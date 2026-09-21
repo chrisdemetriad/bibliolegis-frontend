@@ -1,8 +1,8 @@
 # Build plan
 
-This is the frontend slice of the Bibliolegis build. The product description and architecture decisions live in the bibliolegis-api repo's bibliolegis.md, and the backend's own build plan is in that repo's PLAN.md. This file only covers work that lives in this repo.
+This is the frontend slice of the Bibliolegis build. The product description and architecture decisions live in the bibliolegis-api repo's bibliolegis.md and the backend's own build plan is in that repo's PLAN.md. This file only covers work that lives in this repo.
 
-Items are checkboxes so progress can be tracked directly in this file. Nothing here is fixed. Split an item further if it turns out bigger than expected, and add items as the build surfaces things not listed yet.
+Items are checkboxes so progress can be tracked directly in this file. Nothing here is fixed. Split an item further if it turns out bigger than expected and add items as the build surfaces things not listed yet.
 
 This can start against a stubbed or partially built API. It doesn't need to wait for the backend's generation phase to be finished, only for the endpoints a given page calls to exist.
 
@@ -11,8 +11,10 @@ This can start against a stubbed or partially built API. It doesn't need to wait
 - [ ] TanStack Start scaffold with TypeScript
 - [ ] Biome and Prettier config
 - [ ] GitHub Actions workflow: install, lint, type check, build on every PR
-- [ ] Dockerfile for the frontend, used for local Docker runs and as the Railway/Vercel build source if deploying via Docker
+- [ ] Dockerfile for the frontend, used for local Docker runs and as the Railway build source
 - [ ] README with local setup steps, including how it points at the backend API url
+
+The frontend deploys as its own service inside the same Railway project as the api and Postgres, set up in bibliolegis-api's PLAN.md, rather than a separate project. That gives it private network access to the api service and shared environment variables.
 
 ## Phase 1: API types
 
@@ -66,7 +68,8 @@ Clerk's TanStack Start integration (`@clerk/tanstack-start`) handles the login U
 
 ## Phase 7: deployment
 
-- [ ] Railway (or Vercel) deployment config, building from the Dockerfile if deploying to Railway for parity with the backend and with local Docker runs
-- [ ] Environment variables for the API url set in the deployment platform, not committed anywhere
+- [ ] Frontend service added to the shared Railway project (see bibliolegis-api's PLAN.md Phase 0), built from this repo's Dockerfile for parity with local Docker runs
+- [ ] Backend API url read from a project level shared variable rather than duplicated per service
+- [ ] Environment variables for anything frontend specific (Clerk publishable key) set in the deployment platform, not committed anywhere
 - [ ] Error tracking wired up (Sentry or similar)
 - [ ] Smoke test after each deploy against a deployed backend: login, upload, query returns a cited answer (coordinate with a backend deploy, see that repo's PLAN.md)
