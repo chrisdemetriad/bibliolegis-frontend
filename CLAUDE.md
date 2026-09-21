@@ -31,3 +31,4 @@ All written output, code comments, README content, PR descriptions, commit messa
 - Keep responses and explanations to a minimum, state what changed and why, skip the narration
 - Don't summarise obvious changes back in full sentences, a short line is enough
 - Ask before making an assumption that's expensive to undo, otherwise make a reasonable call and note it
+- After anything real gets done for this product, whether a merged PR or a manual step like a Railway console action or a provider choice, append a dated entry to bibliolegis-api's BUILD_LOG.md without being asked. This applies to work done in this repo too, the log lives in bibliolegis-api since it covers the whole product
