@@ -16,6 +16,32 @@ This can start against a stubbed or partially built API. It doesn't need to wait
 
 The frontend deploys as its own service inside the same Railway project as the api and Postgres, set up in bibliolegis-api's PLAN.md, rather than a separate project. That gives it private network access to the api service and shared environment variables.
 
+## UI foundation
+
+Not numbered, because it doesn't sit in the phase order. It needs to land before
+the document and query pages in Phases 3 and 4, and it can be done any time before
+that.
+
+Tailwind v4 is already here, it came with the scaffold rather than being chosen, so
+this is the point where it's either confirmed or swapped. Confirming it.
+
+Two things already decided, so they're written here rather than left as open items.
+
+The base component library is Radix. shadcn offers base, radix or aria, and this is
+where the keyboard and screen reader behaviour comes from, which carries more weight
+for a legal product than for most.
+
+The components get copied into the repo and treated as ours, so Biome formats them
+like the rest of the code rather than being told to skip them. The cost of that is a
+formatting diff every time `shadcn add` or an upgrade brings a component back in its
+own style. That's the accepted side of the trade, the other side being a directory
+that drifts from the rest of the codebase.
+
+- [ ] Run `shadcn init` with the `start` template and the Radix base, and commit `components.json`
+- [ ] Theming through CSS variables rather than hardcoded Tailwind classes, so the firm's colours are changed in one place if they ever want their own branding
+- [ ] Add components one at a time as a page needs them, rather than bulk adding the whole registry
+- [ ] Decide whether dark mode is wanted. It's close to free at this stage and awkward to retrofit once components carry hardcoded colours
+
 ## Phase 1: API types
 
 - [ ] TypeScript type generation from the backend's exported OpenAPI schema (openapi-typescript or similar)
