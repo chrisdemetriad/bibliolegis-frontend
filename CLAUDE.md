@@ -3,6 +3,7 @@
 ## Git and PRs
 - Conventional commits only, for commit messages and PR titles
 - Always open a PR first, never commit straight to main
+- When told to commit, push, add to main or get it in, branch off main, commit, open a PR and merge it in. Once CI/CD exists, only merge after it passes. If told to commit but not push, just commit locally and stop there
 - Short and concise commit names and PR titles
 
 ## Writing style (comments, docs, PR descriptions, commit messages)
