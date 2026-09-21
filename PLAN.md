@@ -10,7 +10,7 @@ This can start against a stubbed or partially built API. It doesn't need to wait
 
 - [x] TanStack Start scaffold with TypeScript
 - [x] Biome config
-- [ ] GitHub Actions workflow: install, lint, type check, build on every PR
+- [x] GitHub Actions workflow: install, lint, type check, build on every PR
 - [ ] Dockerfile for the frontend, used for local Docker runs and as the Railway build source
 - [ ] README with local setup steps, including how it points at the backend API url
 
