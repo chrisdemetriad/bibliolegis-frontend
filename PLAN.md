@@ -17,17 +17,20 @@ lint, typecheck and build on every PR, a two stage Dockerfile and a README. Noth
 else exists yet, there are no components, no API client and one holding route.
 
 **The backend has moved a long way since this was last true.** As of
-2026-09-22 bibliolegis-api has finished its own Phase 2 (auth) entirely:
-Clerk session verification, the `POST /webhooks/clerk` sync, role
-enforcement and `GET /users/me`, plus admin endpoints to list staff, change
-a role and deactivate an account. It's also resolved both decisions blocking
-its Phase 3 (matters are wanted, file storage is local disk for a first
-pass) and landed the matters schema, though the document endpoints
-themselves haven't started. None of that is built here yet, but it means
-`openapi.json` now describes considerably more than `GET /health`, and this
-repo's own Phase 2 (auth) has something real to call once Phase 1 exists.
-See bibliolegis-api's PLAN.md status block for the detail, this is only a
-summary of what changed there.
+2026-09-22 bibliolegis-api has finished its Phase 2 (auth) and its Phase 3
+(document upload and storage) bar the ingestion trigger. That's Clerk
+session verification, the `POST /webhooks/clerk` sync, role enforcement,
+`GET /users/me` and the admin staff endpoints, plus matters (`POST
+/projects`, `POST /projects/{id}/members`, `GET /projects`) and the document
+endpoints (`POST /documents`, `GET /documents`, `GET /documents/{id}`,
+`DELETE /documents/{id}`). Its Phase 4, ingestion, is underway: PDF and DOCX
+text extraction and an OCR fallback for scanned PDFs are done, chunking is
+next, and embeddings are blocked on an OpenAI key. None of it is built here
+yet, but it means `openapi.json` now describes the whole auth, matters and
+documents surface rather than just `GET /health`, so Phase 1's generated
+types and Phase 3's document pages both have something real to work
+against. See bibliolegis-api's PLAN.md status block for the detail, this is
+only a summary of what changed there.
 
 **Next:** either of two, both unblocked, plus Phase 7 (deployment) out of order.
 
