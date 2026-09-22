@@ -23,13 +23,21 @@ session verification, the `POST /webhooks/clerk` sync, role enforcement,
 `GET /users/me` and the admin staff endpoints, plus matters (`POST
 /projects`, `POST /projects/{id}/members`, `GET /projects`) and the document
 endpoints (`POST /documents`, `GET /documents`, `GET /documents/{id}`,
-`DELETE /documents/{id}`). Its Phase 4, ingestion, is underway: PDF and DOCX
-text extraction and an OCR fallback for scanned PDFs are done, chunking is
-next, and embeddings are blocked on an OpenAI key. None of it is built here
-yet, but it means `openapi.json` now describes the whole auth, matters and
-documents surface rather than just `GET /health`, so Phase 1's generated
-types and Phase 3's document pages both have something real to work
-against. See bibliolegis-api's PLAN.md status block for the detail, this is
+`DELETE /documents/{id}`). Its Phase 4, ingestion, now runs end to end: PDF and
+DOCX text extraction, an OCR fallback for scanned PDFs, chunking and
+embeddings stored in Postgres, with a document reaching status `done` once
+it's retrievable. The OpenAI key that was blocking the second half of that
+arrived on 2026-09-22. What's left there is metadata extraction, retry
+logic, the stuck document sweep and the upload trigger.
+
+None of it is built here yet, but two things matter for this repo. First,
+`openapi.json` describes the whole auth, matters and documents surface
+rather than just `GET /health`, so Phase 1's generated types and Phase 3's
+document pages both have something real to work against. Second, a
+document's `status` is now a field that genuinely moves, `pending` to
+`processing` to `done` or `failed` with an `error_message`, so the document
+list and detail pages have real states to show rather than a column that
+never changes. See bibliolegis-api's PLAN.md status block for the detail, this is
 only a summary of what changed there.
 
 **Next:** either of two, both unblocked, plus Phase 7 (deployment) out of order.
