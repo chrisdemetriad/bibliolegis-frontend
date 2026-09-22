@@ -1,5 +1,41 @@
 # Project rules
 
+## Start here
+
+Read these before doing anything else, in this order. This file is the only one
+loaded automatically, so nothing else about the project is known until they are.
+
+1. [PLAN.md](./PLAN.md) — what's built here, what's next and what's blocked. The
+   status block at the top says where things stand
+2. The backend is a separate repo, bibliolegis-api, with its own PLAN.md,
+   bibliolegis.md (what the product is and the architecture decisions behind it)
+   and BUILD_LOG.md (what's been done and why, covering both repos). Read that
+   repo's PLAN.md status block too, this repo's own status block names what's
+   unblocked because of it but not the detail behind that
+
+## How work goes here
+
+- Take the next unchecked PLAN.md item, or the next group of related ones
+- Tick the PLAN.md boxes in the same PR as the work itself, not afterwards,
+  otherwise they drift
+- Update PLAN.md's "Where things stand" block too, not just the checkboxes below
+  it, whenever what it says stops matching reality: a phase finishing, the
+  backend unblocking something, the "Next" line pointing at something already
+  done. That block is the only thing a fresh session reads before picking up
+  work, a stale one gets duplicated or contradicted work rather than continued
+  work
+- Wait for CI to pass before merging, don't merge and check after
+- Verify things actually work rather than assuming, a green test suite isn't
+  evidence a feature works. Run the dev server and use the page, don't just read
+  the code
+- When something turns out differently from what PLAN.md says, change the plan
+  and say why, in the bibliolegis-api repo's BUILD_LOG.md since that's where the
+  log for the whole product lives, even for work done here
+- Before ending a session or handing back to the user, check this repo's
+  PLAN.md status block and its checkboxes agree with what's actually merged to
+  main, and that bibliolegis-api's BUILD_LOG.md has an entry for anything real
+  that happened here. Do this without being asked
+
 ## Git and PRs
 - Conventional commits only, for commit messages and PR titles
 - Always open a PR first, never commit straight to main
