@@ -8,22 +8,32 @@ This can start against a stubbed or partially built API. It doesn't need to wait
 
 ## Where things stand
 
-Last updated 2026-09-21. Keep this block current, it's what a fresh session reads
+Last updated 2026-09-22. Keep this block current, it's what a fresh session reads
 to work out where to pick up.
 
-**Done:** Phase 0. TanStack Start with React, Biome for linting and formatting,
-CI running lint, typecheck and build on every PR, a two stage Dockerfile and a
-README. Nothing else exists yet, there are no components, no API client and one
-holding route.
+**Done:** Phase 0, plus the Phase 7 docs item pulled forward (bibliolegis-frontend#23,
+merged). TanStack Start with React, Biome for linting and formatting, CI running
+lint, typecheck and build on every PR, a two stage Dockerfile and a README. Nothing
+else exists yet, there are no components, no API client and one holding route.
 
-**Next:** either of two, both unblocked, plus Phase 7 out of order.
+**The backend has moved a long way since this was last true.** As of
+2026-09-22 bibliolegis-api has finished its own Phase 2 (auth) entirely:
+Clerk session verification, the `POST /webhooks/clerk` sync, role
+enforcement and `GET /users/me`, plus admin endpoints to list staff, change
+a role and deactivate an account. It's also resolved both decisions blocking
+its Phase 3 (matters are wanted, file storage is local disk for a first
+pass) and landed the matters schema, though the document endpoints
+themselves haven't started. None of that is built here yet, but it means
+`openapi.json` now describes considerably more than `GET /health`, and this
+repo's own Phase 2 (auth) has something real to call once Phase 1 exists.
+See bibliolegis-api's PLAN.md status block for the detail, this is only a
+summary of what changed there.
 
-Phase 1, the API types, is the one that unlocks everything after it. The backend
-now commits `openapi.json` at the root of the bibliolegis-api repo, with a test
-there that fails when it goes stale, so there's a real file to generate from. It
-describes one endpoint, `GET /health`, because the backend's own auth phase is
-still being built. That's enough to set up the generation, the client and the CI
-staleness check and have them working before there's anything interesting to type.
+**Next:** either of two, both unblocked, plus Phase 7 (deployment) out of order.
+
+Phase 1, the API types, is the one that unlocks everything after it. Regenerating
+the TypeScript types now pulls in the backend's real auth surface, not just a
+liveness check, so this is worth doing before Phase 2 here rather than after.
 
 The UI foundation section below is the other, and it doesn't depend on the backend
 at all.
@@ -31,9 +41,9 @@ at all.
 Phase 7, deployment, can also start now even though Phases 1 to 6 aren't done.
 The domain is bought and Cloudflare sits in front of it already (see the api
 repo's PLAN.md, "Environments and domains"), but nothing is actually deployed to
-Railway yet, checked directly on 2026-09-21: the shared project holds only
-Postgres. The current holding route is enough to prove the pipeline end to end,
-deploy that now rather than waiting for real pages to exist first
+Railway yet as of 2026-09-21, the shared project holds only Postgres. The
+current holding route is enough to prove the pipeline end to end, deploy that
+now rather than waiting for real pages to exist first
 
 **Things worth knowing before starting:**
 
