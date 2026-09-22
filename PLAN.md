@@ -56,6 +56,13 @@ Railway yet as of 2026-09-21, the shared project holds only Postgres. The
 current holding route is enough to prove the pipeline end to end, deploy that
 now rather than waiting for real pages to exist first
 
+**Three features were added to the plan on 2026-09-22, none of them started here
+or in the backend.** Voice is Phase 8 below, a hold to talk button on the query
+page feeding the same endpoint the text box does. Connected mailboxes are Phase 9
+and the morning brief is Phase 10, both well after the MVP. Voice is the one that
+matters, so it's worth reading bibliolegis-api's PLAN.md section "Voice, and what
+it costs" before Phase 4's query page is designed, since the two share a page.
+
 **Things worth knowing before starting:**
 
 - `VITE_API_URL` is in `.env.example` and nothing reads it yet. The client that
@@ -173,3 +180,72 @@ TLS is free and automatic on Railway, so the domain is the only thing bought.
 - [ ] Development build uses the development Clerk application's publishable key, not production's. Both are `VITE_` prefixed and so are readable by anyone using the app, which is fine for a publishable key and would not be for a secret one
 - [ ] Error tracking wired up (Sentry or similar)
 - [ ] Smoke test after each deploy against a deployed backend: login, upload, query returns a cited answer (coordinate with a backend deploy, see that repo's PLAN.md)
+
+## Phase 8: voice
+
+Hold a button, ask a question out loud, hear the answer. The backend half is
+bibliolegis-api's Phase 10 and the design reasoning lives in that repo's PLAN.md
+under "Voice, and what it costs", including why this doesn't use the browser's own
+`SpeechRecognition` API even though it's free.
+
+This needs Phase 4's query page to exist first, since voice is another way into the
+same page rather than a page of its own. The recording and playback parts can be
+built against the two voice endpoints before the query page is finished.
+
+- [ ] Hold to talk button on the query page, not a toggle. Holding means releasing
+      is an unambiguous "I've finished", which avoids having to work out when
+      someone stopped speaking
+- [ ] Capture with `MediaRecorder` and send whatever the browser produced. Safari
+      and Chrome don't record the same container and the backend normalises, so
+      don't fight it here
+- [ ] Microphone permission as a real state on the page, including denied and
+      blocked at the OS level. A button that silently does nothing is the worst
+      version of this
+- [ ] Recording indicator with a live level meter. A microphone that's on when the
+      user thinks it's off is the failure that matters most in a room where client
+      matters get discussed
+- [ ] The transcript lands in the query box, visible and editable, rather than
+      running invisibly. Voice is the one input where the user can't otherwise see
+      what was sent, and transcription gets surnames wrong
+- [ ] Answer playback under an explicit control, no autoplay. Make it obvious when
+      sound is about to start, some of these cases are ones nobody wants read aloud
+      at a desk
+- [ ] Commands act on the interface rather than being answered. "Bring up a list of
+      rape cases" navigates to the document list with that filter applied, using
+      the structured action the backend returns
+- [ ] Fall back to the browser's `speechSynthesis` when the speech call fails. The
+      voice is worse and an answer read badly beats one not read at all
+- [ ] Everything voice does has a keyboard and pointer equivalent. Voice is never
+      the only way to reach something, for the obvious accessibility reason and
+      because open plan offices exist
+- [ ] Works on a phone browser, which is where somebody standing outside a court
+      will actually use it
+
+## Phase 9: connected accounts
+
+The settings side of bibliolegis-api's Phase 11. A user connects their work mailbox
+and calendar, sees what's been imported and can disconnect.
+
+- [ ] Settings page listing connected accounts with provider, address and last
+      synced time
+- [ ] Connect flow handing off to the provider's consent screen and back
+- [ ] Honest import progress, "4,200 of 31,000 messages" rather than a spinner. A
+      first import takes a long time and a spinner with no end makes it look broken
+- [ ] Disconnect with a confirmation that says plainly it deletes the imported
+      messages and their embeddings, not only the connection
+- [ ] Email results visibly different from document results in answers and
+      citations, marked as private to the person asking. A solicitor should never
+      have to wonder whether a colleague can see the same thing
+
+## Phase 10: daily brief
+
+The front of bibliolegis-api's Phase 12. A few lines each morning about the day
+ahead, once mail and calendar are connected.
+
+- [ ] Brief panel on the landing page after sign in, collapsed to a few lines
+- [ ] Each line links through to the event or message it came from, the same way a
+      cited answer links to its source
+- [ ] Honest empty state. A quiet day shows a quiet brief rather than filler
+- [ ] Nothing shown at all until an account is connected, with a one line
+      explanation rather than an empty panel
+
