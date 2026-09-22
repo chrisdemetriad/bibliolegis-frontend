@@ -17,28 +17,33 @@ lint, typecheck and build on every PR, a two stage Dockerfile and a README. Noth
 else exists yet, there are no components, no API client and one holding route.
 
 **The backend has moved a long way since this was last true.** As of
-2026-09-22 bibliolegis-api has finished its Phase 2 (auth) and its Phase 3
-(document upload and storage) bar the ingestion trigger. That's Clerk
-session verification, the `POST /webhooks/clerk` sync, role enforcement,
-`GET /users/me` and the admin staff endpoints, plus matters (`POST
-/projects`, `POST /projects/{id}/members`, `GET /projects`) and the document
-endpoints (`POST /documents`, `GET /documents`, `GET /documents/{id}`,
-`DELETE /documents/{id}`). Its Phase 4, ingestion, now runs end to end: PDF and
-DOCX text extraction, an OCR fallback for scanned PDFs, chunking and
-embeddings stored in Postgres, with a document reaching status `done` once
-it's retrievable. The OpenAI key that was blocking the second half of that
-arrived on 2026-09-22. What's left there is metadata extraction, retry
-logic, the stuck document sweep and the upload trigger.
+2026-09-22 bibliolegis-api has finished its Phase 2 (auth), Phase 3 (document
+upload and storage) and Phase 4 (ingestion). That's Clerk session
+verification, the `POST /webhooks/clerk` sync, role enforcement, `GET
+/users/me` and the admin staff endpoints, plus matters (`POST /projects`,
+`POST /projects/{id}/members`, `GET /projects`) and the document endpoints
+(`POST /documents`, `GET /documents`, `GET /documents/{id}`, `DELETE
+/documents/{id}`).
 
-None of it is built here yet, but two things matter for this repo. First,
-`openapi.json` describes the whole auth, matters and documents surface
-rather than just `GET /health`, so Phase 1's generated types and Phase 3's
-document pages both have something real to work against. Second, a
-document's `status` is now a field that genuinely moves, `pending` to
+Ingestion runs end to end and uploading a document now starts it: PDF and DOCX
+text extraction, an OCR fallback for scanned PDFs, chunking, embeddings stored
+in Postgres, and the case's comparable fields (offence type, location, court,
+date, sentence) read out by an LLM into `case_metadata`. A document reaches
+`done` once it's retrievable. Retrieval itself, Phase 5 there, is next, and
+nothing in this repo can query anything until it lands.
+
+Three things matter for this repo. First, `openapi.json` describes the whole
+auth, matters and documents surface rather than just `GET /health`, so Phase
+1's generated types and Phase 3's document pages both have something real to
+work against. Second, a document's `status` genuinely moves, `pending` to
 `processing` to `done` or `failed` with an `error_message`, so the document
-list and detail pages have real states to show rather than a column that
-never changes. See bibliolegis-api's PLAN.md status block for the detail, this is
-only a summary of what changed there.
+list and detail pages have real states to show rather than a column that never
+changes. Third, and new: `POST /documents` responds as soon as the file is on
+disk and always says `pending`, ingestion runs behind it. So an upload page has
+to poll `GET /documents/{id}` to show a document going through `processing` to
+`done` rather than treating the upload response as the final word, which is a
+real piece of UI rather than a detail. See bibliolegis-api's PLAN.md status
+block for the detail, this is only a summary of what changed there.
 
 **Next:** either of two, both unblocked, plus Phase 7 (deployment) out of order.
 
