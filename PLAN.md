@@ -83,7 +83,15 @@ each with its own progress bar and its own error. A wrong file type is refused
 before it's sent. `uploadDocument` uses `XMLHttpRequest` rather than fetch since
 fetch can't report upload progress.
 
-**Next:** the rest of Phase 3: the detail page and delete.
+Each document has a page at `/documents/{id}` showing its status, when it was
+uploaded, who can see it and, when ingestion failed, the stored reason. It
+polls while the document is still being read. It doesn't show the extracted
+case metadata (offence, court, sentence and the rest) because the api doesn't
+return it. It's stored in `case_metadata` but no endpoint exposes it, so that
+needs a field on `GET /documents/{id}` or an endpoint of its own on the api side
+first.
+
+**Next:** delete with a confirmation, the last Phase 3 item that isn't blocked.
 
 Phase 7, deployment, can also start out of order. Nothing is deployed to Railway
 yet, the shared project holds only Postgres. The holding route is enough to prove
@@ -206,7 +214,7 @@ Clerk's TanStack Start integration (`@clerk/tanstack-react-start`, the current p
 - [x] Upload progress and error state (rejected file type, upload failure)
 - [x] Document list page showing status per document
 - [x] Polling or refresh on the list page while any document is still ingesting. Every two seconds while anything is `pending` or `processing`, stopping once nothing is
-- [ ] Document detail page showing extracted metadata once ingestion is done
+- [ ] Document detail page showing extracted metadata once ingestion is done. The page exists at `/documents/{id}` as of 2026-09-27 with the status, upload time, who can see it and the reason a failed document failed, and it polls while the document is still being read. The metadata part waits on the api, which stores it in `case_metadata` but doesn't return it from any endpoint yet
 - [ ] Delete document action with a confirmation step
 
 ## Phase 4: query and citations

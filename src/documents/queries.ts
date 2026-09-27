@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import type { Document } from "#/api/client";
+import { ApiError, type Document } from "#/api/client";
 import { useApi } from "#/api/useApi";
 
 // Ingestion runs on the api after upload returns, so these are the two states
@@ -25,5 +25,26 @@ export function useDocuments() {
 		queryFn: () => api.listDocuments({ limit: 200 }),
 		refetchInterval: (query) =>
 			query.state.data?.some(isIngesting) ? POLL_MS : false,
+	});
+}
+
+export function useDocument(documentId: string) {
+	const api = useApi();
+	return useQuery({
+		queryKey: documentKeys.detail(documentId),
+		queryFn: () => api.getDocument(documentId),
+		refetchInterval: (query) =>
+			query.state.data && isIngesting(query.state.data) ? POLL_MS : false,
+		// A 404 means gone or not visible to this user, asking again won't help
+		retry: (count, error) =>
+			!(error instanceof ApiError && error.status === 404) && count < 3,
+	});
+}
+
+export function useProjects() {
+	const api = useApi();
+	return useQuery({
+		queryKey: ["projects"],
+		queryFn: () => api.listProjects(),
 	});
 }
