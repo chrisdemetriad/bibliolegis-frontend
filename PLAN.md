@@ -11,12 +11,30 @@ This can start against a stubbed or partially built API. It doesn't need to wait
 Last updated 2026-09-27. Keep this block current, it's what a fresh session reads
 to work out where to pick up.
 
-**Done:** Phase 0, Phase 1 and the Phase 7 docs item pulled forward. TanStack
+**Done:** Phases 0 to 2 and the Phase 7 docs item pulled forward. TanStack
 Start with React, Biome, CI, a two stage Dockerfile and a README. The API types are
 generated from a committed copy of the backend's `openapi.json` into
 `src/api/schema.gen.ts`, `pnpm api:sync` refreshes both, and `src/api/client.ts`
-wraps every endpoint in one typed function. There are still no components and one
-holding route.
+wraps every endpoint in one typed function.
+
+Phase 2, auth, landed on 2026-09-27 using `@clerk/tanstack-react-start` rather
+than the `@clerk/tanstack-start` this plan first named, which is the older
+package from before TanStack Start dropped vinxi. `clerkMiddleware()` runs on
+every request from `src/start.ts`, `<ClerkProvider>` wraps the root route, and
+Clerk's own `<SignIn />` and `<SignUp />` sit at `/sign-in` and `/sign-up`.
+Everything under `src/routes/_authed/` is protected: the layout's `beforeLoad`
+asks a server function for the Clerk session and redirects to `/sign-in` without
+one. `useApi()` builds the client with Clerk's `getToken` and `useCurrentUser()`
+adds the role from `GET /users/me`. The one page is still a holding page, now
+behind sign in and showing who's signed in and their role, with Clerk's
+`<UserButton />` in a header for signing out.
+
+What's been checked and what hasn't. A signed out request to `/` redirects to
+`/sign-in` after Clerk's development handshake, and the sign in page renders
+with the publishable key and no secret key in the browser bundle. The client
+attaching a fresh token to every request was checked against a stubbed fetch.
+A real sign in in a browser, and so a real token reaching `GET /users/me`, has
+not been done yet. That's the first thing to do before building on this.
 
 **The backend has moved a long way since this was last true.** As of
 2026-09-22 bibliolegis-api has finished its Phase 2 (auth), Phase 3 (document
@@ -49,13 +67,10 @@ to poll `GET /documents/{id}` to show a document going through `processing` to
 real piece of UI rather than a detail. See bibliolegis-api's PLAN.md status
 block for the detail, this is only a summary of what changed there.
 
-**Next:** Phase 2, auth, which the client is built to take. Clerk's `getToken`
-goes into `createApi({ getToken })` and every request carries the session token.
-Until then the client can only reach `GET /health`, everything else answers 401.
-Nothing signed in has been exercised through it yet.
-
-The UI foundation section below is unblocked too and doesn't depend on the backend
-at all.
+**Next:** sign in for real in a browser as the development admin and check the
+home page shows the admin role, then the UI foundation section below, which has
+to land before Phase 3's document pages. Phase 3 itself is unblocked on the
+backend side apart from `DocumentOut` not returning `error_message`.
 
 Phase 7, deployment, can also start out of order. Nothing is deployed to Railway
 yet, the shared project holds only Postgres. The holding route is enough to prove
@@ -83,9 +98,9 @@ it costs" before Phase 4's query page is designed, since the two share a page.
 
 **Things worth knowing before starting:**
 
-- `VITE_API_URL` is in `.env.example` and nothing reads it yet. The client that
-  will is Phase 1. Vite bakes `VITE_` variables into the bundle at build time, so
-  they're readable by anyone using the app and no secret goes in one
+- `VITE_API_URL` is read by `src/api/client.ts`. Vite bakes `VITE_` variables
+  into the bundle at build time, so they're readable by anyone using the app and
+  no secret goes in one
 - `src/routeTree.gen.ts` is generated and gitignored. Vite rebuilds it on dev and
   build, and `pnpm typecheck` runs `tsr generate` first, so `tsc` has something to
   resolve the router import against
@@ -99,10 +114,18 @@ it costs" before Phase 4's query page is designed, since the two share a page.
 - The dev server moved to port 4000 on 2026-09-27 and the api to 4444, replacing
   3000 and 8000. `VITE_API_URL` defaults to `http://localhost:4444` to match
 - Auth is Clerk, and the application, an organization for the firm and a
-  development user all exist already. The publishable key for the development
-  instance is `pk_test_YWRhcHRlZC1veC04MTI2LmNsZXJrLmFjY291bnRzLmRldiQ`. Get it
-  from `clerk env pull` rather than copying it from here, and see the api repo's
-  PLAN.md status block for the rest
+  development user all exist already. `clerk env pull --app
+  app_3JeKtVK5lZdHKYWcSXVqv0cT5i2 --instance dev --file .env.local` writes both
+  keys this repo needs into a gitignored file. The secret key is used on the
+  server by `clerkMiddleware()` and never gets a `VITE_` prefix. See the api
+  repo's PLAN.md status block for the rest
+- The api repo's compose `frontend` service keeps its own `node_modules` in an
+  anonymous volume, so after a dependency change here it needs rebuilding with
+  fresh volumes, `docker compose up -d --build -V frontend`, or it fails on the
+  missing package
+- A production image will need `VITE_CLERK_PUBLISHABLE_KEY` at build time and
+  `CLERK_SECRET_KEY` at run time, the same split as `VITE_API_URL`. That's Phase
+  7's to set up
 
 ## Phase 0: repo and tooling
 
@@ -149,14 +172,14 @@ that drifts from the rest of the codebase.
 
 ## Phase 2: auth
 
-Clerk's TanStack Start integration (`@clerk/tanstack-start`) handles the login UI, session and token refresh. This repo doesn't build its own login form or token storage.
+Clerk's TanStack Start integration (`@clerk/tanstack-react-start`, the current package, `@clerk/tanstack-start` is the older one from before TanStack Start moved off vinxi) handles the login UI, session and token refresh. This repo doesn't build its own login form or token storage.
 
-- [ ] Clerk provider wired into the root route
-- [ ] Sign in and sign up pages using Clerk's prebuilt components
-- [ ] Auth guard on protected routes using Clerk's route protection, redirect to sign in when signed out
-- [ ] API client attaches the current Clerk session token to every request to the backend
-- [ ] Current user hook (Clerk's `useUser`/`useAuth`) exposing the signed in user and, once fetched, their role from `GET /users/me`
-- [ ] Sign out action via Clerk's own UI (`UserButton` or similar) rather than a custom one
+- [x] Clerk provider wired into the root route
+- [x] Sign in and sign up pages using Clerk's prebuilt components
+- [x] Auth guard on protected routes using Clerk's route protection, redirect to sign in when signed out
+- [x] API client attaches the current Clerk session token to every request to the backend
+- [x] Current user hook (Clerk's `useUser`/`useAuth`) exposing the signed in user and, once fetched, their role from `GET /users/me`
+- [x] Sign out action via Clerk's own UI (`UserButton` or similar) rather than a custom one
 
 ## Phase 3: documents
 
