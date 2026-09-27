@@ -36,7 +36,7 @@ Vite only exposes variables prefixed with `VITE_` to browser code, and anything 
 
 To run against a deployed backend instead, set `VITE_API_URL` to that url. `.env` is gitignored.
 
-Nothing reads it yet. The API client that does is Phase 1 in [PLAN.md](./PLAN.md), the variable is here so there's one place it lives when that lands.
+`src/api/client.ts` reads it. `createApi()` returns one typed function per endpoint and throws an `ApiError` carrying the status and the backend's response body when a call fails. It takes a `getToken` function rather than holding a token itself, so each signed in session builds its own and no token ends up shared between users during server rendering. The backend has to list this app's origin in `CORS_ALLOWED_ORIGINS`, it defaults to `http://localhost:4000`.
 
 ## API types
 

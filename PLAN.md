@@ -11,10 +11,12 @@ This can start against a stubbed or partially built API. It doesn't need to wait
 Last updated 2026-09-27. Keep this block current, it's what a fresh session reads
 to work out where to pick up.
 
-**Done:** Phase 0, plus the Phase 7 docs item pulled forward (bibliolegis-frontend#23,
-merged). TanStack Start with React, Biome for linting and formatting, CI running
-lint, typecheck and build on every PR, a two stage Dockerfile and a README. Nothing
-else exists yet, there are no components, no API client and one holding route.
+**Done:** Phase 0, Phase 1 and the Phase 7 docs item pulled forward. TanStack
+Start with React, Biome, CI, a two stage Dockerfile and a README. The API types are
+generated from a committed copy of the backend's `openapi.json` into
+`src/api/schema.gen.ts`, `pnpm api:sync` refreshes both, and `src/api/client.ts`
+wraps every endpoint in one typed function. There are still no components and one
+holding route.
 
 **The backend has moved a long way since this was last true.** As of
 2026-09-22 bibliolegis-api has finished its Phase 2 (auth), Phase 3 (document
@@ -29,37 +31,39 @@ Ingestion runs end to end and uploading a document now starts it: PDF and DOCX
 text extraction, an OCR fallback for scanned PDFs, chunking, embeddings stored
 in Postgres, and the case's comparable fields (offence type, location, court,
 date, sentence) read out by an LLM into `case_metadata`. A document reaches
-`done` once it's retrievable. Retrieval itself, Phase 5 there, is next, and
-nothing in this repo can query anything until it lands.
+`done` once it's retrievable. Retrieval, Phase 5 there, is under way as of
+2026-09-27. There's no `/query` endpoint until its Phase 6, so Phase 4 here waits
+on that.
 
 Three things matter for this repo. First, `openapi.json` describes the whole
 auth, matters and documents surface rather than just `GET /health`, so Phase
 1's generated types and Phase 3's document pages both have something real to
 work against. Second, a document's `status` genuinely moves, `pending` to
-`processing` to `done` or `failed` with an `error_message`, so the document
-list and detail pages have real states to show rather than a column that never
-changes. Third, and new: `POST /documents` responds as soon as the file is on
+`processing` to `done` or `failed`, so the document list and detail pages have
+real states to show. The backend stores why a document failed in
+`error_message` but `DocumentOut` doesn't return it yet, so a failed document
+would show no reason. That needs adding on the api side before Phase 3 here. Third, and new: `POST /documents` responds as soon as the file is on
 disk and always says `pending`, ingestion runs behind it. So an upload page has
 to poll `GET /documents/{id}` to show a document going through `processing` to
 `done` rather than treating the upload response as the final word, which is a
 real piece of UI rather than a detail. See bibliolegis-api's PLAN.md status
 block for the detail, this is only a summary of what changed there.
 
-**Next:** either of two, both unblocked, plus Phase 7 (deployment) out of order.
+**Next:** Phase 2, auth, which the client is built to take. Clerk's `getToken`
+goes into `createApi({ getToken })` and every request carries the session token.
+Until then the client can only reach `GET /health`, everything else answers 401.
+Nothing signed in has been exercised through it yet.
 
-Phase 1, the API types, is the one that unlocks everything after it. Regenerating
-the TypeScript types now pulls in the backend's real auth surface, not just a
-liveness check, so this is worth doing before Phase 2 here rather than after.
-
-The UI foundation section below is the other, and it doesn't depend on the backend
+The UI foundation section below is unblocked too and doesn't depend on the backend
 at all.
 
-Phase 7, deployment, can also start now even though Phases 1 to 6 aren't done.
-The domain is bought and Cloudflare sits in front of it already (see the api
-repo's PLAN.md, "Environments and domains"), but nothing is actually deployed to
-Railway yet as of 2026-09-21, the shared project holds only Postgres. The
-current holding route is enough to prove the pipeline end to end, deploy that
-now rather than waiting for real pages to exist first
+Phase 7, deployment, can also start out of order. Nothing is deployed to Railway
+yet, the shared project holds only Postgres. The holding route is enough to prove
+the pipeline end to end. A deployed frontend will need its own origin adding to the
+api's `CORS_ALLOWED_ORIGINS`, see that repo's Phase 9.
+
+The schema drift check in CI only warns until the repo has an `API_REPO_TOKEN`
+secret, a fine grained token with read only access to bibliolegis-api's contents.
 
 **Three features were added to the plan on 2026-09-22, none of them started here
 or in the backend.** Voice is Phase 8 below, a hold to talk button on the query
@@ -132,7 +136,7 @@ that drifts from the rest of the codebase.
 - [x] TypeScript type generation from the backend's exported OpenAPI schema (openapi-typescript or similar)
 - [x] Document the manual regeneration step in the README
 - [x] CI check that fails if generated types are stale against the backend's current schema
-- [ ] Thin API client wrapping fetch calls with the generated types, one function per endpoint rather than scattering fetch calls through components
+- [x] Thin API client wrapping fetch calls with the generated types, one function per endpoint rather than scattering fetch calls through components
 
 ## Phase 2: auth
 
