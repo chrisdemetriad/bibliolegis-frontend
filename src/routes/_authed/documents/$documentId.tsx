@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeftIcon } from "lucide-react";
 import { ApiError } from "#/api/client";
+import { DeleteDocument } from "#/documents/DeleteDocument";
 import { DocumentStatus } from "#/documents/DocumentStatus";
 import { formatUploadedAt } from "#/documents/format";
 import { useDocument, useProjects } from "#/documents/queries";
@@ -45,6 +46,9 @@ function DocumentPage() {
 							{document.filename}
 						</h1>
 						<DocumentStatus status={document.status} />
+						<div className="ml-auto">
+							<DeleteDocument document={document} />
+						</div>
 					</div>
 
 					{document.status === "failed" && (

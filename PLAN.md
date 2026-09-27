@@ -91,7 +91,11 @@ return it. It's stored in `case_metadata` but no endpoint exposes it, so that
 needs a field on `GET /documents/{id}` or an endpoint of its own on the api side
 first.
 
-**Next:** delete with a confirmation, the last Phase 3 item that isn't blocked.
+Delete sits on the detail page behind a confirmation dialog and goes back to
+the list once the api confirms it.
+
+**Next:** Phase 3 is done apart from the metadata on the detail page, which
+waits on the api. Phase 4's `/settings` route can go next, its endpoints exist.
 
 Phase 7, deployment, can also start out of order. Nothing is deployed to Railway
 yet, the shared project holds only Postgres. The holding route is enough to prove
@@ -146,7 +150,9 @@ it costs" before Phase 4's query page is designed, since the two share a page.
   fresh volumes, `docker compose up -d --build -V frontend`, or it fails on the
   missing package
 - New components come in with `pnpm shadcn add <name>`, then `pnpm biome check
-  --write` to bring them into the house style. `shadcn init` itself asks its
+  --write` to bring them into the house style. When `add` asks to overwrite a
+  component that's already here, say no. It asks because Biome has reformatted
+  ours, not because anything changed `shadcn init` itself asks its
   questions interactively even with every flag given, and got the CSS path and
   aliases wrong when left to its defaults, so check `components.json` if it's
   ever run again
@@ -215,7 +221,7 @@ Clerk's TanStack Start integration (`@clerk/tanstack-react-start`, the current p
 - [x] Document list page showing status per document
 - [x] Polling or refresh on the list page while any document is still ingesting. Every two seconds while anything is `pending` or `processing`, stopping once nothing is
 - [ ] Document detail page showing extracted metadata once ingestion is done. The page exists at `/documents/{id}` as of 2026-09-27 with the status, upload time, who can see it and the reason a failed document failed, and it polls while the document is still being read. The metadata part waits on the api, which stores it in `case_metadata` but doesn't return it from any endpoint yet
-- [ ] Delete document action with a confirmation step
+- [x] Delete document action with a confirmation step. On the detail page, the dialog stays open until the api answers so a failed delete says so
 
 ## Phase 4: query and citations
 
