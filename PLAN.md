@@ -165,7 +165,8 @@ it costs" before Phase 4's query page is designed, since the two share a page.
   repo's PLAN.md status block for the rest
 - The api repo's compose `frontend` service keeps its own `node_modules` in an
   anonymous volume and runs `pnpm install` on every start, so a dependency added
-  here reaches it on the next `docker compose up` without a rebuild
+  here reaches it the next time the container starts, no rebuild needed. A
+  container that's already running needs `docker compose restart frontend`
 - New components come in with `pnpm shadcn add <name>`, then `pnpm biome check
   --write` to bring them into the house style. When `add` asks to overwrite a
   component that's already here, say no. It asks because Biome has reformatted
