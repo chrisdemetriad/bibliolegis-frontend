@@ -11,6 +11,7 @@ import { DocumentStatus } from "#/documents/DocumentStatus";
 import { formatUploadedAt } from "#/documents/format";
 import { useDocuments } from "#/documents/queries";
 import { UploadZone } from "#/documents/UploadZone";
+import { Page } from "#/shell/page";
 
 export const Route = createFileRoute("/_authed/documents/")({
 	component: DocumentsPage,
@@ -20,7 +21,7 @@ function DocumentsPage() {
 	const { data: documents, isPending, isError } = useDocuments();
 
 	return (
-		<main className="mx-auto max-w-5xl p-8">
+		<Page>
 			<h1 className="text-2xl font-semibold">Documents</h1>
 
 			<div className="mt-6">
@@ -69,6 +70,6 @@ function DocumentsPage() {
 					</TableBody>
 				</Table>
 			)}
-		</main>
+		</Page>
 	);
 }

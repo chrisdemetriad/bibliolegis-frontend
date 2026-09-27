@@ -5,10 +5,7 @@ import { people, type Stage } from "#/mock/data";
 
 export function Page({ className, ...props }: React.ComponentProps<"main">) {
 	return (
-		<main
-			className={cn("mx-auto w-full max-w-5xl px-4 py-6 sm:px-8", className)}
-			{...props}
-		/>
+		<main className={cn("w-full px-4 py-6 sm:px-8", className)} {...props} />
 	);
 }
 

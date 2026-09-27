@@ -4,6 +4,7 @@ import { type ChatModel, errorMessage } from "#/api/client";
 import { useApi } from "#/api/useApi";
 import { Label } from "#/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "#/components/ui/radio-group";
+import { Page } from "#/shell/page";
 
 export const Route = createFileRoute("/_authed/settings")({
 	component: SettingsPage,
@@ -41,7 +42,7 @@ function SettingsPage() {
 	];
 
 	return (
-		<main className="mx-auto max-w-3xl p-8">
+		<Page>
 			<h1 className="text-2xl font-semibold">Settings</h1>
 
 			<section className="mt-8" aria-labelledby="model-heading">
@@ -111,6 +112,6 @@ function SettingsPage() {
 					)}
 				</p>
 			</section>
-		</main>
+		</Page>
 	);
 }
