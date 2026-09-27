@@ -83,6 +83,8 @@ it costs" before Phase 4's query page is designed, since the two share a page.
   the source bind mounted, which is the one command way to get the whole product
   up. It builds from `../bibliolegis-frontend` so it needs the two repos side by
   side on disk
+- The dev server moved to port 4000 on 2026-09-27 and the api to 4444, replacing
+  3000 and 8000. `VITE_API_URL` defaults to `http://localhost:4444` to match
 - Auth is Clerk, and the application, an organization for the firm and a
   development user all exist already. The publishable key for the development
   instance is `pk_test_YWRhcHRlZC1veC04MTI2LmNsZXJrLmFjY291bnRzLmRldiQ`. Get it
