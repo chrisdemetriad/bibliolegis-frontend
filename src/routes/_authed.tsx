@@ -1,13 +1,10 @@
-import { UserButton } from "@clerk/tanstack-react-start";
 import { auth } from "@clerk/tanstack-react-start/server";
-import {
-	createFileRoute,
-	Link,
-	Outlet,
-	redirect,
-} from "@tanstack/react-router";
+import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
-import { ThemeToggle } from "#/theme/ThemeToggle";
+import { SidebarInset, SidebarProvider } from "#/components/ui/sidebar";
+import { TooltipProvider } from "#/components/ui/tooltip";
+import { AppHeader } from "#/shell/AppHeader";
+import { AppSidebar } from "#/shell/AppSidebar";
 
 // Runs on the server even when called from a client side navigation, so the
 // check reads the session cookie rather than trusting anything in the browser
@@ -34,31 +31,14 @@ export const Route = createFileRoute("/_authed")({
 
 function AuthedLayout() {
 	return (
-		<>
-			<header className="flex items-center justify-between border-b px-8 py-4">
-				<nav className="flex items-center gap-6">
-					<Link to="/" className="font-bold">
-						Bibliolegis
-					</Link>
-					<Link
-						to="/documents"
-						className="text-muted-foreground hover:text-foreground data-[status=active]:text-foreground"
-					>
-						Documents
-					</Link>
-					<Link
-						to="/settings"
-						className="text-muted-foreground hover:text-foreground data-[status=active]:text-foreground"
-					>
-						Settings
-					</Link>
-				</nav>
-				<div className="flex items-center gap-2">
-					<ThemeToggle />
-					<UserButton />
-				</div>
-			</header>
-			<Outlet />
-		</>
+		<TooltipProvider delayDuration={0}>
+			<SidebarProvider>
+				<AppSidebar />
+				<SidebarInset className="min-w-0 md:peer-data-[variant=inset]:shadow-none md:peer-data-[variant=inset]:ring-1 md:peer-data-[variant=inset]:ring-border">
+					<AppHeader />
+					<Outlet />
+				</SidebarInset>
+			</SidebarProvider>
+		</TooltipProvider>
 	);
 }
