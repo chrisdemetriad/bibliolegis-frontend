@@ -34,19 +34,29 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      # bibliolegis-api is private so reading its schema needs a token with read
-      # access to that repo. Without one the job warns rather than fails, so a
-      # missing secret doesn't block every PR here
+      # bibliolegis-api is private, so this reads it with a read only deploy key
+      # on that repo. A deploy key rather than a token because it's scoped to
+      # the one repo and doesn't expire. Without the secret the job warns rather
+      # than fails, so a missing secret doesn't block every PR here
       - name: openapi.json matches bibliolegis-api main
         env:
-          GH_TOKEN: ${{ secrets.API_REPO_TOKEN }}
+          DEPLOY_KEY: ${{ secrets.API_REPO_DEPLOY_KEY }}
         run: |
-          if [ -z "$GH_TOKEN" ]; then
-            echo "::warning::API_REPO_TOKEN isn't set, skipping the check against bibliolegis-api"
+          if [ -z "$DEPLOY_KEY" ]; then
+            echo "::warning::API_REPO_DEPLOY_KEY isn't set, skipping the check against bibliolegis-api"
             exit 0
           fi
-          gh api repos/chrisdemetriad/bibliolegis-api/contents/openapi.json \
-            -H "Accept: application/vnd.github.raw" > /tmp/api-openapi.json
+          mkdir -p ~/.ssh
+          printf '%s\n' "$DEPLOY_KEY" > ~/.ssh/api_repo
+          chmod 600 ~/.ssh/api_repo
+          # GitHub's published host keys, fetched over HTTPS, rather than
+          # trusting whatever answers the first SSH connection
+          curl -fsSL https://api.github.com/meta \
+            | jq -r '.ssh_keys[] | "github.com " + .' > ~/.ssh/known_hosts
+          export GIT_SSH_COMMAND="ssh -i ~/.ssh/api_repo -o IdentitiesOnly=yes"
+          git clone --quiet --depth 1 --filter=blob:none --no-checkout \
+            git@github.com:chrisdemetriad/bibliolegis-api.git /tmp/api
+          git -C /tmp/api show HEAD:openapi.json > /tmp/api-openapi.json
           if ! diff -u openapi.json /tmp/api-openapi.json; then
             echo "::error::openapi.json is behind bibliolegis-api main, run pnpm api:sync and commit the result"
             exit 1
