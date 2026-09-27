@@ -111,6 +111,10 @@ want a click through in a signed in browser.
 It lists the models from `GET /chat-models` grouped by provider and saves the
 choice through `PUT /users/me/model` as soon as it's picked.
 
+The app shell landed on 2026-09-27. It's a sidebar layout plus overview,
+matters, press, library and help pages, all running on made up sample data for
+now. See "App shell and sample pages" below.
+
 **Next:** the rest of Phase 4 waits on the api's `POST /query`. Until then,
 Phase 5's admin pages have their endpoints already, and Phase 7's deployment
 can start.
@@ -213,6 +217,32 @@ that drifts from the rest of the codebase.
 - [x] Theming through CSS variables rather than hardcoded Tailwind classes, so the firm's colours are changed in one place if they ever want their own branding
 - [x] Add components one at a time as a page needs them, rather than bulk adding the whole registry. Button came first, for the theme toggle
 - [x] Decide whether dark mode is wanted. It is, decided on 2026-09-27. It follows the system preference with a manual toggle in the header, and it works through a `dark` class on `<html>` that an inline script sets before first paint, so there's no flash of the light theme
+
+## App shell and sample pages
+
+Added on 2026-09-27 to give the app its layout before the api can fill it. A
+sidebar and inset main area replace the old header, and `/` now goes to
+`/overview`. Inside a matter the sidebar switches to that matter's sections.
+
+Everything firm facing is called a matter rather than a case, since that's the
+word UK firms and the api both use, and case is kept for judgments in the
+Library. URLs are `/matters/{slug}/{section}`, with UK style names such as
+`mackenzie-v-newman`.
+
+Every page apart from Documents and Settings reads hardcoded data from
+`src/mock/data.ts` and shows a "Sample data" badge, so nothing invented is
+mistaken for a real case or citation. Each one gets swapped for an api call as
+its endpoint appears.
+
+- [x] Sidebar layout with the firm nav, a per matter nav, Help, Settings and the user
+- [x] `/overview` with recent activity, coming up and an ask box
+- [x] `/matters` with tabs by practice area, and a matter page with overview, files, chronology, hearings, parties, research, notes, press and activity
+- [x] `/press`, `/library` and `/help`. Press lists the sources it will read (Reuters, BBC News, Sky News, national, business, legal and local titles) with a switch each
+- [ ] Press search on a schedule, reading each enabled source for the parties, case name and reference of every open matter. Needs an api job first
+- [x] Matters cover every practice area the firm might take on, crime and civil alike, each with its own tab
+- [ ] Replace sample data with real endpoints: matters (`GET /projects` exists), activity (from the audit log), press and library need api work first
+- [ ] Search box and ⌘K
+- [ ] The ask boxes call `POST /query` once it exists, see Phase 4
 
 ## Phase 1: API types
 
