@@ -9,6 +9,8 @@
   "scripts": {
     "dev": "vite dev --port 4000",
     "generate-routes": "tsr generate",
+    "api:types": "openapi-typescript openapi.json -o src/api/schema.gen.ts",
+    "api:sync": "cp ../bibliolegis-api/openapi.json openapi.json && pnpm api:types",
     "build": "vite build",
     "preview": "vite preview",
     "start": "node .output/server/index.mjs",
@@ -35,6 +37,7 @@
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",
     "@vitejs/plugin-react": "^6.0.1",
+    "openapi-typescript": "^7.13.0",
     "typescript": "^6.0.2",
     "vite": "^8.0.0"
   }

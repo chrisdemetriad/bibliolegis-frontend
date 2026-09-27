@@ -4,6 +4,10 @@ on:
   pull_request:
   push:
     branches: [main]
+  # The backend's schema can change without anything happening in this repo, so
+  # the drift job also runs daily to catch that between frontend PRs
+  schedule:
+    - cron: "0 6 * * *"
 
 jobs:
   check:
@@ -18,5 +22,32 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm lint
+      - name: Generated API types match openapi.json
+        run: |
+          pnpm api:types
+          git diff --exit-code -- src/api/schema.gen.ts
       - run: pnpm typecheck
       - run: pnpm build
+
+  schema-drift:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      # bibliolegis-api is private so reading its schema needs a token with read
+      # access to that repo. Without one the job warns rather than fails, so a
+      # missing secret doesn't block every PR here
+      - name: openapi.json matches bibliolegis-api main
+        env:
+          GH_TOKEN: ${{ secrets.API_REPO_TOKEN }}
+        run: |
+          if [ -z "$GH_TOKEN" ]; then
+            echo "::warning::API_REPO_TOKEN isn't set, skipping the check against bibliolegis-api"
+            exit 0
+          fi
+          gh api repos/chrisdemetriad/bibliolegis-api/contents/openapi.json \
+            -H "Accept: application/vnd.github.raw" > /tmp/api-openapi.json
+          if ! diff -u openapi.json /tmp/api-openapi.json; then
+            echo "::error::openapi.json is behind bibliolegis-api main, run pnpm api:sync and commit the result"
+            exit 1
+          fi
