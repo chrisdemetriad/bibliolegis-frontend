@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import {
 	Table,
 	TableBody,
@@ -50,7 +50,13 @@ function DocumentsPage() {
 						{documents.map((document) => (
 							<TableRow key={document.id}>
 								<TableCell className="font-medium">
-									{document.filename}
+									<Link
+										to="/documents/$documentId"
+										params={{ documentId: document.id }}
+										className="hover:underline"
+									>
+										{document.filename}
+									</Link>
 								</TableCell>
 								<TableCell>
 									<DocumentStatus status={document.status} />
