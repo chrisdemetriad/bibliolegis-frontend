@@ -1,3 +1,4 @@
+import { ClerkProvider } from "@clerk/tanstack-react-start";
 import { TanStackDevtools } from "@tanstack/react-devtools";
 import { createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
@@ -35,7 +36,11 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 				<HeadContent />
 			</head>
 			<body>
-				{children}
+				{/* Tells Clerk's own components where these pages live, otherwise their
+				sign in and sign up links go to Clerk's hosted pages instead */}
+				<ClerkProvider signInUrl="/sign-in" signUpUrl="/sign-up">
+					{children}
+				</ClerkProvider>
 				<TanStackDevtools
 					config={{
 						position: "bottom-right",
