@@ -46,6 +46,12 @@ function AuthedLayout() {
 					>
 						Documents
 					</Link>
+					<Link
+						to="/settings"
+						className="text-muted-foreground hover:text-foreground data-[status=active]:text-foreground"
+					>
+						Settings
+					</Link>
 				</nav>
 				<div className="flex items-center gap-2">
 					<ThemeToggle />

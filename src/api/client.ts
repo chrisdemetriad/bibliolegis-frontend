@@ -10,6 +10,7 @@ export type ProjectMember = Schemas["ProjectMemberOut"];
 export type MemberAdd = Schemas["MemberAdd"];
 export type StaffAccount = Schemas["StaffAccount"];
 export type UserProfile = Schemas["UserProfile"];
+export type ChatModel = Schemas["ChatModelOut"];
 export type DocumentListQuery = NonNullable<
 	paths["/documents"]["get"]["parameters"]["query"]
 >;
@@ -64,6 +65,13 @@ export function createApi({
 		health: async () => unwrap(await client.GET("/health")),
 
 		me: async () => unwrap(await client.GET("/users/me")),
+
+		listChatModels: async () => unwrap(await client.GET("/chat-models")),
+
+		getMyModel: async () => unwrap(await client.GET("/users/me/model")),
+
+		setMyModel: async (model: string) =>
+			unwrap(await client.PUT("/users/me/model", { body: { model } })),
 
 		listUsers: async () => unwrap(await client.GET("/users")),
 
