@@ -27,6 +27,38 @@
         "title": "Body_upload_document_documents_post",
         "type": "object"
       },
+      "ChatModelOut": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "is_default": {
+            "title": "Is Default",
+            "type": "boolean"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "provider": {
+            "enum": [
+              "openai",
+              "anthropic"
+            ],
+            "title": "Provider",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "provider",
+          "label",
+          "is_default"
+        ],
+        "title": "ChatModelOut",
+        "type": "object"
+      },
       "DocumentOut": {
         "properties": {
           "filename": {
@@ -113,6 +145,19 @@
           "user_id"
         ],
         "title": "MemberAdd",
+        "type": "object"
+      },
+      "ModelChoice": {
+        "properties": {
+          "model": {
+            "title": "Model",
+            "type": "string"
+          }
+        },
+        "required": [
+          "model"
+        ],
+        "title": "ModelChoice",
         "type": "object"
       },
       "ProjectCreate": {
@@ -368,6 +413,28 @@
   },
   "openapi": "3.1.0",
   "paths": {
+    "/chat-models": {
+      "get": {
+        "operationId": "list_chat_models_chat_models_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ChatModelOut"
+                  },
+                  "title": "Response List Chat Models Chat Models Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "List Chat Models"
+      }
+    },
     "/documents": {
       "get": {
         "operationId": "list_documents_documents_get",
@@ -712,6 +779,60 @@
           }
         },
         "summary": "Get Me"
+      }
+    },
+    "/users/me/model": {
+      "get": {
+        "operationId": "get_my_model_users_me_model_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ModelChoice"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Get My Model"
+      },
+      "put": {
+        "operationId": "set_my_model_users_me_model_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ModelChoice"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ModelChoice"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Set My Model"
       }
     },
     "/users/{user_id}": {

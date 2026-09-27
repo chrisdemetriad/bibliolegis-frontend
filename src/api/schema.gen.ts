@@ -4,6 +4,23 @@
  */
 
 export interface paths {
+    "/chat-models": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Chat Models */
+        get: operations["list_chat_models_chat_models_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/documents": {
         parameters: {
             query?: never;
@@ -126,6 +143,24 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/users/me/model": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get My Model */
+        get: operations["get_my_model_users_me_model_get"];
+        /** Set My Model */
+        put: operations["set_my_model_users_me_model_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/users/{user_id}": {
         parameters: {
             query?: never;
@@ -188,6 +223,20 @@ export interface components {
             /** Project Id */
             project_id?: string | null;
         };
+        /** ChatModelOut */
+        ChatModelOut: {
+            /** Id */
+            id: string;
+            /** Is Default */
+            is_default: boolean;
+            /** Label */
+            label: string;
+            /**
+             * Provider
+             * @enum {string}
+             */
+            provider: "openai" | "anthropic";
+        };
         /** DocumentOut */
         DocumentOut: {
             /** Filename */
@@ -229,6 +278,11 @@ export interface components {
              * Format: uuid
              */
             user_id: string;
+        };
+        /** ModelChoice */
+        ModelChoice: {
+            /** Model */
+            model: string;
         };
         /** ProjectCreate */
         ProjectCreate: {
@@ -348,6 +402,26 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    list_chat_models_chat_models_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChatModelOut"][];
+                };
+            };
+        };
+    };
     list_documents_documents_get: {
         parameters: {
             query?: {
@@ -618,6 +692,59 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["UserProfile"];
+                };
+            };
+        };
+    };
+    get_my_model_users_me_model_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ModelChoice"];
+                };
+            };
+        };
+    };
+    set_my_model_users_me_model_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ModelChoice"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ModelChoice"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };
