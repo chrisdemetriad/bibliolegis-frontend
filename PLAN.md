@@ -29,12 +29,19 @@ adds the role from `GET /users/me`. The one page is still a holding page, now
 behind sign in and showing who's signed in and their role, with Clerk's
 `<UserButton />` in a header for signing out.
 
-What's been checked and what hasn't. A signed out request to `/` redirects to
-`/sign-in` after Clerk's development handshake, and the sign in page renders
-with the publishable key and no secret key in the browser bundle. The client
-attaching a fresh token to every request was checked against a stubbed fetch.
-A real sign in in a browser, and so a real token reaching `GET /users/me`, has
-not been done yet. That's the first thing to do before building on this.
+What's been checked. A signed out request to `/` redirects to `/sign-in` after
+Clerk's development handshake, and the sign in page renders with the publishable
+key and no secret key in the browser bundle. A real sign in in a browser as the
+development admin was done on 2026-09-27 and the home page showed "Signed in as
+chris@demetriad.co.uk, admin.", so a real token reaches `GET /users/me` and the
+role comes back.
+
+The UI foundation landed on 2026-09-27 too. shadcn is set up with the Radix base
+and the `radix-nova` style, `components.json` is committed and every colour comes
+from the CSS variables in `src/styles.css`. Dark mode is in from the start: it
+follows the system preference, and a toggle in the header cycles system, light
+and dark. Clerk's own components use Clerk's shadcn theme from `@clerk/ui`, which
+reads the same variables, so sign in follows the theme as well.
 
 **The backend has moved a long way since this was last true.** As of
 2026-09-22 bibliolegis-api has finished its Phase 2 (auth), Phase 3 (document
@@ -67,10 +74,7 @@ to poll `GET /documents/{id}` to show a document going through `processing` to
 real piece of UI rather than a detail. See bibliolegis-api's PLAN.md status
 block for the detail, this is only a summary of what changed there.
 
-**Next:** sign in for real in a browser as the development admin and check the
-home page shows the admin role, then the UI foundation section below, which has
-to land before Phase 3's document pages. Phase 3 itself is unblocked on the
-backend side.
+**Next:** Phase 3's document pages, which the backend no longer blocks.
 
 Phase 7, deployment, can also start out of order. Nothing is deployed to Railway
 yet, the shared project holds only Postgres. The holding route is enough to prove
@@ -85,7 +89,8 @@ section for replacing the key.
 
 Generation models were decided on 2026-09-27: OpenAI and Claude, and each user
 picks theirs. That puts a `/settings` route in this repo, see Phase 4. The backend
-endpoints behind it are in bibliolegis-api's Phase 6 and don't exist yet.
+endpoints behind it exist as of bibliolegis-api #72, `GET /chat-models` and `GET`
+and `PUT /users/me/model`, and this repo's `openapi.json` already has them.
 Both provider keys are in the api's `.env` as of 2026-09-27, so nothing outside
 the code blocks that work.
 
@@ -123,6 +128,11 @@ it costs" before Phase 4's query page is designed, since the two share a page.
   anonymous volume, so after a dependency change here it needs rebuilding with
   fresh volumes, `docker compose up -d --build -V frontend`, or it fails on the
   missing package
+- New components come in with `pnpm shadcn add <name>`, then `pnpm biome check
+  --write` to bring them into the house style. `shadcn init` itself asks its
+  questions interactively even with every flag given, and got the CSS path and
+  aliases wrong when left to its defaults, so check `components.json` if it's
+  ever run again
 - A production image will need `VITE_CLERK_PUBLISHABLE_KEY` at build time and
   `CLERK_SECRET_KEY` at run time, the same split as `VITE_API_URL`. That's Phase
   7's to set up
@@ -158,10 +168,10 @@ formatting diff every time `shadcn add` or an upgrade brings a component back in
 own style. That's the accepted side of the trade, the other side being a directory
 that drifts from the rest of the codebase.
 
-- [ ] Run `shadcn init` with the `start` template and the Radix base, and commit `components.json`
-- [ ] Theming through CSS variables rather than hardcoded Tailwind classes, so the firm's colours are changed in one place if they ever want their own branding
-- [ ] Add components one at a time as a page needs them, rather than bulk adding the whole registry
-- [ ] Decide whether dark mode is wanted. It's close to free at this stage and awkward to retrofit once components carry hardcoded colours
+- [x] Run `shadcn init` with the `start` template and the Radix base, and commit `components.json`
+- [x] Theming through CSS variables rather than hardcoded Tailwind classes, so the firm's colours are changed in one place if they ever want their own branding
+- [x] Add components one at a time as a page needs them, rather than bulk adding the whole registry. Button came first, for the theme toggle
+- [x] Decide whether dark mode is wanted. It is, decided on 2026-09-27. It follows the system preference with a manual toggle in the header, and it works through a `dark` class on `<html>` that an inline script sets before first paint, so there's no flash of the light theme
 
 ## Phase 1: API types
 

@@ -11,7 +11,9 @@ function Home() {
 			<h1 className="text-4xl font-bold">Bibliolegis</h1>
 			{!isLoaded && <p className="mt-4">Loading…</p>}
 			{isLoaded && error !== undefined && (
-				<p className="mt-4">Couldn't load your account from the api.</p>
+				<p className="mt-4 text-destructive">
+					Couldn't load your account from the api.
+				</p>
 			)}
 			{isLoaded && role && (
 				<p className="mt-4 text-lg">
