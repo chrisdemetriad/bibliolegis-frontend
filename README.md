@@ -14,7 +14,7 @@ cp .env.example .env
 pnpm dev
 ```
 
-That serves the app on `localhost:3000`.
+That serves the app on `localhost:4000`.
 
 Run the checks:
 
@@ -30,7 +30,7 @@ pnpm build
 
 ## Pointing at the backend
 
-`VITE_API_URL` in your `.env` is the backend's base url. It defaults to `http://localhost:8000`, which is where the api repo's `docker compose up` puts it, so running both locally needs no change.
+`VITE_API_URL` in your `.env` is the backend's base url. It defaults to `http://localhost:4444`, which is where the api repo's `docker compose up` puts it, so running both locally needs no change.
 
 Vite only exposes variables prefixed with `VITE_` to browser code, and anything it does expose is baked into the built bundle and readable by anyone using the app. Nothing secret goes in here.
 
@@ -42,10 +42,10 @@ Nothing reads it yet. The API client that does is Phase 1 in [PLAN.md](./PLAN.md
 
 ```
 docker build -t bibliolegis-frontend .
-docker run -p 3000:3000 bibliolegis-frontend
+docker run -p 4000:4000 bibliolegis-frontend
 ```
 
-The image serves the built app rather than the dev server, so it won't pick up code changes without a rebuild. It reads `PORT` from the environment and falls back to 3000, which is how Railway assigns it a port.
+The image serves the built app rather than the dev server, so it won't pick up code changes without a rebuild. It reads `PORT` from the environment and falls back to 4000, which is how Railway assigns it a port.
 
 This is the same Dockerfile Railway builds from, so a local run and a deploy produce the same image.
 

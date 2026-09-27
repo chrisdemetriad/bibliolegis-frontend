@@ -25,10 +25,10 @@ RUN corepack enable
 COPY package.json pnpm-lock.yaml ./
 RUN pnpm install --frozen-lockfile
 
-EXPOSE 3000
+EXPOSE 4000
 
 # vite binds 127.0.0.1 by default, which a published port can't reach from
-# outside the container
+# outside the container. The port itself comes from the dev script
 CMD ["pnpm", "dev", "--host", "0.0.0.0"]
 
 # Only the nitro output and its bundled deps are needed at runtime, so the
@@ -39,8 +39,13 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 
+# nitro's own fallback is 3000 so this is set rather than left implicit,
+# otherwise EXPOSE and the port the server actually listens on disagree.
+# Railway injects its own PORT, which takes precedence over this
+ENV PORT=4000
+
 COPY --from=build /app/.output ./.output
 
-EXPOSE 3000
+EXPOSE 4000
 
 CMD ["node", ".output/server/index.mjs"]
