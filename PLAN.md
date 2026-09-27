@@ -63,7 +63,17 @@ the pipeline end to end. A deployed frontend will need its own origin adding to 
 api's `CORS_ALLOWED_ORIGINS`, see that repo's Phase 9.
 
 The schema drift check in CI only warns until the repo has an `API_REPO_TOKEN`
-secret, a fine grained token with read only access to bibliolegis-api's contents.
+secret. A session on 2026-09-27 wasn't allowed to write repository secrets, so it
+needs doing by hand. On GitHub, Settings, Developer settings, Fine grained tokens,
+create a token with access to bibliolegis-api only and Contents read only, then run
+`gh secret set API_REPO_TOKEN --repo chrisdemetriad/bibliolegis-frontend` and paste
+it in. Give it an expiry and note the date somewhere, the check starts warning again
+when it lapses. The next CI run should show the comparison run rather than the
+warning.
+
+Generation models were decided on 2026-09-27: OpenAI and Claude, and each user
+picks theirs. That puts a `/settings` route in this repo, see Phase 4. The backend
+endpoints behind it are in bibliolegis-api's Phase 6 and don't exist yet.
 
 **Three features were added to the plan on 2026-09-22, none of them started here
 or in the backend.** Voice is Phase 8 below, a hold to talk button on the query
@@ -165,6 +175,7 @@ Clerk's TanStack Start integration (`@clerk/tanstack-start`) handles the login U
 - [ ] Aggregation query results shown as a table or simple chart rather than a wall of text
 - [ ] Loading and empty states for the query page (no results found, query still running)
 - [ ] Query history page listing past queries for the logged in user
+- [ ] `/settings` route where a user picks the model that answers their questions, from the list the backend offers rather than one hardcoded here. Show which model answered on each answer too, so a user comparing models can tell them apart. Phase 9's connected accounts land on the same page later
 
 ## Phase 5: admin
 
