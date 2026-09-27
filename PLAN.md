@@ -11,7 +11,9 @@ This can start against a stubbed or partially built API. It doesn't need to wait
 Last updated 2026-09-27. Keep this block current, it's what a fresh session reads
 to work out where to pick up.
 
-**Done:** Phases 0 to 2 and the Phase 7 docs item pulled forward. TanStack
+**Done:** Phases 0 to 2, the UI foundation, Phase 3 apart from the metadata on
+the detail page, Phase 4's `/settings` route and the Phase 7 docs item pulled
+forward. TanStack
 Start with React, Biome, CI, a two stage Dockerfile and a README. The API types are
 generated from a committed copy of the backend's `openapi.json` into
 `src/api/schema.gen.ts`, `pnpm api:sync` refreshes both, and `src/api/client.ts`
@@ -93,6 +95,17 @@ first.
 
 Delete sits on the detail page behind a confirmation dialog and goes back to
 the list once the api confirms it.
+
+How the document pages and settings were checked. A Clerk session can't be
+scripted, so each page was driven in headless Chrome against a small mock of the
+api's endpoints, shaped like the real responses, with the sign in guard switched
+off in a scratch copy of the repo and never committed. That covered the list
+polling a document through to done, upload progress and every upload error,
+the failure reason, delete and its errors, and saving a model. The real api was
+only checked from outside: all its routes answer 401 without a token, and its
+CORS preflight lets `http://localhost:4000` send the `Authorization` header the
+upload needs. Uploading, deleting and saving a model against the real api still
+want a click through in a signed in browser.
 
 `/settings` exists from Phase 4, pulled forward since its endpoints were ready.
 It lists the models from `GET /chat-models` grouped by provider and saves the
