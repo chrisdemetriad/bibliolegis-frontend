@@ -239,6 +239,8 @@ export interface components {
         };
         /** DocumentOut */
         DocumentOut: {
+            /** Error Message */
+            error_message: string | null;
             /** Filename */
             filename: string;
             /**

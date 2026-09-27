@@ -61,6 +61,17 @@
       },
       "DocumentOut": {
         "properties": {
+          "error_message": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error Message"
+          },
           "filename": {
             "title": "Filename",
             "type": "string"
@@ -97,7 +108,8 @@
           "filename",
           "status",
           "project_id",
-          "uploaded_at"
+          "uploaded_at",
+          "error_message"
         ],
         "title": "DocumentOut",
         "type": "object"
