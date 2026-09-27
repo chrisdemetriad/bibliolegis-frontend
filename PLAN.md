@@ -59,8 +59,8 @@ auth, matters and documents surface rather than just `GET /health`, so Phase
 work against. Second, a document's `status` genuinely moves, `pending` to
 `processing` to `done` or `failed`, so the document list and detail pages have
 real states to show. The backend stores why a document failed in
-`error_message` but `DocumentOut` doesn't return it yet, so a failed document
-would show no reason. That needs adding on the api side before Phase 3 here. Third, and new: `POST /documents` responds as soon as the file is on
+`error_message` and `DocumentOut` returns it as of bibliolegis-api #73, synced
+here on 2026-09-27, so a failed document can show its reason. Third, and new: `POST /documents` responds as soon as the file is on
 disk and always says `pending`, ingestion runs behind it. So an upload page has
 to poll `GET /documents/{id}` to show a document going through `processing` to
 `done` rather than treating the upload response as the final word, which is a
@@ -70,7 +70,7 @@ block for the detail, this is only a summary of what changed there.
 **Next:** sign in for real in a browser as the development admin and check the
 home page shows the admin role, then the UI foundation section below, which has
 to land before Phase 3's document pages. Phase 3 itself is unblocked on the
-backend side apart from `DocumentOut` not returning `error_message`.
+backend side.
 
 Phase 7, deployment, can also start out of order. Nothing is deployed to Railway
 yet, the shared project holds only Postgres. The holding route is enough to prove
