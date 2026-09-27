@@ -106,21 +106,38 @@ export function createApi({
 			),
 
 		// The response always says pending, ingestion runs after it returns.
-		// Poll getDocument to see it reach done or failed
-		uploadDocument: async (file: File, projectId?: string) =>
-			unwrap(
-				await client.POST("/documents", {
-					// The generated type says string because OpenAPI describes a
-					// file part that way, what goes over the wire is the File
-					body: { file: file as unknown as string, project_id: projectId },
-					bodySerializer: (body) => {
-						const form = new FormData();
-						form.append("file", body.file as unknown as File);
-						if (body.project_id) form.append("project_id", body.project_id);
-						return form;
-					},
-				}),
-			),
+		// Poll getDocument to see it reach done or failed. XMLHttpRequest rather
+		// than fetch because fetch can't report upload progress, and a large
+		// scanned bundle can take long enough that a bare spinner looks stuck
+		uploadDocument: async (
+			file: File,
+			{
+				projectId,
+				onProgress,
+			}: { projectId?: string; onProgress?: (fraction: number) => void } = {},
+		): Promise<Document> => {
+			const form = new FormData();
+			form.append("file", file);
+			if (projectId) form.append("project_id", projectId);
+			const token = await getToken?.();
+
+			return new Promise((resolve, reject) => {
+				const xhr = new XMLHttpRequest();
+				xhr.open("POST", `${baseUrl}/documents`);
+				if (token) xhr.setRequestHeader("Authorization", `Bearer ${token}`);
+				xhr.responseType = "json";
+				xhr.upload.onprogress = (event) => {
+					if (event.lengthComputable) onProgress?.(event.loaded / event.total);
+				};
+				xhr.onload = () => {
+					if (xhr.status >= 200 && xhr.status < 300) resolve(xhr.response);
+					else reject(new ApiError(xhr.status, xhr.response));
+				};
+				// Network failure or CORS, there's no status to report
+				xhr.onerror = () => reject(new ApiError(0, null));
+				xhr.send(form);
+			});
+		},
 
 		deleteDocument: async (documentId: string) => {
 			unwrap(
@@ -133,3 +150,16 @@ export function createApi({
 }
 
 export type Api = ReturnType<typeof createApi>;
+
+// The api's own reason when it gave one, FastAPI puts it in detail as a
+// string. Validation errors come back as a list and server errors say nothing
+// useful to a person, so both get the fallback
+export function errorMessage(error: unknown, fallback: string) {
+	if (error instanceof ApiError) {
+		if (error.status === 0) return "Couldn't reach the api.";
+		if (error.status >= 500) return fallback;
+		const detail = (error.body as { detail?: unknown } | null)?.detail;
+		if (typeof detail === "string") return detail;
+	}
+	return fallback;
+}
