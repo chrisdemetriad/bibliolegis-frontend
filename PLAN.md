@@ -62,14 +62,17 @@ yet, the shared project holds only Postgres. The holding route is enough to prov
 the pipeline end to end. A deployed frontend will need its own origin adding to the
 api's `CORS_ALLOWED_ORIGINS`, see that repo's Phase 9.
 
-The schema drift check in CI reads bibliolegis-api's `openapi.json` with a read only
-deploy key on that repo, stored here as the `API_REPO_DEPLOY_KEY` secret. It warns
-and passes while the secret is missing. See the README's "API types" section for
-replacing the key.
+The schema drift check in CI is live as of 2026-09-27. It reads bibliolegis-api's
+`openapi.json` with a read only deploy key on that repo, stored here as the
+`API_REPO_DEPLOY_KEY` secret, and fails when this repo's copy is behind. When it
+fails, run `pnpm api:sync` and commit the result. See the README's "API types"
+section for replacing the key.
 
 Generation models were decided on 2026-09-27: OpenAI and Claude, and each user
 picks theirs. That puts a `/settings` route in this repo, see Phase 4. The backend
 endpoints behind it are in bibliolegis-api's Phase 6 and don't exist yet.
+Both provider keys are in the api's `.env` as of 2026-09-27, so nothing outside
+the code blocks that work.
 
 **Three features were added to the plan on 2026-09-22, none of them started here
 or in the backend.** Voice is Phase 8 below, a hold to talk button on the query
