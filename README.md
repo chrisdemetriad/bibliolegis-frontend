@@ -38,6 +38,20 @@ To run against a deployed backend instead, set `VITE_API_URL` to that url. `.env
 
 Nothing reads it yet. The API client that does is Phase 1 in [PLAN.md](./PLAN.md), the variable is here so there's one place it lives when that lands.
 
+## API types
+
+The backend's types come from its OpenAPI schema. `openapi.json` here is a copy of the one committed in bibliolegis-api, and `src/api/schema.gen.ts` is generated from it by openapi-typescript. Both are committed, so a change to the API shows up as a readable diff in the PR that picks it up.
+
+Regenerating is manual. After a backend change that touches the API, with the two repos side by side on disk:
+
+```
+pnpm api:sync
+```
+
+That copies the api repo's `openapi.json` over this one and regenerates the types. `pnpm api:types` does only the second half, from the copy already here. Don't edit `schema.gen.ts` by hand, the next regeneration overwrites it.
+
+CI checks both halves. The `check` job fails if `schema.gen.ts` doesn't match `openapi.json`. The `schema-drift` job fails if `openapi.json` doesn't match bibliolegis-api's main branch, and runs daily as well as on every PR because the backend can change while nothing happens here. The api repo is private, so that job reads it with an `API_REPO_TOKEN` secret, a fine grained token with read only access to that repo's contents. Without the secret it warns and passes.
+
 ## Running with Docker
 
 ```

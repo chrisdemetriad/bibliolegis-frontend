@@ -129,9 +129,9 @@ that drifts from the rest of the codebase.
 
 ## Phase 1: API types
 
-- [ ] TypeScript type generation from the backend's exported OpenAPI schema (openapi-typescript or similar)
-- [ ] Document the manual regeneration step in the README
-- [ ] CI check that fails if generated types are stale against the backend's current schema
+- [x] TypeScript type generation from the backend's exported OpenAPI schema (openapi-typescript or similar)
+- [x] Document the manual regeneration step in the README
+- [x] CI check that fails if generated types are stale against the backend's current schema
 - [ ] Thin API client wrapping fetch calls with the generated types, one function per endpoint rather than scattering fetch calls through components
 
 ## Phase 2: auth
