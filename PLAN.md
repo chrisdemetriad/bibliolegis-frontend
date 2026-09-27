@@ -8,7 +8,7 @@ This can start against a stubbed or partially built API. It doesn't need to wait
 
 ## Where things stand
 
-Last updated 2026-09-22. Keep this block current, it's what a fresh session reads
+Last updated 2026-09-27. Keep this block current, it's what a fresh session reads
 to work out where to pick up.
 
 **Done:** Phase 0, plus the Phase 7 docs item pulled forward (bibliolegis-frontend#23,
@@ -78,6 +78,11 @@ it costs" before Phase 4's query page is designed, since the two share a page.
   resolve the router import against
 - Biome has no Markdown or YAML support, so those files aren't formatted by
   anything. Prettier was tried and dropped, it only overlapped Biome
+- `pnpm dev` is still the normal way to work here. As of 2026-09-27 the api repo's
+  `docker compose up` also runs this repo, at the Dockerfile's `dev` target with
+  the source bind mounted, which is the one command way to get the whole product
+  up. It builds from `../bibliolegis-frontend` so it needs the two repos side by
+  side on disk
 - Auth is Clerk, and the application, an organization for the firm and a
   development user all exist already. The publishable key for the development
   instance is `pk_test_YWRhcHRlZC1veC04MTI2LmNsZXJrLmFjY291bnRzLmRldiQ`. Get it
@@ -89,7 +94,7 @@ it costs" before Phase 4's query page is designed, since the two share a page.
 - [x] TanStack Start scaffold with TypeScript
 - [x] Biome config
 - [x] GitHub Actions workflow: install, lint, type check, build on every PR
-- [x] Dockerfile for the frontend, used for local Docker runs and as the Railway build source
+- [x] Dockerfile for the frontend, used for local Docker runs and as the Railway build source. Gained a `dev` stage on 2026-09-27 for the api repo's compose file to run, kept before `runtime` so an untargeted build still produces the production image
 - [x] README with local setup steps, including how it points at the backend API url
 
 The frontend deploys as its own service inside the same Railway project as the api and Postgres, set up in bibliolegis-api's PLAN.md, rather than a separate project. That gives it private network access to the api service and shared environment variables.

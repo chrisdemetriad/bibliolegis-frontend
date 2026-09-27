@@ -48,3 +48,18 @@ docker run -p 3000:3000 bibliolegis-frontend
 The image serves the built app rather than the dev server, so it won't pick up code changes without a rebuild. It reads `PORT` from the environment and falls back to 3000, which is how Railway assigns it a port.
 
 This is the same Dockerfile Railway builds from, so a local run and a deploy produce the same image.
+
+### The whole stack at once
+
+The api repo's `docker-compose.yml` runs this repo alongside the backend and
+Postgres. Running `docker compose up` in bibliolegis-api brings up all of it. That
+needs the two repos sitting next to each other on disk, it builds this one from
+`../bibliolegis-frontend`.
+
+That service uses the Dockerfile's `dev` target rather than the production image
+and bind mounts the source in, which means edits reload the same as `pnpm dev`. The `dev`
+stage installs dependencies and nothing else, the source arrives at run time.
+
+`dev` sits before `runtime` in the Dockerfile on purpose. A `docker build` with no
+`--target` still stops at the last stage, which keeps the Railway build producing
+the production image rather than a dev server.
