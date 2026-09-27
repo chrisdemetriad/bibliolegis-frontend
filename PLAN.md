@@ -78,7 +78,12 @@ Phase 3 started on 2026-09-27. `/documents` lists every document the user can
 see with its status and polls while any of them is still ingesting. Server state
 goes through TanStack Query, with the hooks in `src/documents/queries.ts`.
 
-**Next:** the rest of Phase 3: upload, the detail page and delete.
+Uploading is a drop zone at the top of the same page, several files at once,
+each with its own progress bar and its own error. A wrong file type is refused
+before it's sent. `uploadDocument` uses `XMLHttpRequest` rather than fetch since
+fetch can't report upload progress.
+
+**Next:** the rest of Phase 3: the detail page and delete.
 
 Phase 7, deployment, can also start out of order. Nothing is deployed to Railway
 yet, the shared project holds only Postgres. The holding route is enough to prove
@@ -197,8 +202,8 @@ Clerk's TanStack Start integration (`@clerk/tanstack-react-start`, the current p
 
 ## Phase 3: documents
 
-- [ ] Document upload page with drag and drop, calling `POST /documents`
-- [ ] Upload progress and error state (rejected file type, upload failure)
+- [x] Document upload page with drag and drop, calling `POST /documents`. It sits at the top of `/documents` rather than on a page of its own, so an upload is seen landing in the list and going through to done
+- [x] Upload progress and error state (rejected file type, upload failure)
 - [x] Document list page showing status per document
 - [x] Polling or refresh on the list page while any document is still ingesting. Every two seconds while anything is `pending` or `processing`, stopping once nothing is
 - [ ] Document detail page showing extracted metadata once ingestion is done

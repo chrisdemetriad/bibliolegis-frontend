@@ -10,6 +10,7 @@ import {
 import { DocumentStatus } from "#/documents/DocumentStatus";
 import { formatUploadedAt } from "#/documents/format";
 import { useDocuments } from "#/documents/queries";
+import { UploadZone } from "#/documents/UploadZone";
 
 export const Route = createFileRoute("/_authed/documents/")({
 	component: DocumentsPage,
@@ -21,6 +22,10 @@ function DocumentsPage() {
 	return (
 		<main className="mx-auto max-w-5xl p-8">
 			<h1 className="text-2xl font-semibold">Documents</h1>
+
+			<div className="mt-6">
+				<UploadZone />
+			</div>
 
 			{isPending && <p className="mt-6 text-muted-foreground">Loading…</p>}
 			{isError && (
