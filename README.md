@@ -50,7 +50,7 @@ pnpm api:sync
 
 That copies the api repo's `openapi.json` over this one and regenerates the types. `pnpm api:types` does only the second half, from the copy already here. Don't edit `schema.gen.ts` by hand, the next regeneration overwrites it.
 
-CI checks both halves. The `check` job fails if `schema.gen.ts` doesn't match `openapi.json`. The `schema-drift` job fails if `openapi.json` doesn't match bibliolegis-api's main branch, and runs daily as well as on every PR because the backend can change while nothing happens here. The api repo is private, so that job reads it with an `API_REPO_TOKEN` secret, a fine grained token with read only access to that repo's contents. Without the secret it warns and passes.
+CI checks both halves. The `check` job fails if `schema.gen.ts` doesn't match `openapi.json`. The `schema-drift` job fails if `openapi.json` doesn't match bibliolegis-api's main branch, and runs daily as well as on every PR because the backend can change while nothing happens here. The api repo is private, so that job reads it over SSH with a read only deploy key on bibliolegis-api, the private half stored here as the `API_REPO_DEPLOY_KEY` secret. Without the secret it warns and passes. To replace the key, generate a new pair with `ssh-keygen -t ed25519 -N "" -f drift_key`, add `drift_key.pub` as a read only deploy key on bibliolegis-api (`gh repo deploy-key add drift_key.pub --repo chrisdemetriad/bibliolegis-api`), store `drift_key` with `gh secret set API_REPO_DEPLOY_KEY --repo chrisdemetriad/bibliolegis-frontend < drift_key`, delete both files and remove the old deploy key.
 
 ## Running with Docker
 

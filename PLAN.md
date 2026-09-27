@@ -62,14 +62,10 @@ yet, the shared project holds only Postgres. The holding route is enough to prov
 the pipeline end to end. A deployed frontend will need its own origin adding to the
 api's `CORS_ALLOWED_ORIGINS`, see that repo's Phase 9.
 
-The schema drift check in CI only warns until the repo has an `API_REPO_TOKEN`
-secret. A session on 2026-09-27 wasn't allowed to write repository secrets, so it
-needs doing by hand. On GitHub, Settings, Developer settings, Fine grained tokens,
-create a token with access to bibliolegis-api only and Contents read only, then run
-`gh secret set API_REPO_TOKEN --repo chrisdemetriad/bibliolegis-frontend` and paste
-it in. Give it an expiry and note the date somewhere, the check starts warning again
-when it lapses. The next CI run should show the comparison run rather than the
-warning.
+The schema drift check in CI reads bibliolegis-api's `openapi.json` with a read only
+deploy key on that repo, stored here as the `API_REPO_DEPLOY_KEY` secret. It warns
+and passes while the secret is missing. See the README's "API types" section for
+replacing the key.
 
 Generation models were decided on 2026-09-27: OpenAI and Claude, and each user
 picks theirs. That puts a `/settings` route in this repo, see Phase 4. The backend
