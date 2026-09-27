@@ -164,9 +164,8 @@ it costs" before Phase 4's query page is designed, since the two share a page.
   server by `clerkMiddleware()` and never gets a `VITE_` prefix. See the api
   repo's PLAN.md status block for the rest
 - The api repo's compose `frontend` service keeps its own `node_modules` in an
-  anonymous volume, so after a dependency change here it needs rebuilding with
-  fresh volumes, `docker compose up -d --build -V frontend`, or it fails on the
-  missing package
+  anonymous volume and runs `pnpm install` on every start, so a dependency added
+  here reaches it on the next `docker compose up` without a rebuild
 - New components come in with `pnpm shadcn add <name>`, then `pnpm biome check
   --write` to bring them into the house style. When `add` asks to overwrite a
   component that's already here, say no. It asks because Biome has reformatted
