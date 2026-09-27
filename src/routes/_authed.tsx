@@ -1,6 +1,11 @@
 import { UserButton } from "@clerk/tanstack-react-start";
 import { auth } from "@clerk/tanstack-react-start/server";
-import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
+import {
+	createFileRoute,
+	Link,
+	Outlet,
+	redirect,
+} from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { ThemeToggle } from "#/theme/ThemeToggle";
 
@@ -31,7 +36,17 @@ function AuthedLayout() {
 	return (
 		<>
 			<header className="flex items-center justify-between border-b px-8 py-4">
-				<span className="font-bold">Bibliolegis</span>
+				<nav className="flex items-center gap-6">
+					<Link to="/" className="font-bold">
+						Bibliolegis
+					</Link>
+					<Link
+						to="/documents"
+						className="text-muted-foreground hover:text-foreground data-[status=active]:text-foreground"
+					>
+						Documents
+					</Link>
+				</nav>
 				<div className="flex items-center gap-2">
 					<ThemeToggle />
 					<UserButton />

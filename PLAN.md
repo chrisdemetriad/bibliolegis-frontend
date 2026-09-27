@@ -74,7 +74,11 @@ to poll `GET /documents/{id}` to show a document going through `processing` to
 real piece of UI rather than a detail. See bibliolegis-api's PLAN.md status
 block for the detail, this is only a summary of what changed there.
 
-**Next:** Phase 3's document pages, which the backend no longer blocks.
+Phase 3 started on 2026-09-27. `/documents` lists every document the user can
+see with its status and polls while any of them is still ingesting. Server state
+goes through TanStack Query, with the hooks in `src/documents/queries.ts`.
+
+**Next:** the rest of Phase 3: upload, the detail page and delete.
 
 Phase 7, deployment, can also start out of order. Nothing is deployed to Railway
 yet, the shared project holds only Postgres. The holding route is enough to prove
@@ -195,8 +199,8 @@ Clerk's TanStack Start integration (`@clerk/tanstack-react-start`, the current p
 
 - [ ] Document upload page with drag and drop, calling `POST /documents`
 - [ ] Upload progress and error state (rejected file type, upload failure)
-- [ ] Document list page showing status per document
-- [ ] Polling or refresh on the list page while any document is still ingesting
+- [x] Document list page showing status per document
+- [x] Polling or refresh on the list page while any document is still ingesting. Every two seconds while anything is `pending` or `processing`, stopping once nothing is
 - [ ] Document detail page showing extracted metadata once ingestion is done
 - [ ] Delete document action with a confirmation step
 

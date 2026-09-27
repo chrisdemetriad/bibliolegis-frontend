@@ -1,9 +1,11 @@
 import { ClerkProvider } from "@clerk/tanstack-react-start";
 import { shadcn } from "@clerk/ui/themes";
 import { TanStackDevtools } from "@tanstack/react-devtools";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 
+import { useState } from "react";
 import { themeScript } from "#/theme/theme";
 import appCss from "../styles.css?url";
 
@@ -32,6 +34,10 @@ export const Route = createRootRoute({
 });
 
 function RootDocument({ children }: { children: React.ReactNode }) {
+	// One per render tree rather than a module level client, so nothing cached
+	// for one user during server rendering can reach another
+	const [queryClient] = useState(() => new QueryClient());
+
 	return (
 		// The theme script adds the dark class before React hydrates, so the
 		// server rendered class list is expected to differ
@@ -51,7 +57,9 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 					// components, so sign in follows the theme and dark mode too
 					appearance={{ theme: shadcn }}
 				>
-					{children}
+					<QueryClientProvider client={queryClient}>
+						{children}
+					</QueryClientProvider>
 				</ClerkProvider>
 				<TanStackDevtools
 					config={{
