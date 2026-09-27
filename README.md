@@ -11,10 +11,11 @@ Requires Node 22 or newer and pnpm 9.
 ```
 pnpm install
 cp .env.example .env
+clerk env pull --app app_3JeKtVK5lZdHKYWcSXVqv0cT5i2 --instance dev --file .env.local
 pnpm dev
 ```
 
-That serves the app on `localhost:4000`.
+That serves the app on `localhost:4000`. The `clerk env pull` step needs the [Clerk CLI](https://clerk.com/docs/cli) signed in to the account that owns the app, see "Auth" below.
 
 Run the checks:
 
@@ -27,6 +28,18 @@ pnpm build
 `pnpm lint` runs Biome, which both lints and formats. `pnpm format` writes the fixes rather than just reporting them. Biome has no Markdown or YAML support yet and skips both, so those files aren't formatted by anything.
 
 `src/routeTree.gen.ts` is generated from the files in `src/routes` and isn't committed. Vite regenerates it on dev and build, and `pnpm typecheck` regenerates it before running `tsc`.
+
+## Auth
+
+Sign in is Clerk, through `@clerk/tanstack-react-start`. Clerk's own components draw the sign in and sign up pages and the account menu, nothing here stores a password or a token.
+
+It needs two keys, both in `.env.local` from `clerk env pull`. `VITE_CLERK_PUBLISHABLE_KEY` goes to the browser and that's what it's for. `CLERK_SECRET_KEY` is read only on the server, by `clerkMiddleware()` in `src/start.ts`, and never gets a `VITE_` prefix. Without them the build still works but every page errors at request time.
+
+Every route inside `src/routes/_authed/` needs a signed in user. The `_authed` layout's `beforeLoad` asks a server function whether the request has a Clerk session and sends anyone without one to `/sign-in`, with `redirect_url` set so Clerk brings them back afterwards. That check runs on the server on a full page load and on every client side navigation too. Anything public goes outside that folder.
+
+Components call the backend through `useApi()` from `src/api/useApi.ts`, which builds the client with Clerk's `getToken`, so every request carries the current session token. `useCurrentUser()` in `src/auth/useCurrentUser.ts` gives the Clerk user plus their role from `GET /users/me`. The role comes from the backend rather than Clerk, since that's what the backend enforces against.
+
+A Clerk account only gets past `GET /users/me` once the backend's webhook sync has recorded it, which happens when they join the firm's organization. Anyone else is signed in to Clerk but gets a 403 from the api.
 
 ## Pointing at the backend
 

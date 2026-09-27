@@ -36,7 +36,7 @@ function unwrap<T>({ data, error, response }: Result<T>): T {
 
 export interface ApiOptions {
 	baseUrl?: string;
-	// Called before every request. Phase 2 passes Clerk's getToken here
+	// Called before every request. useApi() passes Clerk's getToken here
 	getToken?: () => Promise<string | null>;
 }
 
