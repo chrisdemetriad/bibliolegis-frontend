@@ -94,8 +94,13 @@ first.
 Delete sits on the detail page behind a confirmation dialog and goes back to
 the list once the api confirms it.
 
-**Next:** Phase 3 is done apart from the metadata on the detail page, which
-waits on the api. Phase 4's `/settings` route can go next, its endpoints exist.
+`/settings` exists from Phase 4, pulled forward since its endpoints were ready.
+It lists the models from `GET /chat-models` grouped by provider and saves the
+choice through `PUT /users/me/model` as soon as it's picked.
+
+**Next:** the rest of Phase 4 waits on the api's `POST /query`. Until then,
+Phase 5's admin pages have their endpoints already, and Phase 7's deployment
+can start.
 
 Phase 7, deployment, can also start out of order. Nothing is deployed to Railway
 yet, the shared project holds only Postgres. The holding route is enough to prove
@@ -230,7 +235,8 @@ Clerk's TanStack Start integration (`@clerk/tanstack-react-start`, the current p
 - [ ] Aggregation query results shown as a table or simple chart rather than a wall of text
 - [ ] Loading and empty states for the query page (no results found, query still running)
 - [ ] Query history page listing past queries for the logged in user
-- [ ] `/settings` route where a user picks the model that answers their questions, from the list the backend offers rather than one hardcoded here. Show which model answered on each answer too, so a user comparing models can tell them apart. Phase 9's connected accounts land on the same page later
+- [x] `/settings` route where a user picks the model that answers their questions, from the list the backend offers rather than one hardcoded here. Phase 9's connected accounts land on the same page later. Done on 2026-09-27, the choice saves as soon as it's picked
+- [ ] Show which model answered on each answer, so a user comparing models can tell them apart. Split out of the settings item since it needs `/query` to exist
 
 ## Phase 5: admin
 
