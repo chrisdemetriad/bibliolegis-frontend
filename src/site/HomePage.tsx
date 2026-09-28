@@ -94,7 +94,7 @@ function SiteHeader() {
 	return (
 		<header className="absolute inset-x-0 top-0 z-20">
 			<Container className="flex h-20 items-center justify-between gap-6 text-white">
-				<a href="/" className="font-logo text-3xl tracking-tight">
+				<a href="/" className="font-logo text-6xl font-black tracking-normal">
 					Bibliolegis
 				</a>
 				<nav className="hidden items-center gap-8 text-sm text-white/75 md:flex">
