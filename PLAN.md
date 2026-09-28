@@ -144,6 +144,14 @@ visits, and `/settings` controls whether it shows and how many. The ask box
 clears once an answer comes back. Checked with lint, types, a build and the api
 against the dev database, not yet clicked through signed in.
 
+**Matter UI changes landed on 2026-09-28** (#64 to #70), from the user's own
+click through. Matters can be deleted from a menu on their row or header, with
+everything in them, against bibliolegis-api #90. Progress bars run red to green,
+the drop zone's results read "added" and "updated", one file uploads without the
+batch headline, the duplicate dialog links to each matter, rows show when a
+matter was added and a matter's ask panel opens on arrival and is toggled from
+the header. Checked in headless Chrome with the api mocked, not signed in.
+
 **Next:** the rest of Phase 4: aggregation answers as a table, query history
 once the api has `GET /queries`, and the loading and empty states it hasn't
 covered. Phase 5's admin pages have their endpoints already, and Phase 7's
