@@ -1,6 +1,20 @@
 {
   "components": {
     "schemas": {
+      "Body_add_intake_document_intakes__intake_id__documents_post": {
+        "properties": {
+          "file": {
+            "contentMediaType": "application/octet-stream",
+            "title": "File",
+            "type": "string"
+          }
+        },
+        "required": [
+          "file"
+        ],
+        "title": "Body_add_intake_document_intakes__intake_id__documents_post",
+        "type": "object"
+      },
       "Body_upload_document_documents_post": {
         "properties": {
           "file": {
@@ -59,6 +73,140 @@
         "title": "ChatModelOut",
         "type": "object"
       },
+      "CitationOut": {
+        "properties": {
+          "chunk_index": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Chunk Index"
+          },
+          "document_id": {
+            "format": "uuid",
+            "title": "Document Id",
+            "type": "string"
+          },
+          "filename": {
+            "title": "Filename",
+            "type": "string"
+          },
+          "number": {
+            "title": "Number",
+            "type": "integer"
+          },
+          "page_end": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Page End"
+          },
+          "page_start": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Page Start"
+          },
+          "project_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Project Id"
+          },
+          "project_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Project Name"
+          },
+          "project_slug": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Project Slug"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "number",
+          "document_id",
+          "filename",
+          "project_id",
+          "project_slug",
+          "project_name",
+          "chunk_index",
+          "page_start",
+          "page_end",
+          "text"
+        ],
+        "title": "CitationOut",
+        "type": "object"
+      },
+      "DateOut": {
+        "properties": {
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "on_date": {
+            "format": "date",
+            "title": "On Date",
+            "type": "string"
+          },
+          "source_document_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Document Id"
+          }
+        },
+        "required": [
+          "label",
+          "on_date",
+          "source_document_id"
+        ],
+        "title": "DateOut",
+        "type": "object"
+      },
       "DocumentOut": {
         "properties": {
           "error_message": {
@@ -80,6 +228,17 @@
             "format": "uuid",
             "title": "Id",
             "type": "string"
+          },
+          "ingestion_stage": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ingestion Stage"
           },
           "project_id": {
             "anyOf": [
@@ -109,7 +268,8 @@
           "status",
           "project_id",
           "uploaded_at",
-          "error_message"
+          "error_message",
+          "ingestion_stage"
         ],
         "title": "DocumentOut",
         "type": "object"
@@ -138,6 +298,85 @@
           "status"
         ],
         "title": "Health",
+        "type": "object"
+      },
+      "IntakeMatterOut": {
+        "properties": {
+          "document_ids": {
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "title": "Document Ids",
+            "type": "array"
+          },
+          "is_new": {
+            "title": "Is New",
+            "type": "boolean"
+          },
+          "matter": {
+            "$ref": "#/components/schemas/ProjectOut"
+          }
+        },
+        "required": [
+          "matter",
+          "is_new",
+          "document_ids"
+        ],
+        "title": "IntakeMatterOut",
+        "type": "object"
+      },
+      "IntakeOut": {
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "documents": {
+            "items": {
+              "$ref": "#/components/schemas/DocumentOut"
+            },
+            "title": "Documents",
+            "type": "array"
+          },
+          "error_message": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error Message"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "matters": {
+            "items": {
+              "$ref": "#/components/schemas/IntakeMatterOut"
+            },
+            "title": "Matters",
+            "type": "array"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "status",
+          "error_message",
+          "created_at",
+          "documents",
+          "matters"
+        ],
+        "title": "IntakeOut",
         "type": "object"
       },
       "MemberAdd": {
@@ -172,6 +411,36 @@
         "title": "ModelChoice",
         "type": "object"
       },
+      "PartyOut": {
+        "properties": {
+          "is_client": {
+            "title": "Is Client",
+            "type": "boolean"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "role": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Role"
+          }
+        },
+        "required": [
+          "name",
+          "role",
+          "is_client"
+        ],
+        "title": "PartyOut",
+        "type": "object"
+      },
       "ProjectCreate": {
         "properties": {
           "client_reference": {
@@ -188,6 +457,29 @@
           "name": {
             "title": "Name",
             "type": "string"
+          },
+          "practice_area": {
+            "anyOf": [
+              {
+                "enum": [
+                  "Crime",
+                  "Civil litigation",
+                  "Commercial",
+                  "Employment",
+                  "Family",
+                  "Personal injury",
+                  "Property",
+                  "Immigration",
+                  "Private client",
+                  "Regulatory"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Practice Area"
           }
         },
         "required": [
@@ -235,6 +527,17 @@
       },
       "ProjectOut": {
         "properties": {
+          "case_reference": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Case Reference"
+          },
           "client_reference": {
             "anyOf": [
               {
@@ -246,10 +549,32 @@
             ],
             "title": "Client Reference"
           },
+          "court": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Court"
+          },
           "created_at": {
             "format": "date-time",
             "title": "Created At",
             "type": "string"
+          },
+          "dates": {
+            "items": {
+              "$ref": "#/components/schemas/DateOut"
+            },
+            "title": "Dates",
+            "type": "array"
+          },
+          "document_count": {
+            "title": "Document Count",
+            "type": "integer"
           },
           "id": {
             "format": "uuid",
@@ -260,19 +585,149 @@
             "title": "Name",
             "type": "string"
           },
+          "our_side": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Our Side"
+          },
+          "parties": {
+            "items": {
+              "$ref": "#/components/schemas/PartyOut"
+            },
+            "title": "Parties",
+            "type": "array"
+          },
+          "pinned": {
+            "title": "Pinned",
+            "type": "boolean"
+          },
+          "practice_area": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Practice Area"
+          },
+          "slug": {
+            "title": "Slug",
+            "type": "string"
+          },
           "status": {
             "title": "Status",
+            "type": "string"
+          },
+          "summary": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Summary"
+          },
+          "tags": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Tags",
+            "type": "array"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
             "type": "string"
           }
         },
         "required": [
           "id",
+          "slug",
           "name",
           "client_reference",
+          "case_reference",
+          "practice_area",
+          "court",
+          "our_side",
+          "summary",
+          "tags",
           "status",
-          "created_at"
+          "created_at",
+          "updated_at",
+          "pinned",
+          "document_count",
+          "parties",
+          "dates"
         ],
         "title": "ProjectOut",
+        "type": "object"
+      },
+      "QueryIn": {
+        "properties": {
+          "project_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Project Id"
+          },
+          "question": {
+            "maxLength": 2000,
+            "minLength": 1,
+            "title": "Question",
+            "type": "string"
+          }
+        },
+        "required": [
+          "question"
+        ],
+        "title": "QueryIn",
+        "type": "object"
+      },
+      "QueryOut": {
+        "properties": {
+          "answer": {
+            "title": "Answer",
+            "type": "string"
+          },
+          "citations": {
+            "items": {
+              "$ref": "#/components/schemas/CitationOut"
+            },
+            "title": "Citations",
+            "type": "array"
+          },
+          "model": {
+            "title": "Model",
+            "type": "string"
+          },
+          "path": {
+            "title": "Path",
+            "type": "string"
+          }
+        },
+        "required": [
+          "answer",
+          "citations",
+          "model",
+          "path"
+        ],
+        "title": "QueryOut",
         "type": "object"
       },
       "RoleChange": {
@@ -645,6 +1100,154 @@
         "summary": "Health"
       }
     },
+    "/intakes": {
+      "post": {
+        "operationId": "create_intake_intakes_post",
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntakeOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Create Intake"
+      }
+    },
+    "/intakes/{intake_id}": {
+      "get": {
+        "operationId": "get_intake_intakes__intake_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "intake_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Intake Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntakeOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Intake"
+      }
+    },
+    "/intakes/{intake_id}/documents": {
+      "post": {
+        "operationId": "add_intake_document_intakes__intake_id__documents_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "intake_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Intake Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_add_intake_document_intakes__intake_id__documents_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DocumentOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Add Intake Document"
+      }
+    },
+    "/intakes/{intake_id}/seal": {
+      "post": {
+        "operationId": "seal_intake_intakes__intake_id__seal_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "intake_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Intake Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntakeOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Seal Intake"
+      }
+    },
     "/projects": {
       "get": {
         "operationId": "list_projects_projects_get",
@@ -751,6 +1354,145 @@
           }
         },
         "summary": "Add Member"
+      }
+    },
+    "/projects/{project_ref}": {
+      "get": {
+        "operationId": "get_project_projects__project_ref__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "project_ref",
+            "required": true,
+            "schema": {
+              "title": "Project Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Project"
+      }
+    },
+    "/projects/{project_ref}/pin": {
+      "delete": {
+        "operationId": "unpin_project_projects__project_ref__pin_delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "project_ref",
+            "required": true,
+            "schema": {
+              "title": "Project Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Unpin Project"
+      },
+      "put": {
+        "operationId": "pin_project_projects__project_ref__pin_put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "project_ref",
+            "required": true,
+            "schema": {
+              "title": "Project Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Pin Project"
+      }
+    },
+    "/query": {
+      "post": {
+        "operationId": "query_query_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QueryIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QueryOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Query"
       }
     },
     "/users": {

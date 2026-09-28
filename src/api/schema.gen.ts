@@ -74,6 +74,74 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/intakes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Create Intake */
+        post: operations["create_intake_intakes_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/intakes/{intake_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Intake */
+        get: operations["get_intake_intakes__intake_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/intakes/{intake_id}/documents": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Add Intake Document */
+        post: operations["add_intake_document_intakes__intake_id__documents_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/intakes/{intake_id}/seal": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Seal Intake */
+        post: operations["seal_intake_intakes__intake_id__seal_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/projects": {
         parameters: {
             query?: never;
@@ -103,6 +171,58 @@ export interface paths {
         put?: never;
         /** Add Member */
         post: operations["add_member_projects__project_id__members_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{project_ref}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Project */
+        get: operations["get_project_projects__project_ref__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{project_ref}/pin": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Pin Project */
+        put: operations["pin_project_projects__project_ref__pin_put"];
+        post?: never;
+        /** Unpin Project */
+        delete: operations["unpin_project_projects__project_ref__pin_delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/query": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Query */
+        post: operations["query_query_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -216,6 +336,11 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** Body_add_intake_document_intakes__intake_id__documents_post */
+        Body_add_intake_document_intakes__intake_id__documents_post: {
+            /** File */
+            file: string;
+        };
         /** Body_upload_document_documents_post */
         Body_upload_document_documents_post: {
             /** File */
@@ -237,6 +362,44 @@ export interface components {
              */
             provider: "openai" | "anthropic";
         };
+        /** CitationOut */
+        CitationOut: {
+            /** Chunk Index */
+            chunk_index: number | null;
+            /**
+             * Document Id
+             * Format: uuid
+             */
+            document_id: string;
+            /** Filename */
+            filename: string;
+            /** Number */
+            number: number;
+            /** Page End */
+            page_end: number | null;
+            /** Page Start */
+            page_start: number | null;
+            /** Project Id */
+            project_id: string | null;
+            /** Project Name */
+            project_name: string | null;
+            /** Project Slug */
+            project_slug: string | null;
+            /** Text */
+            text: string;
+        };
+        /** DateOut */
+        DateOut: {
+            /** Label */
+            label: string;
+            /**
+             * On Date
+             * Format: date
+             */
+            on_date: string;
+            /** Source Document Id */
+            source_document_id: string | null;
+        };
         /** DocumentOut */
         DocumentOut: {
             /** Error Message */
@@ -248,6 +411,8 @@ export interface components {
              * Format: uuid
              */
             id: string;
+            /** Ingestion Stage */
+            ingestion_stage: string | null;
             /** Project Id */
             project_id: string | null;
             /** Status */
@@ -265,6 +430,35 @@ export interface components {
         };
         /** Health */
         Health: {
+            /** Status */
+            status: string;
+        };
+        /** IntakeMatterOut */
+        IntakeMatterOut: {
+            /** Document Ids */
+            document_ids: string[];
+            /** Is New */
+            is_new: boolean;
+            matter: components["schemas"]["ProjectOut"];
+        };
+        /** IntakeOut */
+        IntakeOut: {
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Documents */
+            documents: components["schemas"]["DocumentOut"][];
+            /** Error Message */
+            error_message: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Matters */
+            matters: components["schemas"]["IntakeMatterOut"][];
             /** Status */
             status: string;
         };
@@ -286,12 +480,23 @@ export interface components {
             /** Model */
             model: string;
         };
+        /** PartyOut */
+        PartyOut: {
+            /** Is Client */
+            is_client: boolean;
+            /** Name */
+            name: string;
+            /** Role */
+            role: string | null;
+        };
         /** ProjectCreate */
         ProjectCreate: {
             /** Client Reference */
             client_reference?: string | null;
             /** Name */
             name: string;
+            /** Practice Area */
+            practice_area?: ("Crime" | "Civil litigation" | "Commercial" | "Employment" | "Family" | "Personal injury" | "Property" | "Immigration" | "Private client" | "Regulatory") | null;
         };
         /** ProjectMemberOut */
         ProjectMemberOut: {
@@ -320,13 +525,21 @@ export interface components {
         };
         /** ProjectOut */
         ProjectOut: {
+            /** Case Reference */
+            case_reference: string | null;
             /** Client Reference */
             client_reference: string | null;
+            /** Court */
+            court: string | null;
             /**
              * Created At
              * Format: date-time
              */
             created_at: string;
+            /** Dates */
+            dates: components["schemas"]["DateOut"][];
+            /** Document Count */
+            document_count: number;
             /**
              * Id
              * Format: uuid
@@ -334,8 +547,45 @@ export interface components {
             id: string;
             /** Name */
             name: string;
+            /** Our Side */
+            our_side: string | null;
+            /** Parties */
+            parties: components["schemas"]["PartyOut"][];
+            /** Pinned */
+            pinned: boolean;
+            /** Practice Area */
+            practice_area: string | null;
+            /** Slug */
+            slug: string;
             /** Status */
             status: string;
+            /** Summary */
+            summary: string | null;
+            /** Tags */
+            tags: string[];
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
+        /** QueryIn */
+        QueryIn: {
+            /** Project Id */
+            project_id?: string | null;
+            /** Question */
+            question: string;
+        };
+        /** QueryOut */
+        QueryOut: {
+            /** Answer */
+            answer: string;
+            /** Citations */
+            citations: components["schemas"]["CitationOut"][];
+            /** Model */
+            model: string;
+            /** Path */
+            path: string;
         };
         /** RoleChange */
         RoleChange: {
@@ -570,6 +820,123 @@ export interface operations {
             };
         };
     };
+    create_intake_intakes_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IntakeOut"];
+                };
+            };
+        };
+    };
+    get_intake_intakes__intake_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                intake_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IntakeOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    add_intake_document_intakes__intake_id__documents_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                intake_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["Body_add_intake_document_intakes__intake_id__documents_post"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DocumentOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    seal_intake_intakes__intake_id__seal_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                intake_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IntakeOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     list_projects_projects_get: {
         parameters: {
             query?: never;
@@ -645,6 +1012,128 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ProjectMemberOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_project_projects__project_ref__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_ref: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProjectOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    pin_project_projects__project_ref__pin_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_ref: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    unpin_project_projects__project_ref__pin_delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_ref: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    query_query_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["QueryIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QueryOut"];
                 };
             };
             /** @description Validation Error */
