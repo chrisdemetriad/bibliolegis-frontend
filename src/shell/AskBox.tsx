@@ -3,7 +3,6 @@ import { Link } from "@tanstack/react-router";
 import {
 	ArrowRightIcon,
 	BriefcaseIcon,
-	CircleAlertIcon,
 	QuoteIcon,
 	SparklesIcon,
 } from "lucide-react";
@@ -13,6 +12,7 @@ import { useApi } from "#/api/useApi";
 import { Button } from "#/components/ui/button";
 import { Kbd } from "#/components/ui/kbd";
 import { Skeleton } from "#/components/ui/skeleton";
+import { StatusIcon } from "#/components/ui/status-icon";
 import { Panel } from "./page";
 
 // Asks POST /query and shows the answer with every claim linked to the
@@ -84,7 +84,7 @@ export function AskBox({
 
 			{ask.isError && (
 				<Panel className="flex items-start gap-2 p-4 text-sm" role="alert">
-					<CircleAlertIcon className="mt-0.5 size-4 shrink-0 text-destructive" />
+					<StatusIcon status="error" className="mt-0.5" />
 					<p>{errorMessage(ask.error, "Couldn't get an answer, try again.")}</p>
 				</Panel>
 			)}
