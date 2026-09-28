@@ -57,6 +57,29 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/documents/{document_id}/passages/{chunk_index}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Passage
+         * @description One passage of a document, what a citation in an answer points at.
+         *
+         *     Checked against the document's own visibility first, so a passage of a
+         *     document the caller can't see 404s the same way the document does.
+         */
+        get: operations["get_passage_documents__document_id__passages__chunk_index__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/health": {
         parameters: {
             query?: never;
@@ -489,6 +512,17 @@ export interface components {
             /** Role */
             role: string | null;
         };
+        /** PassageOut */
+        PassageOut: {
+            /** Chunk Index */
+            chunk_index: number;
+            /** Page End */
+            page_end: number | null;
+            /** Page Start */
+            page_start: number | null;
+            /** Text */
+            text: string;
+        };
         /** ProjectCreate */
         ProjectCreate: {
             /** Client Reference */
@@ -788,6 +822,38 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_passage_documents__document_id__passages__chunk_index__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                document_id: string;
+                chunk_index: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PassageOut"];
+                };
             };
             /** @description Validation Error */
             422: {

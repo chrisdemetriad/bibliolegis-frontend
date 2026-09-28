@@ -16,6 +16,8 @@ export const documentKeys = {
 	all: ["documents"] as const,
 	list: () => [...documentKeys.all, "list"] as const,
 	detail: (id: string) => [...documentKeys.all, "detail", id] as const,
+	passage: (id: string, chunkIndex: number) =>
+		[...documentKeys.all, "passage", id, chunkIndex] as const,
 };
 
 export function useDocuments() {
@@ -36,6 +38,16 @@ export function useDocument(documentId: string) {
 		refetchInterval: (query) =>
 			query.state.data && isIngesting(query.state.data) ? POLL_MS : false,
 		// A 404 means gone or not visible to this user, asking again won't help
+		retry: (count, error) =>
+			!(error instanceof ApiError && error.status === 404) && count < 3,
+	});
+}
+
+export function usePassage(documentId: string, chunkIndex: number) {
+	const api = useApi();
+	return useQuery({
+		queryKey: documentKeys.passage(documentId, chunkIndex),
+		queryFn: () => api.getPassage(documentId, chunkIndex),
 		retry: (count, error) =>
 			!(error instanceof ApiError && error.status === 404) && count < 3,
 	});

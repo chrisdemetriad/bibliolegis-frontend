@@ -59,7 +59,11 @@ function MatterOverview() {
 
 			<section id="ask" className="scroll-mt-20">
 				<SectionTitle>Ask about this matter</SectionTitle>
-				<AskBox scope={matter.title} placeholder={matter.suggestedQuestion} />
+				<AskBox
+					scope={matter.title}
+					placeholder={matter.suggestedQuestion}
+					projectId={matter.projectId}
+				/>
 			</section>
 
 			<section>

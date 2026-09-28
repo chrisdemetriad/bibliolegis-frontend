@@ -441,6 +441,48 @@
         "title": "PartyOut",
         "type": "object"
       },
+      "PassageOut": {
+        "properties": {
+          "chunk_index": {
+            "title": "Chunk Index",
+            "type": "integer"
+          },
+          "page_end": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Page End"
+          },
+          "page_start": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Page Start"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "chunk_index",
+          "text",
+          "page_start",
+          "page_end"
+        ],
+        "title": "PassageOut",
+        "type": "object"
+      },
       "ProjectCreate": {
         "properties": {
           "client_reference": {
@@ -1080,6 +1122,56 @@
           }
         },
         "summary": "Get Document"
+      }
+    },
+    "/documents/{document_id}/passages/{chunk_index}": {
+      "get": {
+        "description": "One passage of a document, what a citation in an answer points at.\n\nChecked against the document's own visibility first, so a passage of a\ndocument the caller can't see 404s the same way the document does.",
+        "operationId": "get_passage_documents__document_id__passages__chunk_index__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "document_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Document Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "chunk_index",
+            "required": true,
+            "schema": {
+              "title": "Chunk Index",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PassageOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Passage"
       }
     },
     "/health": {
