@@ -43,7 +43,7 @@ export function AskBox({
 
 	return (
 		<div className="space-y-3">
-			<Panel className="p-4 focus-within:border-ring">
+			<Panel className="bg-ask p-4 focus-within:border-ring">
 				<textarea
 					value={question}
 					onChange={(event) => setQuestion(event.target.value)}
