@@ -12,6 +12,9 @@ import { Panel } from "#/shell/page";
 
 export type PressView = "list" | "cards";
 
+// Outlet chips shown before "more outlets"
+const TOP_OUTLETS = 8;
+
 // "14 Sep 2026", the way dates are written everywhere else in the app
 export function pressDate(iso: string | null | undefined) {
 	if (!iso) return "Date unknown";
@@ -224,6 +227,7 @@ export function PressFeed({
 	empty?: string;
 }) {
 	const [outlet, setOutlet] = useState<string | null>(null);
+	const [allOutlets, setAllOutlets] = useState(false);
 	const outlets = useMemo(() => {
 		const counts = new Map<string, { name: string; count: number }>();
 		for (const { article } of mentions) {
@@ -253,7 +257,12 @@ export function PressFeed({
 				<div className="mb-3 flex flex-wrap gap-1.5">
 					{[
 						[null, { name: "All", count: mentions.length }] as const,
-						...outlets,
+						// A big case is in dozens of outlets, most of them once
+						...(allOutlets
+							? outlets
+							: outlets.filter(
+									([slug], i) => i < TOP_OUTLETS || slug === outlet,
+								)),
 					].map(([slug, { name, count }]) => (
 						<button
 							key={slug ?? "all"}
@@ -265,6 +274,17 @@ export function PressFeed({
 							{name} <span className="opacity-60">{count}</span>
 						</button>
 					))}
+					{outlets.length > TOP_OUTLETS && (
+						<button
+							type="button"
+							onClick={() => setAllOutlets(!allOutlets)}
+							className="px-1.5 py-0.5 text-xs text-muted-foreground hover:text-foreground"
+						>
+							{allOutlets
+								? "Fewer"
+								: `${outlets.length - TOP_OUTLETS} more outlets`}
+						</button>
+					)}
 				</div>
 			)}
 			{view === "cards" ? (

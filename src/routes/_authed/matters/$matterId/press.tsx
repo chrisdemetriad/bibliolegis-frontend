@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { BellIcon, PlusIcon, RefreshCwIcon } from "lucide-react";
+import { BellIcon, LinkIcon, RefreshCwIcon } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { errorMessage } from "#/api/client";
@@ -10,7 +10,12 @@ import { press } from "#/mock/data";
 import { AddLink } from "#/press/AddLink";
 import { PressFeed, type PressView, ViewToggle } from "#/press/PressFeed";
 import { MatterSources, WatchTerms } from "#/press/PressSettings";
-import { useMatterPress, useRefreshPress } from "#/press/queries";
+import {
+	isSearching,
+	useMatterPress,
+	usePressSources,
+	useRefreshPress,
+} from "#/press/queries";
 import { PressList } from "#/shell/lists";
 import { SectionTitle } from "#/shell/page";
 
@@ -51,23 +56,22 @@ function RealPress({ projectRef }: { projectRef: string }) {
 	const { view: chosen } = Route.useSearch();
 	const view: PressView = chosen ?? "list";
 	const navigate = useNavigate({ from: Route.fullPath });
-	const { data, isPending, isError } = useMatterPress(projectRef);
+	const sources = usePressSources(projectRef);
+	const searching = isSearching(sources.data);
+	const { data, isPending, isError } = useMatterPress(projectRef, {
+		searching,
+	});
 	const refresh = useRefreshPress(projectRef);
 	const [adding, setAdding] = useState(false);
 
 	const searchNow = () =>
 		refresh.mutate(undefined, {
-			onSuccess: ({ mentions_added, sources_failed }) => {
-				const found =
-					mentions_added === 0
-						? "Nothing new"
-						: `${mentions_added} new ${mentions_added === 1 ? "article" : "articles"}`;
-				const failed =
-					sources_failed > 0
-						? `, ${sources_failed} ${sources_failed === 1 ? "source" : "sources"} couldn't be read`
-						: "";
-				toast.success(`${found}${failed}`);
-			},
+			onSuccess: ({ searches_started }) =>
+				toast.success(
+					searches_started === 0
+						? "Checking the feeds. Add a source to search outlets too"
+						: `Searching ${searches_started} ${searches_started === 1 ? "source" : "sources"}, articles appear here as they're found`,
+				),
 			onError: (error) =>
 				toast.error(errorMessage(error, "Couldn't search the sources.")),
 		});
@@ -80,21 +84,22 @@ function RealPress({ projectRef }: { projectRef: string }) {
 						<div className="flex items-center gap-2">
 							<Button
 								size="sm"
-								variant="outline"
-								disabled={refresh.isPending}
-								onClick={searchNow}
+								variant="ghost"
+								onClick={() => setAdding(true)}
+								title="Add one article by its link"
 							>
-								<RefreshCwIcon
-									className={refresh.isPending ? "animate-spin" : undefined}
-								/>
-								{refresh.isPending ? "Searching…" : "Search now"}
+								<LinkIcon /> Paste a link
 							</Button>
 							<Button
 								size="sm"
 								variant="outline"
-								onClick={() => setAdding(true)}
+								disabled={refresh.isPending || searching}
+								onClick={searchNow}
 							>
-								<PlusIcon /> Add article
+								<RefreshCwIcon
+									className={searching ? "animate-spin" : undefined}
+								/>
+								{searching ? "Searching…" : "Search now"}
 							</Button>
 							<ViewToggle
 								view={view}
@@ -111,8 +116,9 @@ function RealPress({ projectRef }: { projectRef: string }) {
 					Press
 				</SectionTitle>
 				<p className="-mt-1 mb-4 text-sm text-muted-foreground">
-					News about this matter and its parties, newest first. Sources are read
-					every few hours, or now with Search now.
+					Everything the sources on the right have found about this matter,
+					newest first. They're searched back to the matter's earliest date when
+					added and for anything new every few hours.
 				</p>
 				{adding && (
 					<AddLink projectRef={projectRef} onDone={() => setAdding(false)} />
@@ -128,7 +134,11 @@ function RealPress({ projectRef }: { projectRef: string }) {
 					<PressFeed
 						mentions={data}
 						view={view}
-						empty="Nothing found yet. Try Search now, or add an article by its link."
+						empty={
+							searching
+								? "Searching, articles appear here as they're found."
+								: "Nothing found yet. Add a source on the right, BBC or All news outlets say, and it searches straight away."
+						}
 					/>
 				)}
 			</div>

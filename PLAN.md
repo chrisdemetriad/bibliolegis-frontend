@@ -160,7 +160,8 @@ doesn't otherwise use. Mounted once in `__root.tsx`, so any page can call
 shows one, so does saving a choice on `/settings` and pinning or unpinning a
 matter. See Phase 6 below for where this should go next.
 
-**Phase 11, press, is done as of 2026-09-28.** A real matter's Press tab and
+**Phase 11, press, is done as of 2026-09-28, and sources became outlets
+on 2026-09-29.** A real matter's Press tab and
 `/press` read the api, with a list and cards toggle, a page per article, Search
 now, pasting a link, watch terms and feeds. Checked in headless Chrome against a
 scratch copy with the api mocked, not yet clicked through with a real Clerk
@@ -503,6 +504,14 @@ original. The article text itself isn't kept, see that phase for why.
       and cards toggle, and the firm's feeds grouped by kind. Only an admin sees
       Add, the switches and remove, the api refuses anyone else anyway. The sample
       sources list is gone from `src/mock/data.ts`
+- [x] Sources are outlets, changed on 2026-09-29 after the user found no way to
+      add the BBC or Reuters and nothing of the hundreds of existing R v Shepherd
+      articles. Add source offers All news outlets, a list of outlets to pick
+      with one click, any other website, and a feed as the last resort. Each
+      source shows what it's done for the matter ("Searching… 43 found so far",
+      "325 found since 9 Dec 2015") and the page refreshes itself while a search
+      runs. Pasting a link is a small button now. Only the top 8 outlet chips
+      show, the rest behind "more outlets"
 - [x] Search now calls the refresh route and shows when each source was last read
       and any error it hit. Done on the matter's Press tab on
       2026-09-28, with a toast saying how many new articles and how many sources
