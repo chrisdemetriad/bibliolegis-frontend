@@ -36,6 +36,7 @@ export function projectToMatter(project: Project): Matter {
 		id: project.slug,
 		projectId: project.id,
 		pinned: project.pinned,
+		createdAt: project.created_at,
 		title: project.name,
 		reference: project.case_reference ?? project.client_reference ?? "",
 		area: isPracticeArea(project.practice_area) ? project.practice_area : null,

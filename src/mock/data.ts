@@ -91,6 +91,8 @@ export type Matter = {
 	// Only on real matters. Its absence is what marks a matter as sample data
 	projectId?: string;
 	pinned?: boolean;
+	// When the matter was opened, an ISO timestamp. Real matters only
+	createdAt?: string;
 	dates?: { label: string; date: string }[];
 };
 
@@ -609,6 +611,17 @@ export function formatDate(date: string) {
 		day: "numeric",
 		month: "short",
 		year: "numeric",
+	});
+}
+
+// "13 Sept 2026, 18:16", in the viewer's own time zone
+export function formatDateTime(iso: string) {
+	return new Date(iso).toLocaleString("en-GB", {
+		day: "numeric",
+		month: "short",
+		year: "numeric",
+		hour: "2-digit",
+		minute: "2-digit",
 	});
 }
 
