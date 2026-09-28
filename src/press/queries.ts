@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import type { MentionStatus, PressMention } from "#/api/client";
+import { ApiError, type MentionStatus, type PressMention } from "#/api/client";
 import { useApi } from "#/api/useApi";
 
 export const pressKeys = {
@@ -27,6 +27,16 @@ export function useMatterPress(ref: string, includeDismissed = false) {
 	return useQuery({
 		queryKey: pressKeys.matter(ref, includeDismissed),
 		queryFn: () => api.listProjectPress(ref, includeDismissed),
+	});
+}
+
+export function usePressArticle(ref: string, outlet: string, slug: string) {
+	const api = useApi();
+	return useQuery({
+		queryKey: pressKeys.article(ref, outlet, slug),
+		queryFn: () => api.getPressArticle(ref, outlet, slug),
+		retry: (count, error) =>
+			!(error instanceof ApiError && error.status === 404) && count < 3,
 	});
 }
 

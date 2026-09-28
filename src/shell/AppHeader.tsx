@@ -31,17 +31,26 @@ function useCrumbs() {
 	const { matters } = useAllMatters();
 	const segments = pathname.split("/").filter(Boolean);
 
-	return segments.map((segment, i) => {
+	// A matter's press article is /matters/<slug>/press/<outlet>/<article>.
+	// The outlet on its own isn't a page, so the two read as one "Article"
+	const inPressArticle =
+		segments[0] === "matters" &&
+		segments[2] === "press" &&
+		segments.length === 5;
+
+	return segments.flatMap((segment, i) => {
+		if (inPressArticle && i === 3) return [];
 		const href = `/${segments.slice(0, i + 1).join("/")}`;
 		const matter =
 			segments[i - 1] === "matters"
 				? matters.find((candidate) => candidate.id === segment)
 				: null;
 		const label =
+			(inPressArticle && i === 4 ? "Article" : null) ??
 			labels[segment] ??
 			matter?.title ??
 			(segments[i - 1] === "documents" ? "Document" : segment);
-		return { href, label };
+		return [{ href, label }];
 	});
 }
 

@@ -55,7 +55,7 @@ export function ViewToggle({
 // Outlets' own pictures, loaded from their servers. no-referrer because some
 // image hosts refuse a request that says it came from somewhere else, and a
 // broken image falls back to the placeholder rather than a torn icon
-function ArticleImage({
+export function ArticleImage({
 	src,
 	className,
 }: {
@@ -87,17 +87,34 @@ function ArticleImage({
 	);
 }
 
+// The headline opens our page for the article, the icon goes straight to the
+// outlet's
 function Title({ mention }: { mention: PressMention }) {
+	const { article, project } = mention;
 	return (
-		<a
-			href={mention.article.url}
-			target="_blank"
-			rel="noreferrer"
-			className="font-medium hover:underline"
-		>
-			{mention.article.title}
-			<ExternalLinkIcon className="ml-1 inline size-3 align-baseline text-muted-foreground" />
-		</a>
+		<span>
+			<Link
+				to="/matters/$matterId/press/$outlet/$slug"
+				params={{
+					matterId: project.slug,
+					outlet: article.outlet_slug,
+					slug: article.slug,
+				}}
+				className="font-medium hover:underline"
+			>
+				{article.title}
+			</Link>
+			<a
+				href={article.url}
+				target="_blank"
+				rel="noreferrer"
+				aria-label={`Open on ${article.outlet_name}`}
+				title={`Open on ${article.outlet_name}`}
+				className="ml-1 inline-block align-baseline text-muted-foreground hover:text-foreground"
+			>
+				<ExternalLinkIcon className="size-3" />
+			</a>
+		</span>
 	);
 }
 
