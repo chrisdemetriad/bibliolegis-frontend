@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
+import { toast } from "sonner";
 import { usePreferences, useSavePreferences } from "#/activity/queries";
 import { type ChatModel, errorMessage, type Preferences } from "#/api/client";
 import { useApi } from "#/api/useApi";
@@ -42,6 +43,13 @@ function SettingsPage() {
 		...new Set((models.data ?? []).map((model) => model.provider)),
 	];
 
+	function chooseModel(id: string) {
+		const label = models.data?.find((model) => model.id === id)?.label ?? id;
+		save.mutate(id, {
+			onSuccess: () => toast.success(`Switched to ${label}`),
+		});
+	}
+
 	return (
 		<Page>
 			<h1 className="text-2xl font-semibold">Settings</h1>
@@ -68,7 +76,7 @@ function SettingsPage() {
 					<RadioGroup
 						className="mt-4 gap-6"
 						value={selected}
-						onValueChange={(model) => save.mutate(model)}
+						onValueChange={chooseModel}
 						aria-labelledby="model-heading"
 					>
 						{providers.map((provider) => (
@@ -152,12 +160,20 @@ function OverviewSettings() {
 							id="show-recently-viewed"
 							type="checkbox"
 							checked={current.show_recently_viewed}
-							onChange={(event) =>
-								save.mutate({
-									...current,
-									show_recently_viewed: event.target.checked,
-								})
-							}
+							onChange={(event) => {
+								const shown = event.target.checked;
+								save.mutate(
+									{ ...current, show_recently_viewed: shown },
+									{
+										onSuccess: () =>
+											toast.success(
+												shown
+													? "Recently viewed shown"
+													: "Recently viewed hidden",
+											),
+									},
+								);
+							}}
 							className="size-4 accent-primary"
 						/>
 						<Label htmlFor="show-recently-viewed">Show Recently viewed</Label>
@@ -175,14 +191,18 @@ function OverviewSettings() {
 							id="recently-viewed-count"
 							value={current.recently_viewed_count}
 							disabled={!current.show_recently_viewed}
-							onChange={(event) =>
-								save.mutate({
-									...current,
-									recently_viewed_count: Number(
-										event.target.value,
-									) as Preferences["recently_viewed_count"],
-								})
-							}
+							onChange={(event) => {
+								const count = Number(
+									event.target.value,
+								) as Preferences["recently_viewed_count"];
+								save.mutate(
+									{ ...current, recently_viewed_count: count },
+									{
+										onSuccess: () =>
+											toast.success(`Now listing ${count} matters`),
+									},
+								);
+							}}
 							className="h-8 rounded-md border bg-background px-2 text-sm disabled:opacity-50"
 						>
 							{RECENTLY_VIEWED_COUNTS.map((count) => (

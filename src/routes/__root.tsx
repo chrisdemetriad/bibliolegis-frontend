@@ -6,6 +6,7 @@ import { createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 
 import { useState } from "react";
+import { Toaster } from "#/components/ui/sonner";
 import { themeScript } from "#/theme/theme";
 import appCss from "../styles.css?url";
 
@@ -65,6 +66,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 						{children}
 					</QueryClientProvider>
 				</ClerkProvider>
+				<Toaster />
 				<TanStackDevtools
 					config={{
 						position: "bottom-right",

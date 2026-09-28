@@ -1,6 +1,7 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { UploadIcon, XIcon } from "lucide-react";
 import { useId, useState } from "react";
+import { toast } from "sonner";
 import { errorMessage } from "#/api/client";
 import { useApi } from "#/api/useApi";
 import { Button } from "#/components/ui/button";
@@ -71,6 +72,9 @@ export function UploadZone({ projectId }: { projectId?: string } = {}) {
 				onProgress: (progress) => update(key, { progress }),
 			});
 			update(key, { state: "done", progress: 1 });
+			toast.success(`${file.name} uploaded`, {
+				description: "Now being read",
+			});
 			// The new row appears in the list as pending, and the list's own
 			// polling carries it through to done or failed from there
 			queryClient.invalidateQueries({ queryKey: documentKeys.list() });

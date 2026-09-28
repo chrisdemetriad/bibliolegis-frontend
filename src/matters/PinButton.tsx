@@ -1,4 +1,5 @@
 import { PinIcon } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "#/components/ui/button";
 import {
 	Tooltip,
@@ -35,7 +36,17 @@ export function PinButton({
 						pinned && "text-foreground",
 						className,
 					)}
-					onClick={() => pin.mutate({ id: projectId, pinned: !pinned })}
+					onClick={() =>
+						pin.mutate(
+							{ id: projectId, pinned: !pinned },
+							{
+								onSuccess: () =>
+									toast.success(
+										pinned ? `Unpinned ${title}` : `Pinned ${title}`,
+									),
+							},
+						)
+					}
 				>
 					<PinIcon className={cn(pinned && "fill-current")} />
 				</Button>
