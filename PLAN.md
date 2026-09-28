@@ -160,10 +160,14 @@ doesn't otherwise use. Mounted once in `__root.tsx`, so any page can call
 shows one, so does saving a choice on `/settings` and pinning or unpinning a
 matter. See Phase 6 below for where this should go next.
 
-**Next:** the rest of Phase 11, press. The api's routes exist as of
-2026-09-28 and a real matter's Press tab reads them with a list and cards
-toggle, its own page per article, Search now, pasting a link and the
-matter's terms and feeds. The firm wide `/press` page is left. After that, the rest of Phase 4: aggregation answers as a
+**Phase 11, press, is done as of 2026-09-28.** A real matter's Press tab and
+`/press` read the api, with a list and cards toggle, a page per article, Search
+now, pasting a link, watch terms and feeds. Checked in headless Chrome against a
+scratch copy with the api mocked, not yet clicked through with a real Clerk
+session. More sources come from the api's Google News and Guardian adapters with
+no change here.
+
+**Next:** the rest of Phase 4: aggregation answers as a
 table, query history once the api has `GET /queries`, and the loading and empty states it hasn't
 covered. Phase 5's admin pages have their endpoints already, and Phase 7's
 deployment can start.
@@ -291,7 +295,7 @@ its endpoint appears.
 - [x] `/overview` with recent activity, coming up and an ask box
 - [x] `/matters` with tabs by practice area, and a matter page with overview, files, chronology, hearings, parties, research, notes, press and activity
 - [x] `/press`, `/library` and `/help`. Press lists the sources it will read (Reuters, BBC News, Sky News, national, business, legal and local titles) with a switch each
-- [ ] Press search on a schedule, reading each enabled source for the parties, case name and reference of every open matter. Needs an api job first
+- [x] Press search on a schedule, reading each enabled source for the parties, case name and reference of every open matter. Done on 2026-09-28 as `worker.py press` in the api, see Phase 11 below. Its Railway cron entry waits on deployment
 - [x] Matters cover every practice area the firm might take on, crime and civil alike, each with its own tab
 - [x] Real matters on `/matters`, from `GET /projects`, done on 2026-09-28. They sit above the sample ones, which stay under a "Sample data" label as the user asked. A matter's pages read it from `GET /projects/{slug}` and fall back to a sample matter only when the api says there's no such matter, so a real matter can take an address a sample one also had. Files and hearings show the real documents and dates, chronology and notes say there's nothing yet rather than showing another matter's sample entries
 - [x] Pin matters from their row on `/matters` or the matter's own header, per person, shown under "Pinned matters" in the sidebar. The pin shows straight away and rolls back if the api refuses
@@ -299,7 +303,7 @@ its endpoint appears.
 - [x] A file dropped a second time is caught before it uploads, done on 2026-09-28. The browser hashes each file with SHA-256 and asks `POST /documents/duplicates`, and a match opens a dialog naming the matter the copy belongs to with Go to matter and Continue uploading. Both drop zones do this, and in a matter's own Files tab a copy already in that matter offers Don't upload instead. If the check itself fails the upload goes ahead as before
 - [x] Recent activity from the audit log, done on 2026-09-28. The overview and a real matter's Activity tab read `GET /activity`, refreshed every 30 seconds. The overview keeps the sample list until the firm has activity of its own, since nothing before that day was logged
 - [x] Recently viewed from `GET /users/me/recently-viewed`, done on 2026-09-28. Opening a real matter records a visit once, not once per tab. `/settings` has an Overview section to hide it and choose 3 or 8 matters
-- [ ] Replace the rest of the sample data with real endpoints: press and library need api work first
+- [ ] Replace the rest of the sample data with real endpoints: library needs api work first. Press was replaced on 2026-09-28, sample matters keep their sample press
 - [x] Pages use the full width of the main area rather than a centred column, asked for on 2026-09-28. Documents and settings moved onto the shared `Page` wrapper to match
 - [ ] Search box and ⌘K
 - [x] The ask boxes call `POST /query`, done on 2026-09-28. The overview's asks across everything, a matter's own is kept to that matter's documents
@@ -489,12 +493,16 @@ original. The article text itself isn't kept, see that phase for why.
 - [x] Add an article by pasting its URL, showing what was read from the page
       before it's saved. Done on 2026-09-28, Add article on
       the Press tab
-- [ ] A sources panel on the matter's Press tab: its watch terms, exclusions and
+- [x] A sources panel on the matter's Press tab: its watch terms, exclusions and
       "must also mention" terms, and feeds of its own. The firm wide list on
       `/press` reads and saves real sources, and Add takes a feed URL. The matter's
       half is done as of 2026-09-28. Changing require or exclude terms while the
       watch list is still the parties sends it empty, so it keeps following the
-      parties rather than being frozen as they were that day. `/press` is left
+      parties rather than being frozen as they were that day. `/press` followed the
+      same day: the firm's press across the caller's matters with the same list
+      and cards toggle, and the firm's feeds grouped by kind. Only an admin sees
+      Add, the switches and remove, the api refuses anyone else anyway. The sample
+      sources list is gone from `src/mock/data.ts`
 - [x] Search now calls the refresh route and shows when each source was last read
       and any error it hit. Done on the matter's Press tab on
       2026-09-28, with a toast saying how many new articles and how many sources
