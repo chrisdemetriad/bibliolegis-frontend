@@ -6,6 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "#/components/ui/tabs";
 import { TagPill } from "#/components/ui/tag-pill";
 import { cn } from "#/lib/utils";
 import { IntakeZone } from "#/matters/IntakeZone";
+import { MatterMenu } from "#/matters/MatterMenu";
 import { PinButton } from "#/matters/PinButton";
 import { useAllMatters } from "#/matters/queries";
 import {
@@ -189,12 +190,20 @@ export function MatterRow({ matter }: { matter: Matter }) {
 						/>
 					))}
 					{matter.projectId && (
-						<PinButton
-							projectId={matter.projectId}
-							pinned={Boolean(matter.pinned)}
-							title={matter.title}
-							className="relative -my-1 -mr-2"
-						/>
+						<>
+							<PinButton
+								projectId={matter.projectId}
+								pinned={Boolean(matter.pinned)}
+								title={matter.title}
+								className="relative -my-1"
+							/>
+							<MatterMenu
+								projectId={matter.projectId}
+								title={matter.title}
+								documents={matter.documents}
+								className="relative -my-1 -mr-2"
+							/>
+						</>
 					)}
 				</div>
 				{next && (

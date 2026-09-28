@@ -1,4 +1,9 @@
-import { createFileRoute, Link, Outlet } from "@tanstack/react-router";
+import {
+	createFileRoute,
+	Link,
+	Outlet,
+	useNavigate,
+} from "@tanstack/react-router";
 import { ShareIcon, SparklesIcon } from "lucide-react";
 import { useRecordView } from "#/activity/queries";
 import { ApiError } from "#/api/client";
@@ -7,6 +12,7 @@ import { Skeleton } from "#/components/ui/skeleton";
 import { TagPill } from "#/components/ui/tag-pill";
 import { projectToMatter } from "#/matters/adapt";
 import { MatterContext } from "#/matters/context";
+import { MatterMenu } from "#/matters/MatterMenu";
 import { PinButton } from "#/matters/PinButton";
 import { useProject } from "#/matters/queries";
 import { findMatter, type Matter } from "#/mock/data";
@@ -63,6 +69,7 @@ function MatterLayout() {
 }
 
 function MatterFrame({ matter }: { matter: Matter }) {
+	const navigate = useNavigate();
 	return (
 		<Page>
 			<div className="mb-6 flex flex-wrap items-start justify-between gap-4 border-b pb-6">
@@ -91,14 +98,7 @@ function MatterFrame({ matter }: { matter: Matter }) {
 					</div>
 				</div>
 				<div className="flex items-center gap-1">
-					{matter.projectId && (
-						<PinButton
-							projectId={matter.projectId}
-							pinned={Boolean(matter.pinned)}
-							title={matter.title}
-						/>
-					)}
-					<Button size="sm" asChild>
+					<Button size="sm" className="mr-1" asChild>
 						<Link
 							to="/matters/$matterId/overview"
 							params={{ matterId: matter.id }}
@@ -107,9 +107,24 @@ function MatterFrame({ matter }: { matter: Matter }) {
 							<SparklesIcon /> Ask about this matter
 						</Link>
 					</Button>
+					{matter.projectId && (
+						<PinButton
+							projectId={matter.projectId}
+							pinned={Boolean(matter.pinned)}
+							title={matter.title}
+						/>
+					)}
 					<Button variant="ghost" size="icon-sm" aria-label="Share matter">
 						<ShareIcon />
 					</Button>
+					{matter.projectId && (
+						<MatterMenu
+							projectId={matter.projectId}
+							title={matter.title}
+							documents={matter.documents}
+							onDeleted={() => navigate({ to: "/overview" })}
+						/>
+					)}
 				</div>
 			</div>
 			<Outlet />
