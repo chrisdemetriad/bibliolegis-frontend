@@ -5,6 +5,7 @@ import { DeleteDocument } from "#/documents/DeleteDocument";
 import { DocumentStatus } from "#/documents/DocumentStatus";
 import { formatUploadedAt } from "#/documents/format";
 import { useDocument, useProjects } from "#/documents/queries";
+import { Page } from "#/shell/page";
 
 export const Route = createFileRoute("/_authed/documents/$documentId")({
 	component: DocumentPage,
@@ -21,7 +22,7 @@ function DocumentPage() {
 		: "Whole firm";
 
 	return (
-		<main className="mx-auto max-w-3xl p-8">
+		<Page>
 			<Link
 				to="/documents"
 				className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
@@ -79,6 +80,6 @@ function DocumentPage() {
 					</dl>
 				</>
 			)}
-		</main>
+		</Page>
 	);
 }

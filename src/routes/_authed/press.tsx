@@ -44,7 +44,7 @@ const kinds: PressSource["kind"][] = [
 
 function PressPage() {
 	return (
-		<Page className="max-w-6xl">
+		<Page>
 			<PageHeader
 				title="Press"
 				description="News about your matters, your clients and the people on the other side. Every source on the right is searched on a schedule for the parties, case names and references of every open matter."

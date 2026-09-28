@@ -241,6 +241,7 @@ its endpoint appears.
 - [ ] Press search on a schedule, reading each enabled source for the parties, case name and reference of every open matter. Needs an api job first
 - [x] Matters cover every practice area the firm might take on, crime and civil alike, each with its own tab
 - [ ] Replace sample data with real endpoints: matters (`GET /projects` exists), activity (from the audit log), press and library need api work first
+- [x] Pages use the full width of the main area rather than a centred column, asked for on 2026-09-28. Documents and settings moved onto the shared `Page` wrapper to match
 - [ ] Search box and ⌘K
 - [ ] The ask boxes call `POST /query` once it exists, see Phase 4
 
