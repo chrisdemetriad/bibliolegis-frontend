@@ -171,6 +171,15 @@ export function createApi({
 			);
 		},
 
+		// Takes every document in the matter with it, files included
+		deleteProject: async (projectRef: string) => {
+			unwrap(
+				await client.DELETE("/projects/{project_ref}", {
+					params: { path: { project_ref: projectRef } },
+				}),
+			);
+		},
+
 		recordView: async (projectRef: string) => {
 			unwrap(
 				await client.PUT("/projects/{project_ref}/view", {

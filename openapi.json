@@ -1821,6 +1821,37 @@
       }
     },
     "/projects/{project_ref}": {
+      "delete": {
+        "description": "Delete a matter along with every document in it.\n\nDocuments don't cascade from their matter on purpose, see the note on\nDocument in app/models.py, so they go first by hand. Their chunks,\nmetadata and profiles cascade from them, and the matter's parties, dates,\nmembers, pins and views cascade from it. The audit log keeps its entries,\nit's the record that any of this happened.",
+        "operationId": "delete_project_projects__project_ref__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "project_ref",
+            "required": true,
+            "schema": {
+              "title": "Project Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Delete Project"
+      },
       "get": {
         "operationId": "get_project_projects__project_ref__get",
         "parameters": [
