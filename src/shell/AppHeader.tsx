@@ -4,7 +4,7 @@ import { Fragment } from "react";
 import { Button } from "#/components/ui/button";
 import { Separator } from "#/components/ui/separator";
 import { SidebarTrigger } from "#/components/ui/sidebar";
-import { findMatter } from "#/mock/data";
+import { useAllMatters } from "#/matters/queries";
 import { ThemeToggle } from "#/theme/ThemeToggle";
 
 const labels: Record<string, string> = {
@@ -28,11 +28,15 @@ const labels: Record<string, string> = {
 // either has a fixed label or is a matter or document id
 function useCrumbs() {
 	const { pathname } = useLocation();
+	const { matters } = useAllMatters();
 	const segments = pathname.split("/").filter(Boolean);
 
 	return segments.map((segment, i) => {
 		const href = `/${segments.slice(0, i + 1).join("/")}`;
-		const matter = segments[i - 1] === "matters" ? findMatter(segment) : null;
+		const matter =
+			segments[i - 1] === "matters"
+				? matters.find((candidate) => candidate.id === segment)
+				: null;
 		const label =
 			labels[segment] ??
 			matter?.title ??

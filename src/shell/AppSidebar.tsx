@@ -34,7 +34,8 @@ import {
 	SidebarMenuButton,
 	SidebarMenuItem,
 } from "#/components/ui/sidebar";
-import { currentUser, findMatter, matters } from "#/mock/data";
+import { useAllMatters } from "#/matters/queries";
+import { currentUser } from "#/mock/data";
 
 type NavItem = {
 	label: string;
@@ -43,18 +44,20 @@ type NavItem = {
 	badge?: string | number;
 };
 
-const firmNav: NavItem[] = [
-	{ label: "Overview", to: "/overview", icon: HouseIcon },
-	{
-		label: "Matters",
-		to: "/matters",
-		icon: BriefcaseIcon,
-		badge: matters.filter((matter) => !matter.closed).length,
-	},
-	{ label: "Documents", to: "/documents", icon: FileTextIcon },
-	{ label: "Library", to: "/library", icon: LibraryIcon },
-	{ label: "Press", to: "/press", icon: NewspaperIcon },
-];
+function firmNav(openMatters: number): NavItem[] {
+	return [
+		{ label: "Overview", to: "/overview", icon: HouseIcon },
+		{
+			label: "Matters",
+			to: "/matters",
+			icon: BriefcaseIcon,
+			badge: openMatters,
+		},
+		{ label: "Documents", to: "/documents", icon: FileTextIcon },
+		{ label: "Library", to: "/library", icon: LibraryIcon },
+		{ label: "Press", to: "/press", icon: NewspaperIcon },
+	];
+}
 
 function matterNav(matterId: string, documents: number): NavItem[] {
 	const base = `/matters/${matterId}`;
@@ -110,7 +113,12 @@ function NavList({ items }: { items: NavItem[] }) {
 
 export function AppSidebar() {
 	const { matterId } = useParams({ strict: false });
-	const matter = matterId ? findMatter(matterId) : undefined;
+	const { matters } = useAllMatters();
+	const matter = matterId
+		? matters.find((candidate) => candidate.id === matterId)
+		: undefined;
+	const pinned = matters.filter((candidate) => candidate.pinned);
+	const openMatters = matters.filter((candidate) => !candidate.closed).length;
 
 	return (
 		<Sidebar variant="inset" collapsible="icon">
@@ -178,22 +186,27 @@ export function AppSidebar() {
 					<>
 						<SidebarGroup>
 							<SidebarGroupContent>
-								<NavList items={firmNav} />
+								<NavList items={firmNav(openMatters)} />
 							</SidebarGroupContent>
 						</SidebarGroup>
 						<SidebarGroup>
 							<SidebarGroupLabel>Pinned matters</SidebarGroupLabel>
 							<SidebarGroupContent>
+								{pinned.length === 0 && (
+									<p className="px-2 text-xs text-muted-foreground group-data-[collapsible=icon]:hidden">
+										Pin a matter from its row on Matters to keep it here.
+									</p>
+								)}
 								<SidebarMenu>
-									{matters.slice(0, 3).map((pinned) => (
-										<SidebarMenuItem key={pinned.id}>
-											<SidebarMenuButton asChild tooltip={pinned.title}>
+									{pinned.map((item) => (
+										<SidebarMenuItem key={item.id}>
+											<SidebarMenuButton asChild tooltip={item.title}>
 												<Link
 													to="/matters/$matterId/overview"
-													params={{ matterId: pinned.id }}
+													params={{ matterId: item.id }}
 												>
 													<span className="ml-1 size-1.5 shrink-0 rounded-full bg-muted-foreground/60" />
-													<span>{pinned.title}</span>
+													<span>{item.title}</span>
 												</Link>
 											</SidebarMenuButton>
 										</SidebarMenuItem>

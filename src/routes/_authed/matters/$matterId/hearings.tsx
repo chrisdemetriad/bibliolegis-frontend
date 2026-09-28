@@ -1,8 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { CalendarPlusIcon, GavelIcon, TimerIcon } from "lucide-react";
 import { Button } from "#/components/ui/button";
+import { useMatter } from "#/matters/context";
 import { daysUntil, formatDate, upcoming } from "#/mock/data";
-import { useMatter } from "#/mock/useMatter";
 import { Panel, PersonAvatar, SectionTitle } from "#/shell/page";
 
 export const Route = createFileRoute("/_authed/matters/$matterId/hearings")({
@@ -12,6 +12,7 @@ export const Route = createFileRoute("/_authed/matters/$matterId/hearings")({
 function Hearings() {
 	const matter = useMatter();
 	const own = upcoming.filter((item) => item.matterId === matter.id);
+	if (matter.projectId) return <RealDates dates={matter.dates ?? []} />;
 
 	return (
 		<div className="space-y-8">
@@ -80,5 +81,41 @@ function Hearings() {
 				</p>
 			</section>
 		</div>
+	);
+}
+
+function RealDates({ dates }: { dates: { label: string; date: string }[] }) {
+	return (
+		<section>
+			<SectionTitle>Hearings and deadlines</SectionTitle>
+			<p className="-mt-1 mb-4 text-sm text-muted-foreground">
+				Read out of the matter's documents as they were uploaded.
+			</p>
+			{dates.length === 0 && (
+				<p className="text-sm text-muted-foreground">Nothing listed.</p>
+			)}
+			<div className="space-y-2">
+				{dates.map((entry) => {
+					const days = daysUntil(entry.date);
+					return (
+						<Panel
+							key={`${entry.label}-${entry.date}`}
+							className="flex items-center gap-4 px-4 py-3"
+						>
+							<GavelIcon className="size-4 shrink-0 text-muted-foreground" />
+							<div className="min-w-0 flex-1">
+								<p className="text-sm">{entry.label}</p>
+								<p className="text-xs text-muted-foreground">
+									{formatDate(entry.date)}
+								</p>
+							</div>
+							<span className="w-16 text-right text-xs text-muted-foreground tabular-nums">
+								{days < 0 ? "Passed" : `${days}d`}
+							</span>
+						</Panel>
+					);
+				})}
+			</div>
+		</section>
 	);
 }

@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { ShieldCheckIcon, UserPlusIcon } from "lucide-react";
 import { Button } from "#/components/ui/button";
-import { useMatter } from "#/mock/useMatter";
+import { useMatter } from "#/matters/context";
 import { Panel, SectionTitle } from "#/shell/page";
 
 export const Route = createFileRoute("/_authed/matters/$matterId/parties")({
