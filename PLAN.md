@@ -152,6 +152,14 @@ batch headline, the duplicate dialog links to each matter, rows show when a
 matter was added and a matter's ask panel opens on arrival and is toggled from
 the header. Checked in headless Chrome with the api mocked, not signed in.
 
+**Toast notifications landed on 2026-09-28**, asked for by the user. shadcn's
+sonner component is in as `src/components/ui/sonner.tsx`, adapted to watch the
+`dark` class on `<html>` instead of pulling in `next-themes`, which this app
+doesn't otherwise use. Mounted once in `__root.tsx`, so any page can call
+`toast` from `sonner`. A file finishing upload in `/matters/{slug}/files`
+shows one, so does saving a choice on `/settings` and pinning or unpinning a
+matter. See Phase 6 below for where this should go next.
+
 **Next:** the rest of Phase 4: aggregation answers as a table, query history
 once the api has `GET /queries`, and the loading and empty states it hasn't
 covered. Phase 5's admin pages have their endpoints already, and Phase 7's
@@ -368,7 +376,7 @@ Clerk's TanStack Start integration (`@clerk/tanstack-react-start`, the current p
 ## Phase 6: polish
 
 - [ ] Basic responsive layout pass once the core pages exist
-- [ ] Consistent error boundary/toast pattern across pages rather than one off handling per page
+- [ ] Consistent error boundary/toast pattern across pages rather than one off handling per page. Sonner's toaster landed on 2026-09-28, mounted once in `__root.tsx`, with a success toast on each file finishing upload in `/matters/{slug}/files`, on saving a setting on `/settings` and on pinning or unpinning a matter. Use `toast` from `sonner` for any other confirmation as it's added rather than a new one off pattern, but keep the inline status text pages already show for errors and in progress states, a toast is for the moment something finishes. The error boundary half of this item is still open
 - [ ] Accessibility pass on the core flows (upload, query, login)
 
 ## Phase 7: deployment
