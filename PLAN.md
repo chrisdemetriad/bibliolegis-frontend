@@ -162,8 +162,8 @@ matter. See Phase 6 below for where this should go next.
 
 **Next:** the rest of Phase 11, press. The api's routes exist as of
 2026-09-28 and a real matter's Press tab reads them with a list and cards
-toggle, and each article has its own page. Pasting a link and the sources
-panel are left. After that, the rest of Phase 4: aggregation answers as a
+toggle, its own page per article, Search now, pasting a link and the
+matter's terms and feeds. The firm wide `/press` page is left. After that, the rest of Phase 4: aggregation answers as a
 table, query history once the api has `GET /queries`, and the loading and empty states it hasn't
 covered. Phase 5's admin pages have their endpoints already, and Phase 7's
 deployment can start.
@@ -486,10 +486,16 @@ original. The article text itself isn't kept, see that phase for why.
       `press_.$outlet.$slug.tsx` so the page replaces the list rather than nesting
       inside it. Headlines in the list open it, the icon beside them goes straight
       to the outlet. A dismissed article can be brought back from here
-- [ ] Add an article by pasting its URL, showing what was read from the page
-      before it's saved
+- [x] Add an article by pasting its URL, showing what was read from the page
+      before it's saved. Done on 2026-09-28, Add article on
+      the Press tab
 - [ ] A sources panel on the matter's Press tab: its watch terms, exclusions and
       "must also mention" terms, and feeds of its own. The firm wide list on
-      `/press` reads and saves real sources, and Add takes a feed URL
-- [ ] Search now calls the refresh route and shows when each source was last read
-      and any error it hit
+      `/press` reads and saves real sources, and Add takes a feed URL. The matter's
+      half is done as of 2026-09-28. Changing require or exclude terms while the
+      watch list is still the parties sends it empty, so it keeps following the
+      parties rather than being frozen as they were that day. `/press` is left
+- [x] Search now calls the refresh route and shows when each source was last read
+      and any error it hit. Done on the matter's Press tab on
+      2026-09-28, with a toast saying how many new articles and how many sources
+      failed
