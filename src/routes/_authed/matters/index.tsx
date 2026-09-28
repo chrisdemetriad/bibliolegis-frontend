@@ -4,6 +4,7 @@ import { Button } from "#/components/ui/button";
 import { Skeleton } from "#/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "#/components/ui/tabs";
 import { cn } from "#/lib/utils";
+import { IntakeZone } from "#/matters/IntakeZone";
 import { PinButton } from "#/matters/PinButton";
 import { useAllMatters } from "#/matters/queries";
 import { daysUntil, formatDate, type Matter, practiceAreas } from "#/mock/data";
@@ -48,6 +49,8 @@ function MattersPage() {
 					</>
 				}
 			/>
+
+			<IntakeZone />
 
 			{projects.isError && (
 				<p className="mb-4 text-sm text-destructive">

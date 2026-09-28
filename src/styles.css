@@ -161,3 +161,12 @@ body {
     @apply font-sans;
   }
 }
+/* The light running along a progress bar while work is still going on */
+@keyframes progress-sheen {
+	from {
+		transform: translateX(-100%);
+	}
+	to {
+		transform: translateX(100%);
+	}
+}

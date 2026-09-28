@@ -7,6 +7,8 @@ export type Document = Schemas["DocumentOut"];
 export type Project = Schemas["ProjectOut"];
 export type ProjectParty = Schemas["PartyOut"];
 export type ProjectDate = Schemas["DateOut"];
+export type Intake = Schemas["IntakeOut"];
+export type IntakeMatter = Schemas["IntakeMatterOut"];
 export type ProjectCreate = Schemas["ProjectCreate"];
 export type ProjectMember = Schemas["ProjectMemberOut"];
 export type MemberAdd = Schemas["MemberAdd"];
@@ -51,6 +53,33 @@ export function createApi({
 	getToken,
 }: ApiOptions = {}) {
 	const client = createClient<paths>({ baseUrl });
+
+	// XMLHttpRequest rather than fetch because fetch can't report upload
+	// progress, and a large scanned bundle can take long enough that a bare
+	// spinner looks stuck
+	async function postWithProgress<T>(
+		path: string,
+		form: FormData,
+		onProgress?: (fraction: number) => void,
+	): Promise<T> {
+		const token = await getToken?.();
+		return new Promise((resolve, reject) => {
+			const xhr = new XMLHttpRequest();
+			xhr.open("POST", `${baseUrl}${path}`);
+			if (token) xhr.setRequestHeader("Authorization", `Bearer ${token}`);
+			xhr.responseType = "json";
+			xhr.upload.onprogress = (event) => {
+				if (event.lengthComputable) onProgress?.(event.loaded / event.total);
+			};
+			xhr.onload = () => {
+				if (xhr.status >= 200 && xhr.status < 300) resolve(xhr.response);
+				else reject(new ApiError(xhr.status, xhr.response));
+			};
+			// Network failure or CORS, there's no status to report
+			xhr.onerror = () => reject(new ApiError(0, null));
+			xhr.send(form);
+		});
+	}
 
 	if (getToken) {
 		const auth: Middleware = {
@@ -140,9 +169,7 @@ export function createApi({
 			),
 
 		// The response always says pending, ingestion runs after it returns.
-		// Poll getDocument to see it reach done or failed. XMLHttpRequest rather
-		// than fetch because fetch can't report upload progress, and a large
-		// scanned bundle can take long enough that a bare spinner looks stuck
+		// Poll getDocument to see it reach done or failed
 		uploadDocument: async (
 			file: File,
 			{
@@ -153,25 +180,41 @@ export function createApi({
 			const form = new FormData();
 			form.append("file", file);
 			if (projectId) form.append("project_id", projectId);
-			const token = await getToken?.();
-
-			return new Promise((resolve, reject) => {
-				const xhr = new XMLHttpRequest();
-				xhr.open("POST", `${baseUrl}/documents`);
-				if (token) xhr.setRequestHeader("Authorization", `Bearer ${token}`);
-				xhr.responseType = "json";
-				xhr.upload.onprogress = (event) => {
-					if (event.lengthComputable) onProgress?.(event.loaded / event.total);
-				};
-				xhr.onload = () => {
-					if (xhr.status >= 200 && xhr.status < 300) resolve(xhr.response);
-					else reject(new ApiError(xhr.status, xhr.response));
-				};
-				// Network failure or CORS, there's no status to report
-				xhr.onerror = () => reject(new ApiError(0, null));
-				xhr.send(form);
-			});
+			return postWithProgress<Document>("/documents", form, onProgress);
 		},
+
+		// A batch of files to be read and sorted into matters. Open it, add each
+		// file, seal it once they've all gone, then poll getIntake until it's
+		// done and says which matters came out of it
+		createIntake: async () => unwrap(await client.POST("/intakes")),
+
+		getIntake: async (intakeId: string) =>
+			unwrap(
+				await client.GET("/intakes/{intake_id}", {
+					params: { path: { intake_id: intakeId } },
+				}),
+			),
+
+		addIntakeDocument: async (
+			intakeId: string,
+			file: File,
+			onProgress?: (fraction: number) => void,
+		): Promise<Document> => {
+			const form = new FormData();
+			form.append("file", file);
+			return postWithProgress<Document>(
+				`/intakes/${intakeId}/documents`,
+				form,
+				onProgress,
+			);
+		},
+
+		sealIntake: async (intakeId: string) =>
+			unwrap(
+				await client.POST("/intakes/{intake_id}/seal", {
+					params: { path: { intake_id: intakeId } },
+				}),
+			),
 
 		deleteDocument: async (documentId: string) => {
 			unwrap(
