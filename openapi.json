@@ -622,6 +622,24 @@
         "title": "MemberAdd",
         "type": "object"
       },
+      "MentionUpdate": {
+        "properties": {
+          "status": {
+            "enum": [
+              "new",
+              "kept",
+              "dismissed"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status"
+        ],
+        "title": "MentionUpdate",
+        "type": "object"
+      },
       "ModelChoice": {
         "properties": {
           "model": {
@@ -633,6 +651,66 @@
           "model"
         ],
         "title": "ModelChoice",
+        "type": "object"
+      },
+      "PagePreviewOut": {
+        "properties": {
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "image_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Image Url"
+          },
+          "published_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Published At"
+          },
+          "site_name": {
+            "title": "Site Name",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "url": {
+            "title": "Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "url",
+          "title",
+          "site_name",
+          "description",
+          "image_url",
+          "published_at"
+        ],
+        "title": "PagePreviewOut",
         "type": "object"
       },
       "PartyOut": {
@@ -727,6 +805,485 @@
           "recently_viewed_count"
         ],
         "title": "Preferences",
+        "type": "object"
+      },
+      "PressArticleOut": {
+        "properties": {
+          "excerpt": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Excerpt"
+          },
+          "fetched_at": {
+            "format": "date-time",
+            "title": "Fetched At",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "image_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Image Url"
+          },
+          "outlet_name": {
+            "title": "Outlet Name",
+            "type": "string"
+          },
+          "outlet_slug": {
+            "title": "Outlet Slug",
+            "type": "string"
+          },
+          "published_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Published At"
+          },
+          "slug": {
+            "title": "Slug",
+            "type": "string"
+          },
+          "source_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Name"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "url": {
+            "title": "Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "url",
+          "outlet_name",
+          "outlet_slug",
+          "slug",
+          "title",
+          "excerpt",
+          "image_url",
+          "published_at",
+          "fetched_at",
+          "source_name"
+        ],
+        "title": "PressArticleOut",
+        "type": "object"
+      },
+      "PressLink": {
+        "properties": {
+          "url": {
+            "maxLength": 2000,
+            "minLength": 1,
+            "title": "Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "url"
+        ],
+        "title": "PressLink",
+        "type": "object"
+      },
+      "PressMentionOut": {
+        "properties": {
+          "added_by_hand": {
+            "title": "Added By Hand",
+            "type": "boolean"
+          },
+          "article": {
+            "$ref": "#/components/schemas/PressArticleOut"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "matched_terms": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Matched Terms",
+            "type": "array"
+          },
+          "project": {
+            "$ref": "#/components/schemas/PressProjectOut"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "status",
+          "matched_terms",
+          "added_by_hand",
+          "created_at",
+          "project",
+          "article"
+        ],
+        "title": "PressMentionOut",
+        "type": "object"
+      },
+      "PressProjectOut": {
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "slug": {
+            "title": "Slug",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "slug",
+          "name"
+        ],
+        "title": "PressProjectOut",
+        "type": "object"
+      },
+      "PressRefreshOut": {
+        "properties": {
+          "articles_added": {
+            "title": "Articles Added",
+            "type": "integer"
+          },
+          "mentions_added": {
+            "title": "Mentions Added",
+            "type": "integer"
+          },
+          "sources_failed": {
+            "title": "Sources Failed",
+            "type": "integer"
+          },
+          "sources_read": {
+            "title": "Sources Read",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "sources_read",
+          "sources_failed",
+          "articles_added",
+          "mentions_added"
+        ],
+        "title": "PressRefreshOut",
+        "type": "object"
+      },
+      "PressSourceCreate": {
+        "properties": {
+          "category": {
+            "anyOf": [
+              {
+                "maxLength": 50,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Category"
+          },
+          "kind": {
+            "default": "rss",
+            "enum": [
+              "rss",
+              "google_news",
+              "guardian"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "name": {
+            "maxLength": 255,
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          },
+          "project": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Project"
+          },
+          "url": {
+            "anyOf": [
+              {
+                "maxLength": 2000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Url"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "title": "PressSourceCreate",
+        "type": "object"
+      },
+      "PressSourceOut": {
+        "properties": {
+          "article_count": {
+            "title": "Article Count",
+            "type": "integer"
+          },
+          "category": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Category"
+          },
+          "enabled": {
+            "title": "Enabled",
+            "type": "boolean"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "last_error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Error"
+          },
+          "last_fetched_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Fetched At"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "project_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Project Id"
+          },
+          "slug": {
+            "title": "Slug",
+            "type": "string"
+          },
+          "url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Url"
+          }
+        },
+        "required": [
+          "id",
+          "project_id",
+          "name",
+          "slug",
+          "kind",
+          "url",
+          "category",
+          "enabled",
+          "last_fetched_at",
+          "last_error",
+          "article_count"
+        ],
+        "title": "PressSourceOut",
+        "type": "object"
+      },
+      "PressSourceUpdate": {
+        "properties": {
+          "category": {
+            "anyOf": [
+              {
+                "maxLength": 50,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Category"
+          },
+          "enabled": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Enabled"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "maxLength": 255,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          }
+        },
+        "title": "PressSourceUpdate",
+        "type": "object"
+      },
+      "PressTerms": {
+        "properties": {
+          "exclude": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Exclude",
+            "type": "array"
+          },
+          "require": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Require",
+            "type": "array"
+          },
+          "watch": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Watch",
+            "type": "array"
+          }
+        },
+        "required": [
+          "watch",
+          "require",
+          "exclude"
+        ],
+        "title": "PressTerms",
+        "type": "object"
+      },
+      "PressTermsOut": {
+        "properties": {
+          "exclude": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Exclude",
+            "type": "array"
+          },
+          "require": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Require",
+            "type": "array"
+          },
+          "watch": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Watch",
+            "type": "array"
+          },
+          "watch_is_default": {
+            "title": "Watch Is Default",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "watch",
+          "require",
+          "exclude",
+          "watch_is_default"
+        ],
+        "title": "PressTermsOut",
         "type": "object"
       },
       "ProjectCreate": {
@@ -1712,6 +2269,269 @@
         "summary": "Seal Intake"
       }
     },
+    "/press": {
+      "get": {
+        "description": "Press across every matter the caller belongs to, newest first.",
+        "operationId": "list_firm_press_press_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "include_dismissed",
+            "required": false,
+            "schema": {
+              "default": false,
+              "title": "Include Dismissed",
+              "type": "boolean"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 100,
+              "title": "Limit",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/PressMentionOut"
+                  },
+                  "title": "Response List Firm Press Press Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "List Firm Press"
+      }
+    },
+    "/press/preview": {
+      "post": {
+        "description": "What a pasted link's page says about itself, before anything is saved.",
+        "operationId": "preview_press_link_press_preview_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PressLink"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagePreviewOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Preview Press Link"
+      }
+    },
+    "/press/sources": {
+      "get": {
+        "description": "Firm wide sources, plus one matter's own when `project` names it.",
+        "operationId": "list_press_sources_press_sources_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "project",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Project"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/PressSourceOut"
+                  },
+                  "title": "Response List Press Sources Press Sources Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "List Press Sources"
+      },
+      "post": {
+        "operationId": "add_press_source_press_sources_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PressSourceCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PressSourceOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Add Press Source"
+      }
+    },
+    "/press/sources/{source_id}": {
+      "delete": {
+        "description": "Remove a source. What it already found stays.",
+        "operationId": "delete_press_source_press_sources__source_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "source_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Source Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Delete Press Source"
+      },
+      "patch": {
+        "operationId": "update_press_source_press_sources__source_id__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "source_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Source Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PressSourceUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PressSourceOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Update Press Source"
+      }
+    },
     "/projects": {
       "get": {
         "operationId": "list_projects_projects_get",
@@ -1950,6 +2770,350 @@
           }
         },
         "summary": "Pin Project"
+      }
+    },
+    "/projects/{project_ref}/press": {
+      "get": {
+        "operationId": "list_project_press_projects__project_ref__press_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "project_ref",
+            "required": true,
+            "schema": {
+              "title": "Project Ref",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "include_dismissed",
+            "required": false,
+            "schema": {
+              "default": false,
+              "title": "Include Dismissed",
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/PressMentionOut"
+                  },
+                  "title": "Response List Project Press Projects  Project Ref  Press Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "List Project Press"
+      },
+      "post": {
+        "description": "Put a pasted article on a matter. Kept straight away, someone chose it.",
+        "operationId": "add_press_link_projects__project_ref__press_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "project_ref",
+            "required": true,
+            "schema": {
+              "title": "Project Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PressLink"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PressMentionOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Add Press Link"
+      }
+    },
+    "/projects/{project_ref}/press/refresh": {
+      "post": {
+        "description": "Search now. Reads every feed this matter watches while the caller waits,\nwhich is a few seconds for a handful of feeds.",
+        "operationId": "refresh_project_press_projects__project_ref__press_refresh_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "project_ref",
+            "required": true,
+            "schema": {
+              "title": "Project Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PressRefreshOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Refresh Project Press"
+      }
+    },
+    "/projects/{project_ref}/press/terms": {
+      "get": {
+        "operationId": "get_press_terms_projects__project_ref__press_terms_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "project_ref",
+            "required": true,
+            "schema": {
+              "title": "Project Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PressTermsOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Press Terms"
+      },
+      "put": {
+        "description": "Replace a matter's terms. An empty watch list goes back to the parties.",
+        "operationId": "set_press_terms_projects__project_ref__press_terms_put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "project_ref",
+            "required": true,
+            "schema": {
+              "title": "Project Ref",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PressTerms"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PressTermsOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Set Press Terms"
+      }
+    },
+    "/projects/{project_ref}/press/{mention_id}": {
+      "patch": {
+        "operationId": "update_press_mention_projects__project_ref__press__mention_id__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "project_ref",
+            "required": true,
+            "schema": {
+              "title": "Project Ref",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "mention_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Mention Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MentionUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PressMentionOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Update Press Mention"
+      }
+    },
+    "/projects/{project_ref}/press/{outlet_slug}/{article_slug}": {
+      "get": {
+        "operationId": "get_press_article_projects__project_ref__press__outlet_slug___article_slug__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "project_ref",
+            "required": true,
+            "schema": {
+              "title": "Project Ref",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "outlet_slug",
+            "required": true,
+            "schema": {
+              "title": "Outlet Slug",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "article_slug",
+            "required": true,
+            "schema": {
+              "title": "Article Slug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PressMentionOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Press Article"
       }
     },
     "/projects/{project_ref}/view": {
