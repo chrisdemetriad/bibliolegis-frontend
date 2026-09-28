@@ -1,5 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ApiError, type MentionStatus, type PressMention } from "#/api/client";
+import {
+	ApiError,
+	type MentionStatus,
+	type PressMention,
+	type PressSourceCreate,
+	type PressSourceUpdate,
+	type PressTerms,
+} from "#/api/client";
 import { useApi } from "#/api/useApi";
 
 export const pressKeys = {
@@ -71,5 +78,94 @@ export function useSetMentionStatus(ref: string) {
 			}
 		},
 		onSettled: () => queryClient.invalidateQueries({ queryKey: pressKeys.all }),
+	});
+}
+
+export function usePressTerms(ref: string) {
+	const api = useApi();
+	return useQuery({
+		queryKey: pressKeys.terms(ref),
+		queryFn: () => api.getPressTerms(ref),
+	});
+}
+
+export function useSetPressTerms(ref: string) {
+	const api = useApi();
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: (terms: PressTerms) => api.setPressTerms(ref, terms),
+		onSuccess: (saved) => queryClient.setQueryData(pressKeys.terms(ref), saved),
+	});
+}
+
+export function usePressSources(ref?: string) {
+	const api = useApi();
+	return useQuery({
+		queryKey: pressKeys.sources(ref),
+		queryFn: () => api.listPressSources(ref),
+	});
+}
+
+export function useAddPressSource() {
+	const api = useApi();
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: (body: PressSourceCreate) => api.addPressSource(body),
+		onSuccess: () =>
+			queryClient.invalidateQueries({
+				queryKey: [...pressKeys.all, "sources"],
+			}),
+	});
+}
+
+export function useUpdatePressSource() {
+	const api = useApi();
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: ({ id, ...body }: PressSourceUpdate & { id: string }) =>
+			api.updatePressSource(id, body),
+		onSettled: () =>
+			queryClient.invalidateQueries({
+				queryKey: [...pressKeys.all, "sources"],
+			}),
+	});
+}
+
+export function useDeletePressSource() {
+	const api = useApi();
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: (id: string) => api.deletePressSource(id),
+		onSettled: () =>
+			queryClient.invalidateQueries({
+				queryKey: [...pressKeys.all, "sources"],
+			}),
+	});
+}
+
+// Search now. Everything press related is refetched after, the sources'
+// last read times and errors included
+export function useRefreshPress(ref: string) {
+	const api = useApi();
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: () => api.refreshPress(ref),
+		onSettled: () => queryClient.invalidateQueries({ queryKey: pressKeys.all }),
+	});
+}
+
+export function usePreviewPressLink() {
+	const api = useApi();
+	return useMutation({
+		mutationFn: (url: string) => api.previewPressLink(url),
+	});
+}
+
+export function useAddPressLink(ref: string) {
+	const api = useApi();
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: (url: string) => api.addPressLink(ref, url),
+		onSuccess: () => queryClient.invalidateQueries({ queryKey: pressKeys.all }),
 	});
 }
