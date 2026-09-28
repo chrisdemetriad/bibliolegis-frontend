@@ -256,7 +256,17 @@ export interface paths {
         get: operations["get_project_projects__project_ref__get"];
         put?: never;
         post?: never;
-        delete?: never;
+        /**
+         * Delete Project
+         * @description Delete a matter along with every document in it.
+         *
+         *     Documents don't cascade from their matter on purpose, see the note on
+         *     Document in app/models.py, so they go first by hand. Their chunks,
+         *     metadata and profiles cascade from them, and the matter's parties, dates,
+         *     members, pins and views cascade from it. The audit log keeps its entries,
+         *     it's the record that any of this happened.
+         */
+        delete: operations["delete_project_projects__project_ref__delete"];
         options?: never;
         head?: never;
         patch?: never;
@@ -1389,6 +1399,35 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["ProjectOut"];
                 };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_project_projects__project_ref__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_ref: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Validation Error */
             422: {
