@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { type ChatModel, errorMessage } from "#/api/client";
+import { usePreferences, useSavePreferences } from "#/activity/queries";
+import { type ChatModel, errorMessage, type Preferences } from "#/api/client";
 import { useApi } from "#/api/useApi";
 import { Label } from "#/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "#/components/ui/radio-group";
@@ -112,6 +113,101 @@ function SettingsPage() {
 					)}
 				</p>
 			</section>
+
+			<OverviewSettings />
 		</Page>
+	);
+}
+
+// The api only accepts these, see RecentlyViewedCount there
+const RECENTLY_VIEWED_COUNTS: Preferences["recently_viewed_count"][] = [3, 8];
+
+function OverviewSettings() {
+	const preferences = usePreferences();
+	const save = useSavePreferences();
+	const current = preferences.data;
+
+	return (
+		<section className="mt-10" aria-labelledby="overview-heading">
+			<h2 id="overview-heading" className="text-lg font-medium">
+				Overview
+			</h2>
+			<p className="mt-1 text-sm text-muted-foreground">
+				What your overview page shows. Only you see these.
+			</p>
+
+			{preferences.isPending && (
+				<p className="mt-4 text-muted-foreground">Loading…</p>
+			)}
+			{preferences.isError && (
+				<p className="mt-4 text-destructive">
+					Couldn't load your settings from the api.
+				</p>
+			)}
+
+			{current && (
+				<div className="mt-4 space-y-4">
+					<div className="flex items-center gap-3">
+						<input
+							id="show-recently-viewed"
+							type="checkbox"
+							checked={current.show_recently_viewed}
+							onChange={(event) =>
+								save.mutate({
+									...current,
+									show_recently_viewed: event.target.checked,
+								})
+							}
+							className="size-4 accent-primary"
+						/>
+						<Label htmlFor="show-recently-viewed">Show Recently viewed</Label>
+					</div>
+					<div className="flex items-center gap-3">
+						<Label
+							htmlFor="recently-viewed-count"
+							className={
+								current.show_recently_viewed ? "" : "text-muted-foreground"
+							}
+						>
+							How many matters to list
+						</Label>
+						<select
+							id="recently-viewed-count"
+							value={current.recently_viewed_count}
+							disabled={!current.show_recently_viewed}
+							onChange={(event) =>
+								save.mutate({
+									...current,
+									recently_viewed_count: Number(
+										event.target.value,
+									) as Preferences["recently_viewed_count"],
+								})
+							}
+							className="h-8 rounded-md border bg-background px-2 text-sm disabled:opacity-50"
+						>
+							{RECENTLY_VIEWED_COUNTS.map((count) => (
+								<option key={count} value={count}>
+									{count}
+								</option>
+							))}
+						</select>
+					</div>
+				</div>
+			)}
+
+			<p className="mt-4 h-5 text-sm" aria-live="polite">
+				{save.isPending && (
+					<span className="text-muted-foreground">Saving…</span>
+				)}
+				{save.isSuccess && (
+					<span className="text-muted-foreground">Saved.</span>
+				)}
+				{save.isError && (
+					<span className="text-destructive">
+						{errorMessage(save.error, "Couldn't save that, try again.")}
+					</span>
+				)}
+			</p>
+		</section>
 	);
 }

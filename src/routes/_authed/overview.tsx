@@ -6,7 +6,14 @@ import {
 	PlusIcon,
 	UploadIcon,
 } from "lucide-react";
+import { ActivityFeed } from "#/activity/ActivityFeed";
+import {
+	useActivity,
+	usePreferences,
+	useRecentlyViewed,
+} from "#/activity/queries";
 import { Button } from "#/components/ui/button";
+import { updatedAgo } from "#/matters/adapt";
 import { useAllMatters } from "#/matters/queries";
 import {
 	activity,
@@ -39,6 +46,11 @@ const sampleStats = [
 function OverviewPage() {
 	const firstName = currentUser.name.split(" ")[0];
 	const { matters } = useAllMatters();
+	const recentActivity = useActivity();
+	const preferences = usePreferences();
+	// Hidden until the setting is known, so it doesn't flash up for someone
+	// who's turned it off
+	const showRecentlyViewed = preferences.data?.show_recently_viewed ?? false;
 	const stats = [
 		{ label: "Open matters", value: matters.filter((m) => !m.closed).length },
 		...sampleStats,
@@ -115,41 +127,11 @@ function OverviewPage() {
 					>
 						Recent activity
 					</SectionTitle>
-					<Panel className="divide-y">
-						{activity.map((item) => {
-							const matter = item.matterId && findMatter(item.matterId);
-							return (
-								<div
-									key={`${item.who}-${item.when}-${item.text}`}
-									className="flex items-start gap-3 px-4 py-3"
-								>
-									<PersonAvatar id={item.who} />
-									<p className="flex-1 text-sm leading-relaxed">
-										<span className="font-medium">{personName(item.who)}</span>{" "}
-										<span className="text-muted-foreground">{item.text}</span>{" "}
-										{item.target && (
-											<>
-												<span className="font-medium">{item.target}</span>{" "}
-												<span className="text-muted-foreground">in</span>{" "}
-											</>
-										)}
-										{matter && (
-											<Link
-												to="/matters/$matterId/overview"
-												params={{ matterId: matter.id }}
-												className="font-medium hover:underline"
-											>
-												{matter.title}
-											</Link>
-										)}
-									</p>
-									<span className="shrink-0 text-xs text-muted-foreground">
-										{item.when}
-									</span>
-								</div>
-							);
-						})}
-					</Panel>
+					{recentActivity.data && recentActivity.data.length > 0 ? (
+						<ActivityFeed items={recentActivity.data} />
+					) : (
+						<SampleActivity />
+					)}
 				</section>
 
 				<div className="space-y-8">
@@ -182,28 +164,84 @@ function OverviewPage() {
 						</Panel>
 					</section>
 
-					<section>
-						<SectionTitle>Recently viewed</SectionTitle>
-						<div className="space-y-2">
-							{matters.slice(0, 4).map((matter) => (
-								<Link
-									key={matter.id}
-									to="/matters/$matterId/overview"
-									params={{ matterId: matter.id }}
-									className="block rounded-lg border px-3 py-2 hover:bg-muted/50"
-								>
-									<p className="truncate text-sm">{matter.title}</p>
-									<p className="text-xs text-muted-foreground">
-										{[matter.area, `updated ${matter.updated}`]
-											.filter(Boolean)
-											.join(", ")}
-									</p>
-								</Link>
-							))}
-						</div>
-					</section>
+					{showRecentlyViewed && <RecentlyViewed />}
 				</div>
 			</div>
 		</Page>
+	);
+}
+
+function RecentlyViewed() {
+	const recent = useRecentlyViewed();
+	return (
+		<section>
+			<SectionTitle>Recently viewed</SectionTitle>
+			{recent.data?.length === 0 && (
+				<p className="text-sm text-muted-foreground">
+					Matters you open will show up here.
+				</p>
+			)}
+			<div className="space-y-2">
+				{recent.data?.map(({ matter }) => (
+					<Link
+						key={matter.id}
+						to="/matters/$matterId/overview"
+						params={{ matterId: matter.slug }}
+						className="block rounded-lg border px-3 py-2 hover:bg-muted/50"
+					>
+						<p className="truncate text-sm">{matter.name}</p>
+						<p className="text-xs text-muted-foreground">
+							{[
+								matter.practice_area,
+								`updated ${updatedAgo(matter.updated_at)}`,
+							]
+								.filter(Boolean)
+								.join(", ")}
+						</p>
+					</Link>
+				))}
+			</div>
+		</section>
+	);
+}
+
+// Shown until the firm has activity of its own
+function SampleActivity() {
+	return (
+		<Panel className="divide-y">
+			{activity.map((item) => {
+				const matter = item.matterId && findMatter(item.matterId);
+				return (
+					<div
+						key={`${item.who}-${item.when}-${item.text}`}
+						className="flex items-start gap-3 px-4 py-3"
+					>
+						<PersonAvatar id={item.who} />
+						<p className="flex-1 text-sm leading-relaxed">
+							<span className="font-medium">{personName(item.who)}</span>{" "}
+							<span className="text-muted-foreground">{item.text}</span>{" "}
+							{item.target && (
+								<>
+									<span className="font-medium">{item.target}</span>{" "}
+									<span className="text-muted-foreground">in</span>{" "}
+								</>
+							)}
+							{matter && (
+								<Link
+									to="/matters/$matterId/overview"
+									params={{ matterId: matter.id }}
+									className="font-medium hover:underline"
+								>
+									{matter.title}
+								</Link>
+							)}
+						</p>
+						<span className="shrink-0 text-xs text-muted-foreground">
+							{item.when}
+						</span>
+					</div>
+				);
+			})}
+		</Panel>
 	);
 }
