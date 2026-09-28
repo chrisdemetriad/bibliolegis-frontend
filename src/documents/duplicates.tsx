@@ -1,4 +1,5 @@
 import { useNavigate } from "@tanstack/react-router";
+import { ArrowRightIcon } from "lucide-react";
 import { type ReactNode, useCallback, useRef, useState } from "react";
 import type { Duplicate } from "#/api/client";
 import { useApi } from "#/api/useApi";
@@ -12,6 +13,8 @@ import {
 	AlertDialogHeader,
 	AlertDialogTitle,
 } from "#/components/ui/alert-dialog";
+import { Button } from "#/components/ui/button";
+import { cn } from "#/lib/utils";
 
 // Hex SHA-256 of the file's bytes, the same fingerprint the api keeps for
 // every upload. Content rather than name or size, so a renamed copy is still
@@ -25,6 +28,10 @@ export async function fingerprint(file: File) {
 		byte.toString(16).padStart(2, "0"),
 	).join("");
 }
+
+type Place =
+	| { key: string; kind: "matter"; slug: string; name: string }
+	| { key: string; kind: "document"; id: string; name: string };
 
 type Pending = {
 	matches: { file: File; duplicate: Duplicate }[];
@@ -82,22 +89,42 @@ export function useDuplicateCheck(currentProjectId?: string) {
 		[api],
 	);
 
-	const first = pending?.matches[0]?.duplicate;
-	const target = first?.matter;
-	const alreadyHere = target != null && target.id === currentProjectId;
+	// Where each copy already is, once per place. A matter when it's in one,
+	// otherwise the document itself. Copies already in the matter being
+	// uploaded into are left out, there's nowhere to go for those
+	const places: Place[] = [];
+	for (const { duplicate } of pending?.matches ?? []) {
+		if (duplicate.matter?.id === currentProjectId && currentProjectId) continue;
+		const key = duplicate.matter?.id ?? duplicate.document_id;
+		if (places.some((place) => place.key === key)) continue;
+		places.push(
+			duplicate.matter
+				? {
+						key,
+						kind: "matter",
+						slug: duplicate.matter.slug,
+						name: duplicate.matter.name,
+					}
+				: {
+						key,
+						kind: "document",
+						id: duplicate.document_id,
+						name: duplicate.filename,
+					},
+		);
+	}
 
-	const goThere = () => {
-		if (!first) return;
+	const goTo = (place: Place) => {
 		settle(false);
-		if (target) {
+		if (place.kind === "matter") {
 			void navigate({
 				to: "/matters/$matterId/overview",
-				params: { matterId: target.slug },
+				params: { matterId: place.slug },
 			});
 		} else {
 			void navigate({
 				to: "/documents/$documentId",
-				params: { documentId: first.document_id },
+				params: { documentId: place.id },
 			});
 		}
 	};
@@ -139,15 +166,40 @@ export function useDuplicateCheck(currentProjectId?: string) {
 						</div>
 					</AlertDialogDescription>
 				</AlertDialogHeader>
-				<AlertDialogFooter>
-					{alreadyHere ? (
-						<AlertDialogCancel>Don't upload</AlertDialogCancel>
-					) : (
-						<AlertDialogCancel onClick={goThere}>
-							{target ? "Go to matter" : "Go to document"}
-						</AlertDialogCancel>
+				{/* Spread apart so going elsewhere and carrying on aren't side by side */}
+				<AlertDialogFooter
+					className={cn(
+						"sm:justify-between",
+						places.length > 1 && "sm:flex-col sm:items-stretch",
 					)}
-					<AlertDialogAction onClick={() => settle(true)}>
+				>
+					{places.length === 0 ? (
+						<AlertDialogCancel>Don't upload</AlertDialogCancel>
+					) : places.length === 1 ? (
+						<AlertDialogCancel onClick={() => goTo(places[0])}>
+							{places[0].kind === "matter" ? "Go to matter" : "Go to document"}
+						</AlertDialogCancel>
+					) : (
+						// One per place, so it's clear which matter each one opens
+						<div className="flex flex-col items-start gap-1">
+							{places.map((place) => (
+								<Button
+									key={place.key}
+									variant="link"
+									className="h-auto max-w-full justify-start px-0 py-0.5 text-left whitespace-normal text-foreground"
+									onClick={() => goTo(place)}
+								>
+									Go to {place.name}
+									{place.kind === "matter" && " matter"}
+									<ArrowRightIcon data-icon="inline-end" />
+								</Button>
+							))}
+						</div>
+					)}
+					<AlertDialogAction
+						className="sm:self-end"
+						onClick={() => settle(true)}
+					>
 						Continue uploading
 					</AlertDialogAction>
 				</AlertDialogFooter>
