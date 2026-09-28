@@ -299,7 +299,11 @@ export function IntakeZone() {
 			? intake?.status === "failed"
 				? (intake.error_message ??
 					"The files were read but couldn't be sorted into matters.")
-				: summary(intake?.matters ?? [], shown.length - failedCount)
+				: summary(
+						intake?.matters ?? [],
+						shown.length - failedCount,
+						failedCount,
+					)
 			: uploading
 				? `Uploading ${shown.length === 1 ? "1 file" : `${shown.length} files`}`
 				: reading || intake?.status === "grouping"
@@ -307,6 +311,7 @@ export function IntakeZone() {
 					: "Reading the files";
 
 	const idle = shown.length === 0 && !intakeId && !error;
+	const single = shown.length === 1;
 
 	return (
 		<section aria-label="Open matters from case files" className="mb-8">
@@ -375,45 +380,59 @@ export function IntakeZone() {
 					</div>
 				) : (
 					<div aria-live="polite">
-						<div className="flex items-end justify-between gap-4">
-							<div className="flex min-w-0 items-center gap-2">
-								{error || intake?.status === "failed" ? (
-									<StatusIcon status="error" />
-								) : finished ? (
-									<StatusIcon status="success" />
-								) : (
-									<LoaderCircleIcon className="size-4 shrink-0 animate-spin text-muted-foreground" />
+						{/* One file in progress needs no batch headline or batch bar,
+						its own row says it all. The headline comes back once it's done
+						or if it fails, since that's where the outcome is */}
+						{(!single || finished || error) && (
+							<div className="mb-5 flex items-end justify-between gap-4">
+								<div className="flex min-w-0 items-center gap-2">
+									{error || intake?.status === "failed" ? (
+										<StatusIcon status="error" />
+									) : finished ? (
+										<StatusIcon status="success" />
+									) : (
+										<LoaderCircleIcon className="size-4 shrink-0 animate-spin text-muted-foreground" />
+									)}
+									<p className="truncate font-medium">{headline}</p>
+								</div>
+								{!single && (
+									<p className="shrink-0 text-2xl font-semibold tracking-tight tabular-nums">
+										{percent}%
+									</p>
 								)}
-								<p className="truncate font-medium">{headline}</p>
 							</div>
-							<p className="shrink-0 text-2xl font-semibold tracking-tight tabular-nums">
-								{percent}%
-							</p>
-						</div>
-						<Bar value={overall} active={busy} className="mt-3 h-2" />
+						)}
+						{!single && (
+							<Bar value={overall} active={busy} className="-mt-2 mb-5 h-2" />
+						)}
 
-						<ul className="mt-5 space-y-3">
+						<ul className="space-y-3">
 							{shown.map((row, i) => (
 								<li key={row.key} className="flex items-center gap-3 text-sm">
 									<FileTextIcon className="size-4 shrink-0 text-muted-foreground" />
-									<span className="w-48 min-w-0 truncate sm:w-72">
+									<span className="min-w-0 truncate max-sm:w-40 sm:w-1/2">
 										{row.name}
 									</span>
 									<Bar
 										value={progress[i].value}
 										active={busy && progress[i].value < 1}
 										failed={progress[i].failed}
-										className="h-1 flex-1 max-sm:hidden"
+										className="h-1 min-w-12 flex-1 max-sm:hidden"
 									/>
 									<span
 										className={cn(
-											"w-56 truncate text-right text-xs text-muted-foreground max-sm:flex-1",
+											"w-40 truncate text-right text-xs text-muted-foreground max-sm:flex-1",
 											progress[i].failed && "text-destructive",
 										)}
 										title={progress[i].label}
 									>
 										{progress[i].label}
 									</span>
+									{single && (
+										<span className="w-10 shrink-0 text-right text-sm font-medium tabular-nums">
+											{percent}%
+										</span>
+									)}
 								</li>
 							))}
 						</ul>
@@ -445,16 +464,24 @@ export function IntakeZone() {
 	);
 }
 
-function summary(matters: IntakeMatter[], files: number) {
-	if (files <= 0) return "None of the files could be read";
+function plural(count: number, one: string, many: string) {
+	return `${count} ${count === 1 ? one : many}`;
+}
+
+// "1 new matter added, 2 existing matters updated". No file count, the rows
+// above already list the files, only the ones that couldn't be read get a
+// mention
+function summary(matters: IntakeMatter[], read: number, failed: number) {
+	if (read <= 0) return "None of the files could be read";
 	const made = matters.filter((item) => item.is_new).length;
 	const joined = matters.length - made;
 	const parts = [
-		made > 0 && `${made} new ${made === 1 ? "matter" : "matters"}`,
+		made > 0 && `${plural(made, "new matter", "new matters")} added`,
 		joined > 0 &&
-			`${joined} existing ${joined === 1 ? "matter" : "matters"} added to`,
+			`${plural(joined, "existing matter", "existing matters")} updated`,
+		failed > 0 && `${plural(failed, "file", "files")} couldn't be read`,
 	].filter(Boolean);
-	return `${parts.join(", ") || "No matters"} from ${files} ${files === 1 ? "file" : "files"}`;
+	return parts.join(", ") || "No matters added";
 }
 
 function MatterResult({ item }: { item: IntakeMatter }) {
@@ -467,7 +494,7 @@ function MatterResult({ item }: { item: IntakeMatter }) {
 				className="flex items-center gap-3 rounded-lg border bg-card px-3 py-2.5 hover:bg-muted/50"
 			>
 				<span className="rounded-md border px-1.5 py-px text-xs text-muted-foreground">
-					{item.is_new ? "New" : "Added to"}
+					{item.is_new ? "New" : "Updated"}
 				</span>
 				<span className="min-w-0 flex-1 truncate text-sm font-medium">
 					{item.matter.name}
