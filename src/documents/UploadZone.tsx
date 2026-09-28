@@ -1,15 +1,11 @@
 import { useQueryClient } from "@tanstack/react-query";
-import {
-	CircleAlertIcon,
-	CircleCheckIcon,
-	UploadIcon,
-	XIcon,
-} from "lucide-react";
+import { UploadIcon, XIcon } from "lucide-react";
 import { useId, useState } from "react";
 import { errorMessage } from "#/api/client";
 import { useApi } from "#/api/useApi";
 import { Button } from "#/components/ui/button";
 import { Progress } from "#/components/ui/progress";
+import { StatusIcon } from "#/components/ui/status-icon";
 import { cn } from "#/lib/utils";
 import { useDuplicateCheck } from "./duplicates";
 import { documentKeys } from "./queries";
@@ -146,12 +142,8 @@ export function UploadZone({ projectId }: { projectId?: string } = {}) {
 							key={upload.key}
 							className="flex items-center gap-3 rounded-lg border px-3 py-2 text-sm"
 						>
-							{upload.state === "done" && (
-								<CircleCheckIcon className="size-4 shrink-0 text-muted-foreground" />
-							)}
-							{upload.state === "failed" && (
-								<CircleAlertIcon className="size-4 shrink-0 text-destructive" />
-							)}
+							{upload.state === "done" && <StatusIcon status="success" />}
+							{upload.state === "failed" && <StatusIcon status="error" />}
 							<div className="min-w-0 flex-1">
 								<p className="truncate font-medium">{upload.name}</p>
 								{upload.state === "uploading" && (

@@ -2,8 +2,6 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import {
 	ArrowRightIcon,
-	CircleAlertIcon,
-	CircleCheckIcon,
 	FileTextIcon,
 	LoaderCircleIcon,
 	UploadIcon,
@@ -17,6 +15,8 @@ import {
 } from "#/api/client";
 import { useApi } from "#/api/useApi";
 import { Button } from "#/components/ui/button";
+import { progressColour } from "#/components/ui/progress";
+import { StatusIcon } from "#/components/ui/status-icon";
 import { useDuplicateCheck } from "#/documents/duplicates";
 import { documentKeys } from "#/documents/queries";
 import { cn } from "#/lib/utils";
@@ -378,9 +378,9 @@ export function IntakeZone() {
 						<div className="flex items-end justify-between gap-4">
 							<div className="flex min-w-0 items-center gap-2">
 								{error || intake?.status === "failed" ? (
-									<CircleAlertIcon className="size-4 shrink-0 text-destructive" />
+									<StatusIcon status="error" />
 								) : finished ? (
-									<CircleCheckIcon className="size-4 shrink-0" />
+									<StatusIcon status="success" />
 								) : (
 									<LoaderCircleIcon className="size-4 shrink-0 animate-spin text-muted-foreground" />
 								)}
@@ -486,8 +486,8 @@ function MatterResult({ item }: { item: IntakeMatter }) {
 	);
 }
 
-// A progress bar that eases between values, with a sheen running along it
-// while there's still work going on
+// A progress bar that eases between values and from red to green as it
+// fills, with a sheen running along it while there's still work going on
 function Bar({
 	value,
 	active,
@@ -509,13 +509,16 @@ function Bar({
 		>
 			<div
 				className={cn(
-					"relative h-full overflow-hidden rounded-full bg-primary transition-[width] duration-700 ease-out",
+					"relative h-full overflow-hidden rounded-full transition-[width,background-color] duration-700 ease-out",
 					failed && "bg-destructive/60",
 				)}
-				style={{ width: `${Math.max(value, active ? 0.02 : 0) * 100}%` }}
+				style={{
+					width: `${Math.max(value, active ? 0.02 : 0) * 100}%`,
+					backgroundColor: failed ? undefined : progressColour(value),
+				}}
 			>
 				{active && (
-					<span className="absolute inset-0 animate-[progress-sheen_1.6s_linear_infinite] bg-linear-to-r from-transparent via-primary-foreground/35 to-transparent motion-reduce:hidden" />
+					<span className="absolute inset-0 animate-[progress-sheen_1.6s_linear_infinite] bg-linear-to-r from-transparent via-white/40 to-transparent motion-reduce:hidden" />
 				)}
 			</div>
 		</div>
