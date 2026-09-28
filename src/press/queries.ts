@@ -3,6 +3,7 @@ import {
 	ApiError,
 	type MentionStatus,
 	type PressMention,
+	type PressSource,
 	type PressSourceCreate,
 	type PressSourceUpdate,
 	type PressTerms,
@@ -29,11 +30,27 @@ export function useFirmPress() {
 	});
 }
 
-export function useMatterPress(ref: string, includeDismissed = false) {
+// While a search is running its articles arrive every few seconds
+const SEARCHING_REFRESH_MS = 4_000;
+
+export function isSearching(sources: PressSource[] | undefined) {
+	return (sources ?? []).some(
+		(source) =>
+			source.searching ||
+			source.search?.status === "pending" ||
+			source.search?.status === "running",
+	);
+}
+
+export function useMatterPress(
+	ref: string,
+	{ includeDismissed = false, searching = false } = {},
+) {
 	const api = useApi();
 	return useQuery({
 		queryKey: pressKeys.matter(ref, includeDismissed),
 		queryFn: () => api.listProjectPress(ref, includeDismissed),
+		refetchInterval: searching ? SEARCHING_REFRESH_MS : false,
 	});
 }
 
@@ -103,6 +120,8 @@ export function usePressSources(ref?: string) {
 	return useQuery({
 		queryKey: pressKeys.sources(ref),
 		queryFn: () => api.listPressSources(ref),
+		refetchInterval: (query) =>
+			isSearching(query.state.data) ? SEARCHING_REFRESH_MS : false,
 	});
 }
 

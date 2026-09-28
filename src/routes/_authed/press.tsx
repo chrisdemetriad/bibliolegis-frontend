@@ -1,10 +1,11 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { PlusIcon } from "lucide-react";
 import { useState } from "react";
+import type { PressSource } from "#/api/client";
 import { Button } from "#/components/ui/button";
 import { Skeleton } from "#/components/ui/skeleton";
 import { PressFeed, type PressView, ViewToggle } from "#/press/PressFeed";
-import { AddFeed, SOURCE_CATEGORIES, SourceRow } from "#/press/PressSettings";
+import { AddSource, SOURCE_CATEGORIES, SourceRow } from "#/press/PressSettings";
 import { useFirmPress, useMe, usePressSources } from "#/press/queries";
 import { Page, PageHeader, Panel, SectionTitle } from "#/shell/page";
 
@@ -25,7 +26,7 @@ function PressPage() {
 			<PageHeader
 				title="Press"
 				sample={false}
-				description="News about the matters you're on and the people in them, newest first. The firm's feeds on the right are read every few hours for each open matter's parties, and a matter can add feeds and terms of its own on its Press tab."
+				description="News about the matters you're on, newest first. Every source on the right is searched for every open matter, back to the matter's earliest date when it's added and for anything new every few hours. A matter's own terms and sources are on its Press tab."
 				actions={
 					<ViewToggle
 						view={view}
@@ -65,21 +66,37 @@ function PressPage() {
 	);
 }
 
-// Only an admin changes the firm's feeds, the api refuses anyone else, so
+// Only an admin changes the firm's sources, the api refuses anyone else, so
 // everyone else sees them without the switches working
 function FirmSources() {
 	const { data: sources, isPending } = usePressSources();
 	const { data: me } = useMe();
 	const isAdmin = me?.role === "admin";
 	const [adding, setAdding] = useState(false);
-	const groups = [...SOURCE_CATEGORIES, null].map((category) => ({
-		label: category ?? "Other",
-		items: (sources ?? []).filter((source) =>
-			category
-				? source.category === category
-				: !SOURCE_CATEGORIES.some((known) => known === source.category),
-		),
-	}));
+	const all = sources ?? [];
+	const known = (source: PressSource) =>
+		SOURCE_CATEGORIES.some((category) => category === source.category);
+	const groups = [
+		{
+			label: "Every outlet",
+			items: all.filter((source) => source.kind === "google_news"),
+		},
+		...SOURCE_CATEGORIES.map((category) => ({
+			label: category,
+			items: all.filter(
+				(source) =>
+					source.kind !== "google_news" && source.category === category,
+			),
+		})),
+		{
+			label: "Other outlets",
+			items: all.filter((source) => source.kind === "site" && !known(source)),
+		},
+		{
+			label: "Feeds",
+			items: all.filter((source) => source.kind === "rss" && !known(source)),
+		},
+	];
 	const on = sources?.filter((source) => source.enabled).length ?? 0;
 
 	return (
@@ -103,14 +120,14 @@ function FirmSources() {
 			</SectionTitle>
 			{adding && (
 				<Panel className="mb-4">
-					<AddFeed onDone={() => setAdding(false)} />
+					<AddSource existing={sources ?? []} onDone={() => setAdding(false)} />
 				</Panel>
 			)}
 			{isPending ? (
 				<Skeleton className="h-48" />
 			) : sources?.length === 0 ? (
 				<p className="text-sm text-muted-foreground">
-					No feeds yet.{" "}
+					No sources yet.{" "}
 					{isAdmin ? "Add one to start." : "An admin can add them here."}
 				</p>
 			) : (

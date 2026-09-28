@@ -1,11 +1,17 @@
 import { PlusIcon, Trash2Icon, XIcon } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-import { errorMessage, type PressSource, type PressTerms } from "#/api/client";
+import {
+	errorMessage,
+	type PressSource,
+	type PressSourceCreate,
+	type PressTerms,
+} from "#/api/client";
 import { Button } from "#/components/ui/button";
 import { Input } from "#/components/ui/input";
 import { Skeleton } from "#/components/ui/skeleton";
 import { Panel, SectionTitle } from "#/shell/page";
+import { OUTLETS } from "./outlets";
 import { pressDate } from "./PressFeed";
 import {
 	useAddPressSource,
@@ -143,6 +149,44 @@ export function WatchTerms({ projectRef }: { projectRef: string }) {
 	);
 }
 
+// What a source has done for the matter being looked at, or for the firm
+function sourceStatus(source: PressSource): { text: string; error?: boolean } {
+	const search = source.search;
+	if (search) {
+		if (search.status === "pending") return { text: "Waiting to search" };
+		if (search.status === "running")
+			return { text: `Searching… ${search.found} found so far` };
+		if (search.status === "failed")
+			return { text: search.last_error ?? "The search failed", error: true };
+		const since = search.searched_from
+			? ` since ${pressDate(search.searched_from)}`
+			: "";
+		const note = search.last_error ? ` · ${search.last_error}` : "";
+		return { text: `${search.found} found${since}${note}` };
+	}
+	if (source.searching) return { text: "Searching…" };
+	if (source.last_error) return { text: source.last_error, error: true };
+	if (source.kind === "rss") {
+		const read = source.last_fetched_at
+			? `Feed, read ${pressDate(source.last_fetched_at)}`
+			: "Feed, not read yet";
+		return {
+			text:
+				source.article_count > 0
+					? `${read} · ${source.article_count} found`
+					: read,
+		};
+	}
+	return {
+		text:
+			source.article_count > 0
+				? `${source.article_count} found`
+				: source.kind === "google_news"
+					? "Every outlet Google News knows"
+					: (source.domain ?? ""),
+	};
+}
+
 export function SourceRow({
 	source,
 	canChange,
@@ -152,21 +196,16 @@ export function SourceRow({
 }) {
 	const updateSource = useUpdatePressSource();
 	const deleteSource = useDeletePressSource();
-	const read = source.last_fetched_at
-		? `Read ${pressDate(source.last_fetched_at)}`
-		: "Not read yet";
+	const status = sourceStatus(source);
 	return (
 		<div className="flex items-center gap-3 px-3 py-2">
 			<div className="min-w-0 flex-1">
 				<p className="truncate text-sm">{source.name}</p>
 				<p
-					className={`truncate text-xs ${source.last_error ? "text-destructive" : "text-muted-foreground"}`}
-					title={source.last_error ?? undefined}
+					className={`truncate text-xs ${status.error ? "text-destructive" : "text-muted-foreground"}`}
+					title={status.text}
 				>
-					{source.last_error ?? read}
-					{!source.last_error &&
-						source.article_count > 0 &&
-						` · ${source.article_count} found`}
+					{status.text}
 				</p>
 			</div>
 			{canChange && (
@@ -181,7 +220,7 @@ export function SourceRow({
 			)}
 			<Switch
 				checked={source.enabled}
-				label={`Read ${source.name}`}
+				label={`Search ${source.name}`}
 				disabled={!canChange || updateSource.isPending}
 				onChange={(enabled) =>
 					updateSource.mutate(
@@ -199,7 +238,7 @@ export function SourceRow({
 	);
 }
 
-// How /press groups the firm's feeds
+// How /press groups the firm's sources
 export const SOURCE_CATEGORIES = [
 	"Wire",
 	"Broadcaster",
@@ -209,7 +248,147 @@ export const SOURCE_CATEGORIES = [
 	"Local",
 ] as const;
 
-export function AddFeed({
+// Pick an outlet, type a website, or for the few who want it, a feed. Each
+// outlet starts searching as soon as it's added, back to the matter's
+// earliest date
+export function AddSource({
+	projectRef,
+	existing,
+	onDone,
+}: {
+	projectRef?: string;
+	existing: PressSource[];
+	onDone: () => void;
+}) {
+	const add = useAddPressSource();
+	const [website, setWebsite] = useState("");
+	const [feed, setFeed] = useState(false);
+	const taken = new Set(existing.map((source) => source.domain));
+	const hasEvery = existing.some((source) => source.kind === "google_news");
+
+	const addSource = (body: PressSourceCreate) =>
+		add.mutate(
+			{ ...body, project: projectRef },
+			{
+				onSuccess: (source) =>
+					toast.success(
+						source.kind === "rss"
+							? `${source.name} added`
+							: `${source.name} added, searching now`,
+					),
+				onError: (error) =>
+					toast.error(errorMessage(error, "Couldn't add that source.")),
+			},
+		);
+
+	if (feed) {
+		return (
+			<AddFeed
+				projectRef={projectRef}
+				onDone={() => {
+					setFeed(false);
+					onDone();
+				}}
+			/>
+		);
+	}
+
+	return (
+		<div className="space-y-3 p-3">
+			<button
+				type="button"
+				disabled={hasEvery || add.isPending}
+				onClick={() =>
+					addSource({ name: "All news outlets", kind: "google_news" })
+				}
+				className="w-full rounded-md border px-3 py-2 text-left text-sm hover:bg-muted disabled:opacity-50"
+			>
+				<span className="font-medium">All news outlets</span>
+				<span className="block text-xs text-muted-foreground">
+					{hasEvery
+						? "Already searching every outlet"
+						: "Everything Google News has, BBC to local papers"}
+				</span>
+			</button>
+			<div>
+				<p className="mb-1.5 text-xs text-muted-foreground">
+					Or pick outlets one by one
+				</p>
+				<div className="flex flex-wrap gap-1.5">
+					{OUTLETS.map((outlet) => (
+						<button
+							key={outlet.domain}
+							type="button"
+							disabled={taken.has(outlet.domain) || add.isPending}
+							onClick={() =>
+								addSource({
+									name: outlet.name,
+									kind: "site",
+									domain: outlet.domain,
+									category: outlet.category,
+								})
+							}
+							className="rounded-full border px-2.5 py-0.5 text-xs hover:bg-muted disabled:border-dashed disabled:opacity-50"
+						>
+							{taken.has(outlet.domain) ? "✓ " : "+ "}
+							{outlet.name}
+						</button>
+					))}
+				</div>
+			</div>
+			<form
+				className="flex gap-2"
+				onSubmit={(event) => {
+					event.preventDefault();
+					const domain = website.trim();
+					if (!domain) return;
+					addSource({
+						name: domain
+							.replace(/^https?:\/\/(www\.)?/, "")
+							.replace(/\/.*$/, ""),
+						kind: "site",
+						domain,
+					});
+					setWebsite("");
+				}}
+			>
+				<Input
+					value={website}
+					onChange={(event) => setWebsite(event.target.value)}
+					placeholder="Another website, e.g. kentonline.co.uk"
+					aria-label="Another outlet's website"
+					className="h-8"
+				/>
+				<Button
+					size="sm"
+					type="submit"
+					variant="outline"
+					disabled={add.isPending}
+				>
+					Add
+				</Button>
+			</form>
+			<div className="flex justify-between">
+				<button
+					type="button"
+					onClick={() => setFeed(true)}
+					className="text-xs text-muted-foreground underline-offset-2 hover:underline"
+				>
+					Add an RSS feed instead
+				</button>
+				<button
+					type="button"
+					onClick={onDone}
+					className="text-xs text-muted-foreground hover:text-foreground"
+				>
+					Done
+				</button>
+			</div>
+		</div>
+	);
+}
+
+function AddFeed({
 	projectRef,
 	onDone,
 }: {
@@ -218,7 +397,6 @@ export function AddFeed({
 }) {
 	const [name, setName] = useState("");
 	const [url, setUrl] = useState("");
-	const [category, setCategory] = useState<string>("");
 	const add = useAddPressSource();
 	return (
 		<form
@@ -226,13 +404,7 @@ export function AddFeed({
 			onSubmit={(event) => {
 				event.preventDefault();
 				add.mutate(
-					{
-						name,
-						url,
-						kind: "rss",
-						project: projectRef,
-						category: category || null,
-					},
+					{ name, url, kind: "rss", project: projectRef },
 					{
 						onSuccess: () => {
 							toast.success(`${name} added`);
@@ -257,19 +429,6 @@ export function AddFeed({
 				onChange={(event) => setUrl(event.target.value)}
 				className="h-8"
 			/>
-			{!projectRef && (
-				<select
-					aria-label="Kind of outlet"
-					value={category}
-					onChange={(event) => setCategory(event.target.value)}
-					className="h-8 w-full rounded-md border bg-transparent px-2 text-sm"
-				>
-					<option value="">Kind of outlet</option>
-					{SOURCE_CATEGORIES.map((kind) => (
-						<option key={kind}>{kind}</option>
-					))}
-				</select>
-			)}
 			{add.isError && (
 				<p className="text-xs text-destructive">
 					{errorMessage(add.error, "Couldn't add that feed.")}
@@ -287,8 +446,8 @@ export function AddFeed({
 	);
 }
 
-// The feeds this matter is searched in. Firm wide ones are shown for what
-// they are and changed on /press, the matter's own can be added here
+// Where this matter's press comes from. The firm's sources are searched for
+// every matter and changed on /press, a matter can add its own here
 export function MatterSources({ projectRef }: { projectRef: string }) {
 	const { data, isPending } = usePressSources(projectRef);
 	const [adding, setAdding] = useState(false);
@@ -301,7 +460,7 @@ export function MatterSources({ projectRef }: { projectRef: string }) {
 				action={
 					!adding && (
 						<Button variant="ghost" size="xs" onClick={() => setAdding(true)}>
-							<PlusIcon /> Add feed
+							<PlusIcon /> Add source
 						</Button>
 					)
 				}
@@ -312,7 +471,16 @@ export function MatterSources({ projectRef }: { projectRef: string }) {
 				<Skeleton className="h-32" />
 			) : (
 				<div className="space-y-3">
-					{(adding || own.length > 0) && (
+					{adding && (
+						<Panel>
+							<AddSource
+								projectRef={projectRef}
+								existing={data ?? []}
+								onDone={() => setAdding(false)}
+							/>
+						</Panel>
+					)}
+					{own.length > 0 && (
 						<div>
 							<p className="mb-1 text-xs text-muted-foreground">
 								Just this matter
@@ -321,18 +489,12 @@ export function MatterSources({ projectRef }: { projectRef: string }) {
 								{own.map((source) => (
 									<SourceRow key={source.id} source={source} canChange />
 								))}
-								{adding && (
-									<AddFeed
-										projectRef={projectRef}
-										onDone={() => setAdding(false)}
-									/>
-								)}
 							</Panel>
 						</div>
 					)}
 					<div>
 						<p className="mb-1 text-xs text-muted-foreground">
-							The firm's, changed on the Press page
+							The firm's, for every matter, changed on the Press page
 						</p>
 						{firm.length === 0 ? (
 							<p className="text-xs text-muted-foreground">None set up yet.</p>

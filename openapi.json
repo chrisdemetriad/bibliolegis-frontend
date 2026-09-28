@@ -988,30 +988,71 @@
       },
       "PressRefreshOut": {
         "properties": {
-          "articles_added": {
-            "title": "Articles Added",
-            "type": "integer"
-          },
-          "mentions_added": {
-            "title": "Mentions Added",
-            "type": "integer"
-          },
-          "sources_failed": {
-            "title": "Sources Failed",
-            "type": "integer"
-          },
-          "sources_read": {
-            "title": "Sources Read",
+          "searches_started": {
+            "title": "Searches Started",
             "type": "integer"
           }
         },
         "required": [
-          "sources_read",
-          "sources_failed",
-          "articles_added",
-          "mentions_added"
+          "searches_started"
         ],
         "title": "PressRefreshOut",
+        "type": "object"
+      },
+      "PressSearchOut": {
+        "properties": {
+          "found": {
+            "title": "Found",
+            "type": "integer"
+          },
+          "last_error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Error"
+          },
+          "searched_from": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Searched From"
+          },
+          "searched_to": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Searched To"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status",
+          "searched_from",
+          "searched_to",
+          "found",
+          "last_error"
+        ],
+        "title": "PressSearchOut",
         "type": "object"
       },
       "PressSourceCreate": {
@@ -1028,12 +1069,24 @@
             ],
             "title": "Category"
           },
+          "domain": {
+            "anyOf": [
+              {
+                "maxLength": 255,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Domain"
+          },
           "kind": {
-            "default": "rss",
+            "default": "site",
             "enum": [
-              "rss",
+              "site",
               "google_news",
-              "guardian"
+              "rss"
             ],
             "title": "Kind",
             "type": "string"
@@ -1091,6 +1144,17 @@
             ],
             "title": "Category"
           },
+          "domain": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Domain"
+          },
           "enabled": {
             "title": "Enabled",
             "type": "boolean"
@@ -1143,6 +1207,21 @@
             ],
             "title": "Project Id"
           },
+          "search": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PressSearchOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "searching": {
+            "default": false,
+            "title": "Searching",
+            "type": "boolean"
+          },
           "slug": {
             "title": "Slug",
             "type": "string"
@@ -1166,6 +1245,7 @@
           "slug",
           "kind",
           "url",
+          "domain",
           "category",
           "enabled",
           "last_fetched_at",
@@ -2875,7 +2955,7 @@
     },
     "/projects/{project_ref}/press/refresh": {
       "post": {
-        "description": "Search now. Reads every feed this matter watches while the caller waits,\nwhich is a few seconds for a handful of feeds.",
+        "description": "Search now. Every source this matter uses is read or searched after the\nresponse goes, a first search back to the matter's earliest date takes\nminutes. The sources' search status says how it's going.",
         "operationId": "refresh_project_press_projects__project_ref__press_refresh_post",
         "parameters": [
           {
@@ -2889,7 +2969,7 @@
           }
         ],
         "responses": {
-          "200": {
+          "202": {
             "content": {
               "application/json": {
                 "schema": {
@@ -2952,7 +3032,7 @@
         "summary": "Get Press Terms"
       },
       "put": {
-        "description": "Replace a matter's terms. An empty watch list goes back to the parties.",
+        "description": "Replace a matter's terms. An empty watch list goes back to the parties.\n\nDifferent terms find different articles, so the matter's outlet searches\nstart again from its earliest date. What they found before stays.",
         "operationId": "set_press_terms_projects__project_ref__press_terms_put",
         "parameters": [
           {

@@ -404,8 +404,9 @@ export interface paths {
         put?: never;
         /**
          * Refresh Project Press
-         * @description Search now. Reads every feed this matter watches while the caller waits,
-         *     which is a few seconds for a handful of feeds.
+         * @description Search now. Every source this matter uses is read or searched after the
+         *     response goes, a first search back to the matter's earliest date takes
+         *     minutes. The sources' search status says how it's going.
          */
         post: operations["refresh_project_press_projects__project_ref__press_refresh_post"];
         delete?: never;
@@ -426,6 +427,9 @@ export interface paths {
         /**
          * Set Press Terms
          * @description Replace a matter's terms. An empty watch list goes back to the parties.
+         *
+         *     Different terms find different articles, so the matter's outlet searches
+         *     start again from its earliest date. What they found before stays.
          */
         put: operations["set_press_terms_projects__project_ref__press_terms_put"];
         post?: never;
@@ -1010,25 +1014,34 @@ export interface components {
         };
         /** PressRefreshOut */
         PressRefreshOut: {
-            /** Articles Added */
-            articles_added: number;
-            /** Mentions Added */
-            mentions_added: number;
-            /** Sources Failed */
-            sources_failed: number;
-            /** Sources Read */
-            sources_read: number;
+            /** Searches Started */
+            searches_started: number;
+        };
+        /** PressSearchOut */
+        PressSearchOut: {
+            /** Found */
+            found: number;
+            /** Last Error */
+            last_error: string | null;
+            /** Searched From */
+            searched_from: string | null;
+            /** Searched To */
+            searched_to: string | null;
+            /** Status */
+            status: string;
         };
         /** PressSourceCreate */
         PressSourceCreate: {
             /** Category */
             category?: string | null;
+            /** Domain */
+            domain?: string | null;
             /**
              * Kind
-             * @default rss
+             * @default site
              * @enum {string}
              */
-            kind: "rss" | "google_news" | "guardian";
+            kind: "site" | "google_news" | "rss";
             /** Name */
             name: string;
             /** Project */
@@ -1042,6 +1055,8 @@ export interface components {
             article_count: number;
             /** Category */
             category: string | null;
+            /** Domain */
+            domain: string | null;
             /** Enabled */
             enabled: boolean;
             /**
@@ -1059,6 +1074,12 @@ export interface components {
             name: string;
             /** Project Id */
             project_id: string | null;
+            search?: components["schemas"]["PressSearchOut"] | null;
+            /**
+             * Searching
+             * @default false
+             */
+            searching: boolean;
             /** Slug */
             slug: string;
             /** Url */
@@ -2127,7 +2148,7 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description Successful Response */
-            200: {
+            202: {
                 headers: {
                     [name: string]: unknown;
                 };
