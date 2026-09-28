@@ -1,7 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo } from "react";
+import { activityKeys } from "#/activity/queries";
 import { ApiError, type Project } from "#/api/client";
 import { useApi } from "#/api/useApi";
+import { documentKeys } from "#/documents/queries";
 import { type Matter, matters as sampleMatters } from "#/mock/data";
 import { projectToMatter } from "./adapt";
 
@@ -75,5 +77,36 @@ export function usePinMatter() {
 		},
 		onSettled: () =>
 			queryClient.invalidateQueries({ queryKey: matterKeys.all }),
+	});
+}
+
+// Deletes a matter and every document in it. onDeleted runs before the caches
+// are touched, so a page showing the matter can move away first rather than
+// refetch it and flash a not found
+export function useDeleteMatter(onDeleted?: () => unknown) {
+	const api = useApi();
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationFn: (projectId: string) => api.deleteProject(projectId),
+		onSuccess: async (_data, projectId) => {
+			await onDeleted?.();
+			queryClient.setQueryData<Project[]>(matterKeys.list(), (projects) =>
+				projects?.filter((project) => project.id !== projectId),
+			);
+			queryClient.removeQueries({
+				queryKey: [...matterKeys.all, "detail"],
+				predicate: (query) =>
+					(query.state.data as Project | undefined)?.id === projectId,
+			});
+			await Promise.all(
+				[
+					matterKeys.all,
+					documentKeys.all,
+					activityKeys.all,
+					activityKeys.recentlyViewed,
+				].map((queryKey) => queryClient.invalidateQueries({ queryKey })),
+			);
+		},
 	});
 }
