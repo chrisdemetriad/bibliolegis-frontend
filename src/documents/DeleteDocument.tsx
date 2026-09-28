@@ -31,7 +31,7 @@ export function DeleteDocument({ document }: { document: Document }) {
 				queryKey: documentKeys.detail(document.id),
 			});
 			await queryClient.invalidateQueries({ queryKey: documentKeys.list() });
-			navigate({ to: "/documents" });
+			navigate({ to: "/matters" });
 		},
 	});
 

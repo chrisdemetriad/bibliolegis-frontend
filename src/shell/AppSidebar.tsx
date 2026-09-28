@@ -6,7 +6,6 @@ import {
 	BriefcaseIcon,
 	CalendarClockIcon,
 	FilesIcon,
-	FileTextIcon,
 	HistoryIcon,
 	HouseIcon,
 	LibraryIcon,
@@ -53,7 +52,6 @@ function firmNav(openMatters: number): NavItem[] {
 			icon: BriefcaseIcon,
 			badge: openMatters,
 		},
-		{ label: "Documents", to: "/documents", icon: FileTextIcon },
 		{ label: "Library", to: "/library", icon: LibraryIcon },
 		{ label: "Press", to: "/press", icon: NewspaperIcon },
 	];

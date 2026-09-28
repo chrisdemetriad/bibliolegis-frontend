@@ -64,7 +64,7 @@ function OverviewPage() {
 				actions={
 					<>
 						<Button variant="outline" size="sm" asChild>
-							<Link to="/documents">
+							<Link to="/matters">
 								<UploadIcon /> Upload
 							</Link>
 						</Button>
