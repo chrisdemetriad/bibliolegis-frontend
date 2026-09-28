@@ -8,7 +8,13 @@ import { cn } from "#/lib/utils";
 import { IntakeZone } from "#/matters/IntakeZone";
 import { PinButton } from "#/matters/PinButton";
 import { useAllMatters } from "#/matters/queries";
-import { daysUntil, formatDate, type Matter, practiceAreas } from "#/mock/data";
+import {
+	daysUntil,
+	formatDate,
+	formatDateTime,
+	type Matter,
+	practiceAreas,
+} from "#/mock/data";
 import { Page, PageHeader, PersonAvatar, SampleBadge } from "#/shell/page";
 
 export const Route = createFileRoute("/_authed/matters/")({
@@ -172,22 +178,34 @@ export function MatterRow({ matter }: { matter: Matter }) {
 					{details.join(" · ")}
 				</p>
 			</div>
-			<div className="hidden shrink-0 flex-col items-end gap-2 sm:flex">
+			{/* Controls along the top, when it was added along the bottom */}
+			<div className="flex shrink-0 flex-col items-end justify-between gap-2 self-stretch">
 				<div className="flex items-center gap-1">
 					{matter.team.map((id) => (
-						<PersonAvatar key={id} id={id} className="size-6 text-[0.55rem]" />
+						<PersonAvatar
+							key={id}
+							id={id}
+							className="size-6 text-[0.55rem] max-sm:hidden"
+						/>
 					))}
+					{matter.projectId && (
+						<PinButton
+							projectId={matter.projectId}
+							pinned={Boolean(matter.pinned)}
+							title={matter.title}
+							className="relative -my-1 -mr-2"
+						/>
+					)}
 				</div>
-				{next && <p className="text-xs text-muted-foreground">{next}</p>}
+				{next && (
+					<p className="text-xs text-muted-foreground max-sm:hidden">{next}</p>
+				)}
+				{matter.createdAt && (
+					<span className="rounded-full border px-2 py-px text-xs whitespace-nowrap text-muted-foreground max-sm:hidden">
+						Added {formatDateTime(matter.createdAt)}
+					</span>
+				)}
 			</div>
-			{matter.projectId && (
-				<PinButton
-					projectId={matter.projectId}
-					pinned={Boolean(matter.pinned)}
-					title={matter.title}
-					className="relative -my-1 -mr-2"
-				/>
-			)}
 		</div>
 	);
 }
