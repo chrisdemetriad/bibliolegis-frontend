@@ -129,6 +129,12 @@ All of it was checked in headless Chrome against the real api and real model
 calls on a scratch database, with the sign in guard off in a scratch copy. A
 signed in click through on the real stack is still worth doing.
 
+**The public homepage landed on 2026-09-28**, see "Homepage" below. `/` is a
+marketing page on the root host and redirects to `/overview` on `app.`, so locally
+`localhost:4000` shows the homepage and `app.localhost:4000` the app. Its security
+section says files are encrypted at rest, which the api's Phase 7 hasn't built, so
+that has to land before the page goes live or the line comes out.
+
 **Next:** the rest of Phase 4: aggregation answers as a table, query history
 once the api has `GET /queries`, and the loading and empty states it hasn't
 covered. Phase 5's admin pages have their endpoints already, and Phase 7's
@@ -176,6 +182,10 @@ it costs" before Phase 4's query page is designed, since the two share a page.
   side on disk
 - The dev server moved to port 4000 on 2026-09-27 and the api to 4444, replacing
   3000 and 8000. `VITE_API_URL` defaults to `http://localhost:4444` to match
+- `localhost:4000/` is the homepage and `app.localhost:4000/` goes into the app.
+  Browsers resolve any `*.localhost` name to this machine, so there's nothing to
+  set up. The app pages work on either host, only `/` differs. Calling the api
+  from `app.localhost:4000` needs that origin in the api's `CORS_ALLOWED_ORIGINS`
 - Auth is Clerk, and the application, an organization for the firm and a
   development user all exist already. `clerk env pull --app
   app_3JeKtVK5lZdHKYWcSXVqv0cT5i2 --instance dev --file .env.local` writes both
@@ -263,6 +273,32 @@ its endpoint appears.
 - [ ] Search box and ⌘K
 - [x] The ask boxes call `POST /query`, done on 2026-09-28. The overview's asks across everything, a matter's own is kept to that matter's documents
 
+## Homepage
+
+Added on 2026-09-28. `bibliolegis.com` and `app.bibliolegis.com` are the same
+service (see bibliolegis-api's PLAN.md, "Environments and domains"), so the host
+decides what `/` shows. `src/site/host.ts` reads it on the server and in the
+browser, and `src/routes/index.tsx` redirects to `/overview` on `app.`. Sign in
+and sign up fall back to `/overview`, otherwise they'd land on the homepage.
+
+The page is in `src/site/`, styled after the Lexora Legal template: dark ink and
+warm paper sections, a brass accent and Instrument Serif headings. The colours are
+`--site-*` variables in `src/styles.css`, paper sections follow dark mode and ink
+ones stay dark. Some lines are adapted from Access's CaseMatters Evo video, see
+bibliolegis-api's COMPETITORS.md, which also lists what competitors offer for
+choosing what to build next.
+
+- [x] Public `/` with a hero, a mock cited answer, the problem, features, a savings calculator, security, how it works, what's coming, FAQ and a closing call to action
+- [x] Every call to action is "Try it now" to sign up, not a demo booking
+- [x] `/` redirects to `/overview` on the `app.` host
+- [x] Photos are Unsplash placeholders in `public/marketing/`, listed in its CREDITS.md
+- [ ] Replace the photos with bought or commissioned ones, or credit the photographers
+- [ ] Encryption at rest built in the api (its Phase 7) before the page claims it in production
+- [ ] Pricing, once decided, and what "Try it now" promises (trial length, card or not)
+- [ ] Legal pages the footer will need: privacy policy, terms, cookies
+- [ ] Open Graph image and tags so a shared link shows a card
+- [ ] Decide whether the app host should send marketing visitors back to the root, and the root send app pages to `app.`. Nothing enforces either yet
+
 ## Phase 1: API types
 
 - [x] TypeScript type generation from the backend's exported OpenAPI schema (openapi-typescript or similar)
@@ -320,7 +356,7 @@ Clerk's TanStack Start integration (`@clerk/tanstack-react-start`, the current p
 The domain and environment layout is product wide and lives in bibliolegis-api's
 PLAN.md, under "Environments and domains". Production on `app.bibliolegis.com`,
 development on `dev.bibliolegis.com`, each a Railway environment inside the one
-project. The bare root is reserved for a separate marketing homepage, not this app.
+project. The bare root shows the public homepage from this same app, see "Homepage" above.
 TLS is free and automatic on Railway, so the domain is the only thing bought.
 
 - [ ] Frontend service added to the shared Railway project (see bibliolegis-api's PLAN.md Phase 0), built from this repo's Dockerfile for parity with local Docker runs

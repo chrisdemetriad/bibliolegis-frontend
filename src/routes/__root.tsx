@@ -53,6 +53,10 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 				<ClerkProvider
 					signInUrl="/sign-in"
 					signUpUrl="/sign-up"
+					// The root is the public homepage now, so without these a fresh
+					// sign in would land back on the marketing page
+					signInFallbackRedirectUrl="/overview"
+					signUpFallbackRedirectUrl="/overview"
 					// Clerk's shadcn theme reads the same CSS variables as our own
 					// components, so sign in follows the theme and dark mode too
 					appearance={{ theme: shadcn }}

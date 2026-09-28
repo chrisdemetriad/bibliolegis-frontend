@@ -15,7 +15,7 @@ clerk env pull --app app_3JeKtVK5lZdHKYWcSXVqv0cT5i2 --instance dev --file .env.
 pnpm dev
 ```
 
-That serves the app on `localhost:4000`. The `clerk env pull` step needs the [Clerk CLI](https://clerk.com/docs/cli) signed in to the account that owns the app, see "Auth" below.
+That serves the public homepage on `localhost:4000` and the app on `app.localhost:4000`. Only `/` differs between the two, the host decides whether it's the homepage or a redirect into the app, so any app page also works on plain `localhost:4000`. The `clerk env pull` step needs the [Clerk CLI](https://clerk.com/docs/cli) signed in to the account that owns the app, see "Auth" below.
 
 Run the checks:
 
