@@ -116,6 +116,25 @@ body {
   --warning: oklch(0.985 0.03 95);
   --warning-foreground: oklch(0.42 0.09 70);
   --warning-border: oklch(0.91 0.08 95);
+  /* A fixed palette for tag pills, picked by hashing the tag's text so a
+     given tag reads the same colour everywhere it turns up. Not meant for
+     anything else, the rest of the app stays greyscale bar --warning */
+  --tag-1: oklch(0.94 0.045 255);
+  --tag-1-foreground: oklch(0.4 0.1 255);
+  --tag-2: oklch(0.94 0.06 155);
+  --tag-2-foreground: oklch(0.4 0.1 155);
+  --tag-3: oklch(0.94 0.06 80);
+  --tag-3-foreground: oklch(0.42 0.1 70);
+  --tag-4: oklch(0.94 0.05 320);
+  --tag-4-foreground: oklch(0.42 0.1 320);
+  --tag-5: oklch(0.94 0.05 195);
+  --tag-5-foreground: oklch(0.4 0.08 195);
+  --tag-6: oklch(0.94 0.06 35);
+  --tag-6-foreground: oklch(0.42 0.11 35);
+  --tag-7: oklch(0.94 0.045 290);
+  --tag-7-foreground: oklch(0.42 0.09 290);
+  --tag-8: oklch(0.94 0.05 15);
+  --tag-8-foreground: oklch(0.45 0.1 15);
   /* The public homepage only. Ink sections stay dark in both themes, paper
      ones follow it */
   --site-ink: oklch(0.2 0.025 255);
@@ -162,6 +181,22 @@ body {
   --warning: oklch(0.28 0.05 85);
   --warning-foreground: oklch(0.88 0.1 90);
   --warning-border: oklch(0.4 0.07 85);
+  --tag-1: oklch(0.3 0.055 255);
+  --tag-1-foreground: oklch(0.85 0.08 255);
+  --tag-2: oklch(0.3 0.06 155);
+  --tag-2-foreground: oklch(0.85 0.09 155);
+  --tag-3: oklch(0.3 0.06 80);
+  --tag-3-foreground: oklch(0.86 0.09 75);
+  --tag-4: oklch(0.3 0.06 320);
+  --tag-4-foreground: oklch(0.85 0.09 320);
+  --tag-5: oklch(0.3 0.05 195);
+  --tag-5-foreground: oklch(0.85 0.08 195);
+  --tag-6: oklch(0.3 0.06 35);
+  --tag-6-foreground: oklch(0.86 0.1 35);
+  --tag-7: oklch(0.3 0.055 290);
+  --tag-7-foreground: oklch(0.85 0.08 290);
+  --tag-8: oklch(0.3 0.06 15);
+  --tag-8-foreground: oklch(0.86 0.09 15);
   --site-paper: oklch(0.17 0.015 255);
   --site-paper-deep: oklch(0.21 0.02 255);
   --site-brass-deep: oklch(0.78 0.09 80);

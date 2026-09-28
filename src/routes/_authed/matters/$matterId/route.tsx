@@ -4,6 +4,7 @@ import { useRecordView } from "#/activity/queries";
 import { ApiError } from "#/api/client";
 import { Button } from "#/components/ui/button";
 import { Skeleton } from "#/components/ui/skeleton";
+import { TagPill } from "#/components/ui/tag-pill";
 import { projectToMatter } from "#/matters/adapt";
 import { MatterContext } from "#/matters/context";
 import { PinButton } from "#/matters/PinButton";
@@ -78,18 +79,9 @@ function MatterFrame({ matter }: { matter: Matter }) {
 							.join(" · ")}
 					</p>
 					<div className="mt-3 flex flex-wrap gap-1.5">
-						{matter.area && (
-							<span className="rounded-md border px-1.5 py-px text-xs text-muted-foreground">
-								{matter.area}
-							</span>
-						)}
+						{matter.area && <TagPill>{matter.area}</TagPill>}
 						{matter.tags.map((tag) => (
-							<span
-								key={tag}
-								className="rounded-md border px-1.5 py-px text-xs text-muted-foreground"
-							>
-								{tag}
-							</span>
+							<TagPill key={tag}>{tag}</TagPill>
 						))}
 						{matter.closed && (
 							<span className="rounded-md bg-muted px-1.5 py-px text-xs">

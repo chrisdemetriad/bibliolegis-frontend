@@ -3,6 +3,7 @@ import { BriefcaseIcon, FilterIcon, PlusIcon } from "lucide-react";
 import { Button } from "#/components/ui/button";
 import { Skeleton } from "#/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "#/components/ui/tabs";
+import { TagPill } from "#/components/ui/tag-pill";
 import { cn } from "#/lib/utils";
 import { IntakeZone } from "#/matters/IntakeZone";
 import { PinButton } from "#/matters/PinButton";
@@ -159,12 +160,7 @@ export function MatterRow({ matter }: { matter: Matter }) {
 						{matter.title}
 					</Link>
 					{matter.tags.map((tag) => (
-						<span
-							key={tag}
-							className="rounded-md border px-1.5 py-px text-xs text-muted-foreground"
-						>
-							{tag}
-						</span>
+						<TagPill key={tag}>{tag}</TagPill>
 					))}
 				</div>
 				{matter.summary && (
