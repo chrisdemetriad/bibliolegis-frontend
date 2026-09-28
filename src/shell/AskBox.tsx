@@ -30,6 +30,9 @@ export function AskBox({
 	const [question, setQuestion] = useState("");
 	const ask = useMutation({
 		mutationFn: (text: string) => api.query(text, projectId),
+		// Cleared only once there's an answer, so a failed ask keeps the
+		// question there to try again. The answer panel still shows it
+		onSuccess: () => setQuestion(""),
 	});
 
 	const submit = () => {
