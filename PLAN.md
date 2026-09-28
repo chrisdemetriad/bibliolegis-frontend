@@ -162,7 +162,8 @@ matter. See Phase 6 below for where this should go next.
 
 **Next:** the rest of Phase 11, press. The api's routes exist as of
 2026-09-28 and a real matter's Press tab reads them with a list and cards
-toggle. The article page, pasting a link and the sources panel are left. After that, the rest of Phase 4: aggregation answers as a
+toggle, and each article has its own page. Pasting a link and the sources
+panel are left. After that, the rest of Phase 4: aggregation answers as a
 table, query history once the api has `GET /queries`, and the loading and empty states it hasn't
 covered. Phase 5's admin pages have their endpoints already, and Phase 7's
 deployment can start.
@@ -479,9 +480,12 @@ original. The article text itself isn't kept, see that phase for why.
       `PressMentionOut` rather than stretching the sample `PressItem`, which sample
       matters keep. The chips are per outlet, the BBC rather than the feed that
       found it
-- [ ] `/matters/$matterId/press/$outlet/$slug`, one article: photo, headline,
+- [x] `/matters/$matterId/press/$outlet/$slug`, one article: photo, headline,
       outlet, date, excerpt, the terms it matched and a clear link to the original.
-      Keep and dismiss buttons
+      Keep and dismiss buttons. Done on 2026-09-28. The file is
+      `press_.$outlet.$slug.tsx` so the page replaces the list rather than nesting
+      inside it. Headlines in the list open it, the icon beside them goes straight
+      to the outlet. A dismissed article can be brought back from here
 - [ ] Add an article by pasting its URL, showing what was read from the page
       before it's saved
 - [ ] A sources panel on the matter's Press tab: its watch terms, exclusions and
