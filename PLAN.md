@@ -8,7 +8,7 @@ This can start against a stubbed or partially built API. It doesn't need to wait
 
 ## Where things stand
 
-Last updated 2026-09-27. Keep this block current, it's what a fresh session reads
+Last updated 2026-09-28. Keep this block current, it's what a fresh session reads
 to work out where to pick up.
 
 **Done:** Phases 0 to 2, the UI foundation, Phase 3 apart from the metadata on
@@ -115,9 +115,24 @@ The app shell landed on 2026-09-27. It's a sidebar layout plus overview,
 matters, press, library and help pages, all running on made up sample data for
 now. See "App shell and sample pages" below.
 
-**Next:** the rest of Phase 4 waits on the api's `POST /query`. Until then,
-Phase 5's admin pages have their endpoints already, and Phase 7's deployment
-can start.
+**Matters from dropped files landed on 2026-09-28** (#48 to #53), asked for
+by the user. Every page is full width now. `/matters` has a drop zone at the
+top: files go to the api's `/intakes`, each shows upload progress then the
+stage it's being read at, and once the api has grouped them into matters the
+results link to each one. Real matters from `GET /projects` sit above the
+sample ones, can be pinned per person and show in the sidebar. A matter's pages
+load it by slug from `GET /projects/{slug}` and only fall back to sample data
+on a 404, through `src/matters/context.tsx` rather than the route loader, since
+the api needs the Clerk token the loader doesn't have. The ask boxes call
+`POST /query` and every citation opens the document at the quoted passage.
+All of it was checked in headless Chrome against the real api and real model
+calls on a scratch database, with the sign in guard off in a scratch copy. A
+signed in click through on the real stack is still worth doing.
+
+**Next:** the rest of Phase 4: aggregation answers as a table, query history
+once the api has `GET /queries`, and the loading and empty states it hasn't
+covered. Phase 5's admin pages have their endpoints already, and Phase 7's
+deployment can start.
 
 Phase 7, deployment, can also start out of order. Nothing is deployed to Railway
 yet, the shared project holds only Postgres. The holding route is enough to prove
