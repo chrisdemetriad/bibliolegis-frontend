@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { AlertTriangleIcon, ArrowRightIcon, CircleDotIcon } from "lucide-react";
-import { useMatter } from "#/matters/context";
+import { useAskPanel, useMatter } from "#/matters/context";
 import { daysUntil, formatDate, matters } from "#/mock/data";
 import { AskBox } from "#/shell/AskBox";
 import {
@@ -17,6 +17,7 @@ export const Route = createFileRoute("/_authed/matters/$matterId/overview")({
 
 function MatterOverview() {
 	const matter = useMatter();
+	const { open: askOpen } = useAskPanel();
 	// Related matters come from the sample set, so only sample matters get them
 	const related = matter.projectId
 		? []
@@ -84,6 +85,17 @@ function MatterOverview() {
 				)}
 			</div>
 
+			{askOpen && (
+				<section id="ask" className="scroll-mt-20">
+					<SectionTitle>Ask about this matter</SectionTitle>
+					<AskBox
+						scope={matter.title}
+						placeholder={matter.suggestedQuestion}
+						projectId={matter.projectId}
+					/>
+				</section>
+			)}
+
 			<Panel className="p-5">
 				<div className="mb-5 flex flex-wrap items-center justify-between gap-2">
 					<h2 className="text-sm font-medium">Where it stands</h2>
@@ -99,15 +111,6 @@ function MatterOverview() {
 					<KeyDates dates={matter.dates ?? []} />
 				)}
 			</Panel>
-
-			<section id="ask" className="scroll-mt-20">
-				<SectionTitle>Ask about this matter</SectionTitle>
-				<AskBox
-					scope={matter.title}
-					placeholder={matter.suggestedQuestion}
-					projectId={matter.projectId}
-				/>
-			</section>
 
 			<section>
 				<SectionTitle>Issues</SectionTitle>

@@ -10,3 +10,14 @@ export function useMatter() {
 	if (!matter) throw new Error("useMatter is only for pages under a matter");
 	return matter;
 }
+
+// Whether a matter's ask panel is showing. Open by default on arriving at a
+// matter, the header's Ask button toggles it
+export const AskPanelContext = createContext<{
+	open: boolean;
+	setOpen: (open: boolean) => void;
+}>({ open: true, setOpen: () => {} });
+
+export function useAskPanel() {
+	return useContext(AskPanelContext);
+}
