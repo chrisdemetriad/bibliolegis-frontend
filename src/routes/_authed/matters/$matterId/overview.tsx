@@ -41,6 +41,49 @@ function MatterOverview() {
 				</Link>
 			)}
 
+			<div className="grid gap-8 md:grid-cols-2">
+				<section>
+					<SectionTitle>Summary</SectionTitle>
+					<p className="text-sm leading-relaxed text-foreground/90">
+						{matter.summary || "No summary yet."}
+					</p>
+					<dl className="mt-4 grid grid-cols-2 gap-3 text-sm">
+						{matter.client && (
+							<div>
+								<dt className="text-xs text-muted-foreground">Client</dt>
+								<dd>{matter.client}</dd>
+							</div>
+						)}
+						{matter.nextDate && (
+							<div>
+								<dt className="text-xs text-muted-foreground">Next date</dt>
+								<dd>
+									{matter.nextDate.label}, {formatDate(matter.nextDate.date)}
+								</dd>
+							</div>
+						)}
+					</dl>
+				</section>
+				{matter.team.length > 0 && (
+					<section>
+						<SectionTitle>Team</SectionTitle>
+						<div className="space-y-2">
+							{matter.team.map((id) => (
+								<div key={id} className="flex items-center gap-2.5">
+									<PersonAvatar id={id} />
+									<p className="text-sm">
+										{personName(id)}
+										{id === matter.lead && (
+											<span className="text-muted-foreground">, lead</span>
+										)}
+									</p>
+								</div>
+							))}
+						</div>
+					</section>
+				)}
+			</div>
+
 			<Panel className="p-5">
 				<div className="mb-5 flex flex-wrap items-center justify-between gap-2">
 					<h2 className="text-sm font-medium">Where it stands</h2>
@@ -104,49 +147,6 @@ function MatterOverview() {
 					))}
 				</div>
 			</section>
-
-			<div className="grid gap-8 md:grid-cols-2">
-				<section>
-					<SectionTitle>Summary</SectionTitle>
-					<p className="text-sm leading-relaxed text-foreground/90">
-						{matter.summary || "No summary yet."}
-					</p>
-					<dl className="mt-4 grid grid-cols-2 gap-3 text-sm">
-						{matter.client && (
-							<div>
-								<dt className="text-xs text-muted-foreground">Client</dt>
-								<dd>{matter.client}</dd>
-							</div>
-						)}
-						{matter.nextDate && (
-							<div>
-								<dt className="text-xs text-muted-foreground">Next date</dt>
-								<dd>
-									{matter.nextDate.label}, {formatDate(matter.nextDate.date)}
-								</dd>
-							</div>
-						)}
-					</dl>
-				</section>
-				{matter.team.length > 0 && (
-					<section>
-						<SectionTitle>Team</SectionTitle>
-						<div className="space-y-2">
-							{matter.team.map((id) => (
-								<div key={id} className="flex items-center gap-2.5">
-									<PersonAvatar id={id} />
-									<p className="text-sm">
-										{personName(id)}
-										{id === matter.lead && (
-											<span className="text-muted-foreground">, lead</span>
-										)}
-									</p>
-								</div>
-							))}
-						</div>
-					</section>
-				)}
-			</div>
 
 			{related.length > 0 && (
 				<section>
