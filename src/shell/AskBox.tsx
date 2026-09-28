@@ -47,7 +47,7 @@ export function AskBox({
 					value={question}
 					onChange={(event) => setQuestion(event.target.value)}
 					onKeyDown={(event) => {
-						if (event.key === "Enter" && (event.metaKey || event.ctrlKey)) {
+						if (event.key === "Enter" && !event.shiftKey) {
 							event.preventDefault();
 							submit();
 						}
@@ -63,7 +63,7 @@ export function AskBox({
 						links to where it came from.
 					</p>
 					<kbd className="rounded border px-1 text-[0.7rem] text-muted-foreground max-sm:hidden">
-						⌘↵
+						↵
 					</kbd>
 					<Button size="sm" onClick={submit} disabled={ask.isPending}>
 						Ask <ArrowRightIcon />
