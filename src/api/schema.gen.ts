@@ -4,6 +4,26 @@
  */
 
 export interface paths {
+    "/activity": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Activity
+         * @description What's happened lately in the matters the caller can see, newest first.
+         */
+        get: operations["list_activity_activity_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/chat-models": {
         parameters: {
             query?: never;
@@ -33,6 +53,31 @@ export interface paths {
         put?: never;
         /** Upload Document */
         post: operations["upload_document_documents_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/documents/duplicates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Find Duplicates
+         * @description Which of these files the caller can already see a copy of.
+         *
+         *     Asked before uploading, so a file dropped a second time can be caught
+         *     and the person asked whether they meant to. Only documents the caller
+         *     can see count, a copy in a matter they're not on isn't theirs to be
+         *     told about. The earliest copy of each is the one returned.
+         */
+        post: operations["find_duplicates_documents_duplicates_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -235,6 +280,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/projects/{project_ref}/view": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Record View */
+        put: operations["record_view_projects__project_ref__view_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/query": {
         parameters: {
             query?: never;
@@ -304,6 +366,47 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/users/me/preferences": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get My Preferences */
+        get: operations["get_my_preferences_users_me_preferences_get"];
+        /** Set My Preferences */
+        put: operations["set_my_preferences_users_me_preferences_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/users/me/recently-viewed": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Recently Viewed
+         * @description The caller's most recently opened matters, newest first.
+         *
+         *     As many as their `recently_viewed_count` setting asks for. A matter
+         *     they've since been taken off or that's no longer listed drops out.
+         */
+        get: operations["list_recently_viewed_users_me_recently_viewed_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/users/{user_id}": {
         parameters: {
             query?: never;
@@ -359,6 +462,62 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** ActivityDocumentOut */
+        ActivityDocumentOut: {
+            /** Exists */
+            exists: boolean;
+            /** Filename */
+            filename: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+        };
+        /** ActivityMatterOut */
+        ActivityMatterOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+            /** Slug */
+            slug: string;
+        };
+        /** ActivityOut */
+        ActivityOut: {
+            /** Action */
+            action: string;
+            actor: components["schemas"]["ActorOut"] | null;
+            /** Count */
+            count: number;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            document: components["schemas"]["ActivityDocumentOut"] | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            matter: components["schemas"]["ActivityMatterOut"] | null;
+            /** Pages */
+            pages: number | null;
+        };
+        /** ActorOut */
+        ActorOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+        };
         /** Body_add_intake_document_intakes__intake_id__documents_post */
         Body_add_intake_document_intakes__intake_id__documents_post: {
             /** File */
@@ -446,6 +605,41 @@ export interface components {
              */
             uploaded_at: string;
         };
+        /** DuplicateCheck */
+        DuplicateCheck: {
+            /** Sha256 */
+            sha256: string[];
+        };
+        /** DuplicateMatterOut */
+        DuplicateMatterOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+            /** Slug */
+            slug: string;
+        };
+        /** DuplicateOut */
+        DuplicateOut: {
+            /**
+             * Document Id
+             * Format: uuid
+             */
+            document_id: string;
+            /** Filename */
+            filename: string;
+            matter: components["schemas"]["DuplicateMatterOut"] | null;
+            /** Sha256 */
+            sha256: string;
+            /**
+             * Uploaded At
+             * Format: date-time
+             */
+            uploaded_at: string;
+        };
         /** HTTPValidationError */
         HTTPValidationError: {
             /** Detail */
@@ -522,6 +716,16 @@ export interface components {
             page_start: number | null;
             /** Text */
             text: string;
+        };
+        /** Preferences */
+        Preferences: {
+            /**
+             * Recently Viewed Count
+             * @enum {integer}
+             */
+            recently_viewed_count: 3 | 8;
+            /** Show Recently Viewed */
+            show_recently_viewed: boolean;
         };
         /** ProjectCreate */
         ProjectCreate: {
@@ -621,6 +825,15 @@ export interface components {
             /** Path */
             path: string;
         };
+        /** RecentlyViewedOut */
+        RecentlyViewedOut: {
+            matter: components["schemas"]["ProjectOut"];
+            /**
+             * Viewed At
+             * Format: date-time
+             */
+            viewed_at: string;
+        };
         /** RoleChange */
         RoleChange: {
             /** Role */
@@ -688,6 +901,39 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    list_activity_activity_get: {
+        parameters: {
+            query?: {
+                /** @description a matter's id or slug */
+                project?: string | null;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ActivityOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     list_chat_models_chat_models_get: {
         parameters: {
             query?: never;
@@ -761,6 +1007,39 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["DocumentOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    find_duplicates_documents_duplicates_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DuplicateCheck"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DuplicateOut"][];
                 };
             };
             /** @description Validation Error */
@@ -1180,6 +1459,35 @@ export interface operations {
             };
         };
     };
+    record_view_projects__project_ref__view_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_ref: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     query_query_post: {
         parameters: {
             query?: never;
@@ -1302,6 +1610,79 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_my_preferences_users_me_preferences_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Preferences"];
+                };
+            };
+        };
+    };
+    set_my_preferences_users_me_preferences_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["Preferences"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Preferences"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_recently_viewed_users_me_recently_viewed_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RecentlyViewedOut"][];
                 };
             };
         };

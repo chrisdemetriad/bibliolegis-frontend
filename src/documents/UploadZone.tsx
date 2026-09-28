@@ -11,6 +11,7 @@ import { useApi } from "#/api/useApi";
 import { Button } from "#/components/ui/button";
 import { Progress } from "#/components/ui/progress";
 import { cn } from "#/lib/utils";
+import { useDuplicateCheck } from "./duplicates";
 import { documentKeys } from "./queries";
 
 // The api checks this too. Checking here as well means a wrong file fails
@@ -38,6 +39,7 @@ export function UploadZone({ projectId }: { projectId?: string } = {}) {
 	const inputId = useId();
 	const [dragging, setDragging] = useState(false);
 	const [uploads, setUploads] = useState<Upload[]>([]);
+	const duplicates = useDuplicateCheck(projectId);
 
 	const update = (key: string, change: Partial<Upload>) =>
 		setUploads((current) =>
@@ -84,13 +86,20 @@ export function UploadZone({ projectId }: { projectId?: string } = {}) {
 		}
 	}
 
-	function uploadAll(files: FileList | null) {
-		if (!files) return;
-		for (const file of Array.from(files)) void uploadOne(file);
+	async function uploadAll(fileList: FileList | null) {
+		if (!fileList) return;
+		// Copied first, clearing the input empties the live FileList
+		const files = Array.from(fileList);
+		const carryOn = await duplicates.confirm(
+			files.filter((file) => ACCEPTED.includes(extensionOf(file.name))),
+		);
+		if (!carryOn) return;
+		for (const file of files) void uploadOne(file);
 	}
 
 	return (
 		<section aria-label="Upload documents">
+			{duplicates.dialog}
 			<label
 				htmlFor={inputId}
 				onDragOver={(event) => {
@@ -101,7 +110,7 @@ export function UploadZone({ projectId }: { projectId?: string } = {}) {
 				onDrop={(event) => {
 					event.preventDefault();
 					setDragging(false);
-					uploadAll(event.dataTransfer.files);
+					void uploadAll(event.dataTransfer.files);
 				}}
 				className={cn(
 					"flex cursor-pointer flex-col items-center gap-2 rounded-lg border border-dashed p-8 text-center transition-colors hover:bg-muted/50 has-focus-visible:ring-3 has-focus-visible:ring-ring/50",
@@ -123,7 +132,7 @@ export function UploadZone({ projectId }: { projectId?: string } = {}) {
 					accept={ACCEPTED.join(",")}
 					className="sr-only"
 					onChange={(event) => {
-						uploadAll(event.target.files);
+						void uploadAll(event.target.files);
 						// Cleared so choosing the same file again still fires
 						event.target.value = "";
 					}}

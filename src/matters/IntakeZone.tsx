@@ -17,6 +17,7 @@ import {
 } from "#/api/client";
 import { useApi } from "#/api/useApi";
 import { Button } from "#/components/ui/button";
+import { useDuplicateCheck } from "#/documents/duplicates";
 import { documentKeys } from "#/documents/queries";
 import { cn } from "#/lib/utils";
 import { matterKeys } from "./queries";
@@ -121,9 +122,12 @@ export function IntakeZone() {
 	const [intakeId, setIntakeId] = useState<string | null>(null);
 	const [intake, setIntake] = useState<Intake | null>(null);
 	const [error, setError] = useState<string | null>(null);
+	const [checking, setChecking] = useState(false);
+	const duplicates = useDuplicateCheck();
 
 	const finished = intake?.status === "done" || intake?.status === "failed";
-	const busy = (rows.length > 0 || intakeId !== null) && !finished && !error;
+	const busy =
+		checking || ((rows.length > 0 || intakeId !== null) && !finished && !error);
 
 	// Pick up a batch left running when the page was last open
 	useEffect(() => {
@@ -173,6 +177,16 @@ export function IntakeZone() {
 
 	async function start(files: File[]) {
 		if (files.length === 0 || busy) return;
+
+		// Asked before anything is shown or sent, so going to the matter
+		// instead leaves nothing half started behind
+		setChecking(true);
+		const carryOn = await duplicates.confirm(
+			files.filter((file) => ACCEPTED.includes(extensionOf(file.name))),
+		);
+		setChecking(false);
+		if (!carryOn) return;
+
 		setIntake(null);
 		setError(null);
 
@@ -296,6 +310,7 @@ export function IntakeZone() {
 
 	return (
 		<section aria-label="Open matters from case files" className="mb-8">
+			{duplicates.dialog}
 			{/* A div rather than a label, so a click on the progress or the results
 			once files are in doesn't open the file picker. The button inside is
 			the keyboard way in, a click anywhere else on the empty zone is a

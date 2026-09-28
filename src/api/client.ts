@@ -18,6 +18,10 @@ export type MemberAdd = Schemas["MemberAdd"];
 export type StaffAccount = Schemas["StaffAccount"];
 export type UserProfile = Schemas["UserProfile"];
 export type ChatModel = Schemas["ChatModelOut"];
+export type Duplicate = Schemas["DuplicateOut"];
+export type Activity = Schemas["ActivityOut"];
+export type RecentlyViewed = Schemas["RecentlyViewedOut"];
+export type Preferences = Schemas["Preferences"];
 export type DocumentListQuery = NonNullable<
 	paths["/documents"]["get"]["parameters"]["query"]
 >;
@@ -107,6 +111,23 @@ export function createApi({
 		setMyModel: async (model: string) =>
 			unwrap(await client.PUT("/users/me/model", { body: { model } })),
 
+		getMyPreferences: async () =>
+			unwrap(await client.GET("/users/me/preferences")),
+
+		setMyPreferences: async (body: Preferences) =>
+			unwrap(await client.PUT("/users/me/preferences", { body })),
+
+		listRecentlyViewed: async () =>
+			unwrap(await client.GET("/users/me/recently-viewed")),
+
+		// Without a project, activity across every matter the user is on
+		listActivity: async (projectRef?: string, limit?: number) =>
+			unwrap(
+				await client.GET("/activity", {
+					params: { query: { project: projectRef, limit } },
+				}),
+			),
+
 		listUsers: async () => unwrap(await client.GET("/users")),
 
 		changeRole: async (userId: string, role: string) =>
@@ -145,6 +166,14 @@ export function createApi({
 		unpinProject: async (projectRef: string) => {
 			unwrap(
 				await client.DELETE("/projects/{project_ref}/pin", {
+					params: { path: { project_ref: projectRef } },
+				}),
+			);
+		},
+
+		recordView: async (projectRef: string) => {
+			unwrap(
+				await client.PUT("/projects/{project_ref}/view", {
 					params: { path: { project_ref: projectRef } },
 				}),
 			);
@@ -235,6 +264,11 @@ export function createApi({
 					body: { question, project_id: projectId ?? null },
 				}),
 			),
+
+		// sha256 are hex fingerprints of files about to be uploaded, see
+		// src/documents/fingerprint.ts
+		findDuplicates: async (sha256: string[]) =>
+			unwrap(await client.POST("/documents/duplicates", { body: { sha256 } })),
 
 		deleteDocument: async (documentId: string) => {
 			unwrap(
