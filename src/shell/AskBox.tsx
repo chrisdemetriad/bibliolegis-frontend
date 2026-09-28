@@ -11,6 +11,7 @@ import { Fragment, type ReactNode, useState } from "react";
 import { type Citation, errorMessage, type QueryAnswer } from "#/api/client";
 import { useApi } from "#/api/useApi";
 import { Button } from "#/components/ui/button";
+import { Kbd } from "#/components/ui/kbd";
 import { Skeleton } from "#/components/ui/skeleton";
 import { Panel } from "./page";
 
@@ -62,9 +63,7 @@ export function AskBox({
 						Answers come only from the documents you can see, and every claim
 						links to where it came from.
 					</p>
-					<kbd className="rounded border px-1 text-[0.7rem] text-muted-foreground max-sm:hidden">
-						↵
-					</kbd>
+					<Kbd className="max-sm:hidden">↵</Kbd>
 					<Button size="sm" onClick={submit} disabled={ask.isPending}>
 						Ask <ArrowRightIcon />
 					</Button>
