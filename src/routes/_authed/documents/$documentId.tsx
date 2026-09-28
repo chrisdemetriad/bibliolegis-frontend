@@ -30,11 +30,11 @@ function DocumentPage() {
 	return (
 		<Page>
 			<Link
-				to="/documents"
+				to="/matters"
 				className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
 			>
 				<ArrowLeftIcon className="size-4" />
-				Documents
+				Matters
 			</Link>
 
 			{isPending && <p className="mt-6 text-muted-foreground">Loading…</p>}
