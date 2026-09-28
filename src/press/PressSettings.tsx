@@ -143,7 +143,7 @@ export function WatchTerms({ projectRef }: { projectRef: string }) {
 	);
 }
 
-function SourceRow({
+export function SourceRow({
 	source,
 	canChange,
 }: {
@@ -169,7 +169,7 @@ function SourceRow({
 						` · ${source.article_count} found`}
 				</p>
 			</div>
-			{canChange && source.project_id && (
+			{canChange && (
 				<button
 					type="button"
 					aria-label={`Remove ${source.name}`}
@@ -199,6 +199,16 @@ function SourceRow({
 	);
 }
 
+// How /press groups the firm's feeds
+export const SOURCE_CATEGORIES = [
+	"Wire",
+	"Broadcaster",
+	"National",
+	"Business",
+	"Legal",
+	"Local",
+] as const;
+
 export function AddFeed({
 	projectRef,
 	onDone,
@@ -208,6 +218,7 @@ export function AddFeed({
 }) {
 	const [name, setName] = useState("");
 	const [url, setUrl] = useState("");
+	const [category, setCategory] = useState<string>("");
 	const add = useAddPressSource();
 	return (
 		<form
@@ -215,7 +226,13 @@ export function AddFeed({
 			onSubmit={(event) => {
 				event.preventDefault();
 				add.mutate(
-					{ name, url, kind: "rss", project: projectRef },
+					{
+						name,
+						url,
+						kind: "rss",
+						project: projectRef,
+						category: category || null,
+					},
 					{
 						onSuccess: () => {
 							toast.success(`${name} added`);
@@ -240,6 +257,19 @@ export function AddFeed({
 				onChange={(event) => setUrl(event.target.value)}
 				className="h-8"
 			/>
+			{!projectRef && (
+				<select
+					aria-label="Kind of outlet"
+					value={category}
+					onChange={(event) => setCategory(event.target.value)}
+					className="h-8 w-full rounded-md border bg-transparent px-2 text-sm"
+				>
+					<option value="">Kind of outlet</option>
+					{SOURCE_CATEGORIES.map((kind) => (
+						<option key={kind}>{kind}</option>
+					))}
+				</select>
+			)}
 			{add.isError && (
 				<p className="text-xs text-destructive">
 					{errorMessage(add.error, "Couldn't add that feed.")}

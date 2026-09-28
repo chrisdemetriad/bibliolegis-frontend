@@ -1,162 +1,140 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { PlusIcon, RefreshCwIcon } from "lucide-react";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { PlusIcon } from "lucide-react";
 import { useState } from "react";
 import { Button } from "#/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "#/components/ui/tabs";
-import {
-	type PressItem,
-	type PressSource,
-	press,
-	pressSchedule,
-	pressSources,
-} from "#/mock/data";
-import { PressList } from "#/shell/lists";
+import { Skeleton } from "#/components/ui/skeleton";
+import { PressFeed, type PressView, ViewToggle } from "#/press/PressFeed";
+import { AddFeed, SOURCE_CATEGORIES, SourceRow } from "#/press/PressSettings";
+import { useFirmPress, useMe, usePressSources } from "#/press/queries";
 import { Page, PageHeader, Panel, SectionTitle } from "#/shell/page";
 
 export const Route = createFileRoute("/_authed/press")({
+	validateSearch: (search: Record<string, unknown>): { view?: "cards" } =>
+		search.view === "cards" ? { view: "cards" } : {},
 	component: PressPage,
 });
 
-const abouts: PressItem["about"][] = [
-	"Our matter",
-	"Our client",
-	"Other side",
-	"Sector",
-];
-
-const tabs = [
-	{ value: "all", label: "All", items: press },
-	...abouts.map((about) => ({
-		value: about,
-		label: about,
-		items: press.filter((item) => item.about === about),
-	})),
-];
-
-const kinds: PressSource["kind"][] = [
-	"Wire",
-	"Broadcaster",
-	"National",
-	"Business",
-	"Legal",
-	"Local",
-];
-
 function PressPage() {
+	const { view: chosen } = Route.useSearch();
+	const view: PressView = chosen ?? "list";
+	const navigate = useNavigate({ from: Route.fullPath });
+	const { data, isPending, isError } = useFirmPress();
+
 	return (
 		<Page>
 			<PageHeader
 				title="Press"
-				description="News about your matters, your clients and the people on the other side. Every source on the right is searched on a schedule for the parties, case names and references of every open matter."
+				sample={false}
+				description="News about the matters you're on and the people in them, newest first. The firm's feeds on the right are read every few hours for each open matter's parties, and a matter can add feeds and terms of its own on its Press tab."
 				actions={
-					<Button variant="outline" size="sm">
-						<RefreshCwIcon /> Search now
-					</Button>
+					<ViewToggle
+						view={view}
+						onChange={(next) =>
+							void navigate({
+								search: next === "cards" ? { view: "cards" } : {},
+								replace: true,
+							})
+						}
+					/>
 				}
 			/>
 
 			<div className="grid gap-8 lg:grid-cols-[1fr_18rem]">
-				<Tabs defaultValue="all" className="min-w-0">
-					<div className="overflow-x-auto border-b">
-						<TabsList variant="line" className="h-10!">
-							{tabs.map((tab) => (
-								<TabsTrigger key={tab.value} value={tab.value}>
-									{tab.label}
-									<span className="text-xs text-muted-foreground">
-										{tab.items.length}
-									</span>
-								</TabsTrigger>
-							))}
-						</TabsList>
-					</div>
-					{tabs.map((tab) => (
-						<TabsContent key={tab.value} value={tab.value} className="mt-4">
-							<PressList items={tab.items} />
-						</TabsContent>
-					))}
-				</Tabs>
-
-				<aside className="space-y-6">
-					<Panel className="p-4 text-sm">
-						<p className="font-medium">{pressSchedule.every}</p>
-						<p className="mt-1 text-xs text-muted-foreground">
-							Last searched {pressSchedule.lastRun}. Next{" "}
-							{pressSchedule.nextRun}.
-						</p>
-					</Panel>
-					<Sources />
+				<div className="min-w-0">
+					{isPending ? (
+						<div className="space-y-2">
+							<Skeleton className="h-24" />
+							<Skeleton className="h-24" />
+						</div>
+					) : isError ? (
+						<p className="text-sm text-destructive">Couldn't load the press.</p>
+					) : (
+						<PressFeed
+							mentions={data}
+							view={view}
+							showMatter
+							empty="Nothing found yet for any of your matters."
+						/>
+					)}
+				</div>
+				<aside>
+					<FirmSources />
 				</aside>
 			</div>
 		</Page>
 	);
 }
 
-// The switches only change local state for now. Once the search exists they
-// save which sources the firm wants read
-function Sources() {
-	const [on, setOn] = useState(
-		() => new Set(pressSources.filter((s) => s.on).map((s) => s.name)),
-	);
-
-	const toggle = (name: string) =>
-		setOn((current) => {
-			const next = new Set(current);
-			if (next.has(name)) next.delete(name);
-			else next.add(name);
-			return next;
-		});
+// Only an admin changes the firm's feeds, the api refuses anyone else, so
+// everyone else sees them without the switches working
+function FirmSources() {
+	const { data: sources, isPending } = usePressSources();
+	const { data: me } = useMe();
+	const isAdmin = me?.role === "admin";
+	const [adding, setAdding] = useState(false);
+	const groups = [...SOURCE_CATEGORIES, null].map((category) => ({
+		label: category ?? "Other",
+		items: (sources ?? []).filter((source) =>
+			category
+				? source.category === category
+				: !SOURCE_CATEGORIES.some((known) => known === source.category),
+		),
+	}));
+	const on = sources?.filter((source) => source.enabled).length ?? 0;
 
 	return (
 		<section>
 			<SectionTitle
 				action={
-					<Button variant="ghost" size="xs">
-						<PlusIcon /> Add
-					</Button>
+					isAdmin &&
+					!adding && (
+						<Button variant="ghost" size="xs" onClick={() => setAdding(true)}>
+							<PlusIcon /> Add
+						</Button>
+					)
 				}
 			>
 				Sources
-				<span className="ml-1.5 font-normal text-muted-foreground">
-					{on.size} of {pressSources.length}
-				</span>
+				{sources && (
+					<span className="ml-1.5 font-normal text-muted-foreground">
+						{on} of {sources.length}
+					</span>
+				)}
 			</SectionTitle>
-			<div className="space-y-4">
-				{kinds.map((kind) => (
-					<div key={kind}>
-						<p className="mb-1 text-xs text-muted-foreground">{kind}</p>
-						<Panel className="divide-y">
-							{pressSources
-								.filter((source) => source.kind === kind)
-								.map((source) => (
-									<div
-										key={source.name}
-										className="flex items-center gap-3 px-3 py-2"
-									>
-										<div className="min-w-0 flex-1">
-											<p className="truncate text-sm">{source.name}</p>
-											<p className="truncate text-xs text-muted-foreground">
-												{source.domain}
-												{source.found > 0 && ` · ${source.found} found`}
-											</p>
-										</div>
-										<button
-											type="button"
-											role="switch"
-											aria-checked={on.has(source.name)}
-											aria-label={`Search ${source.name}`}
-											onClick={() => toggle(source.name)}
-											className="relative h-5 w-9 shrink-0 rounded-full bg-input transition-colors aria-checked:bg-primary"
-										>
-											<span
-												className={`absolute top-0.5 left-0.5 size-4 rounded-full bg-background shadow-sm transition-transform ${on.has(source.name) ? "translate-x-4" : ""}`}
-											/>
-										</button>
-									</div>
-								))}
-						</Panel>
-					</div>
-				))}
-			</div>
+			{adding && (
+				<Panel className="mb-4">
+					<AddFeed onDone={() => setAdding(false)} />
+				</Panel>
+			)}
+			{isPending ? (
+				<Skeleton className="h-48" />
+			) : sources?.length === 0 ? (
+				<p className="text-sm text-muted-foreground">
+					No feeds yet.{" "}
+					{isAdmin ? "Add one to start." : "An admin can add them here."}
+				</p>
+			) : (
+				<div className="space-y-4">
+					{groups
+						.filter((group) => group.items.length > 0)
+						.map((group) => (
+							<div key={group.label}>
+								<p className="mb-1 text-xs text-muted-foreground">
+									{group.label}
+								</p>
+								<Panel className="divide-y">
+									{group.items.map((source) => (
+										<SourceRow
+											key={source.id}
+											source={source}
+											canChange={isAdmin}
+										/>
+									))}
+								</Panel>
+							</div>
+						))}
+				</div>
+			)}
 		</section>
 	);
 }

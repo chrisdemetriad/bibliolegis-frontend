@@ -118,13 +118,7 @@ function Title({ mention }: { mention: PressMention }) {
 	);
 }
 
-function Byline({
-	mention,
-	showMatter,
-}: {
-	mention: PressMention;
-	showMatter: boolean;
-}) {
+function Byline({ mention }: { mention: PressMention }) {
 	return (
 		<div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground">
 			<span className="font-medium text-foreground">
@@ -135,16 +129,20 @@ function Byline({
 			{mention.status === "new" && (
 				<span className="rounded-md border px-1.5 py-px">New</span>
 			)}
-			{showMatter && (
-				<Link
-					to="/matters/$matterId/press"
-					params={{ matterId: mention.project.slug }}
-					className="ml-auto hover:text-foreground"
-				>
-					{mention.project.name}
-				</Link>
-			)}
 		</div>
+	);
+}
+
+// Which matter an article is on, for lists that cover more than one
+function MatterLink({ mention }: { mention: PressMention }) {
+	return (
+		<Link
+			to="/matters/$matterId/press"
+			params={{ matterId: mention.project.slug }}
+			className="text-xs text-muted-foreground hover:text-foreground"
+		>
+			{mention.project.name}
+		</Link>
 	);
 }
 
@@ -158,7 +156,7 @@ function ListItem({
 	return (
 		<Panel className="flex gap-4 px-4 py-3.5">
 			<div className="min-w-0 flex-1">
-				<Byline mention={mention} showMatter={showMatter} />
+				<Byline mention={mention} />
 				<div className="mt-1.5">
 					<Title mention={mention} />
 				</div>
@@ -166,6 +164,11 @@ function ListItem({
 					<p className="mt-1 line-clamp-2 text-sm text-muted-foreground">
 						{mention.article.excerpt}
 					</p>
+				)}
+				{showMatter && (
+					<div className="mt-2">
+						<MatterLink mention={mention} />
+					</div>
 				)}
 			</div>
 			<ArticleImage
@@ -190,12 +193,17 @@ function Card({
 				className="aspect-video w-full"
 			/>
 			<div className="flex flex-1 flex-col gap-1.5 p-4">
-				<Byline mention={mention} showMatter={showMatter} />
+				<Byline mention={mention} />
 				<Title mention={mention} />
 				{mention.article.excerpt && (
 					<p className="line-clamp-3 text-sm text-muted-foreground">
 						{mention.article.excerpt}
 					</p>
+				)}
+				{showMatter && (
+					<div className="mt-auto pt-1">
+						<MatterLink mention={mention} />
+					</div>
 				)}
 			</div>
 		</Panel>
