@@ -6,6 +6,7 @@ import {
 	ShieldIcon,
 	SparklesIcon,
 } from "lucide-react";
+import { Kbd } from "#/components/ui/kbd";
 import { Page, PageHeader, Panel, SectionTitle } from "#/shell/page";
 
 export const Route = createFileRoute("/_authed/help")({
@@ -88,9 +89,7 @@ function HelpPage() {
 						{shortcuts.map(([label, keys]) => (
 							<div key={label} className="flex justify-between px-4 py-2.5">
 								<span>{label}</span>
-								<kbd className="rounded border px-1.5 text-xs text-muted-foreground">
-									{keys}
-								</kbd>
+								<Kbd>{keys}</Kbd>
 							</div>
 						))}
 					</Panel>

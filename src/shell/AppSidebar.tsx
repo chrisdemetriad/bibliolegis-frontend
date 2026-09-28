@@ -21,6 +21,7 @@ import {
 	SparklesIcon,
 	UsersIcon,
 } from "lucide-react";
+import { Kbd } from "#/components/ui/kbd";
 import {
 	Sidebar,
 	SidebarContent,
@@ -145,7 +146,7 @@ export function AppSidebar() {
 				>
 					<SearchIcon className="size-4" />
 					<span className="flex-1 text-left">Search</span>
-					<kbd className="rounded border px-1 font-sans text-[0.7rem]">⌘K</kbd>
+					<Kbd>⌘K</Kbd>
 				</button>
 			</SidebarHeader>
 
