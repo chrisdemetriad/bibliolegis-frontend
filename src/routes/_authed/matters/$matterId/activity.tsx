@@ -1,4 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { ActivityFeed } from "#/activity/ActivityFeed";
+import { useActivity } from "#/activity/queries";
 import { useMatter } from "#/matters/context";
 import { activity } from "#/mock/data";
 import { Panel, PersonAvatar, personName, SectionTitle } from "#/shell/page";
@@ -9,6 +11,7 @@ export const Route = createFileRoute("/_authed/matters/$matterId/activity")({
 
 function MatterActivity() {
 	const matter = useMatter();
+	if (matter.projectId) return <RealActivity projectRef={matter.id} />;
 	const items = activity.filter((item) => item.matterId === matter.id);
 
 	return (
@@ -43,6 +46,31 @@ function MatterActivity() {
 						</div>
 					))}
 				</Panel>
+			)}
+		</div>
+	);
+}
+
+function RealActivity({ projectRef }: { projectRef: string }) {
+	const { data, isPending, isError } = useActivity(projectRef);
+	return (
+		<div>
+			<SectionTitle>Activity</SectionTitle>
+			<p className="-mt-1 mb-4 text-sm text-muted-foreground">
+				Files added, read and removed on this matter, from the same record the
+				audit log keeps.
+			</p>
+			{isPending && <p className="text-sm text-muted-foreground">Loading…</p>}
+			{isError && (
+				<p className="text-sm text-destructive">
+					Couldn't load the activity from the api.
+				</p>
+			)}
+			{data?.length === 0 && (
+				<p className="text-sm text-muted-foreground">Nothing recent.</p>
+			)}
+			{data && data.length > 0 && (
+				<ActivityFeed items={data} withMatter={false} />
 			)}
 		</div>
 	);

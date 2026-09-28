@@ -1,5 +1,6 @@
 import { createFileRoute, Link, Outlet } from "@tanstack/react-router";
 import { ShareIcon, SparklesIcon } from "lucide-react";
+import { useRecordView } from "#/activity/queries";
 import { ApiError } from "#/api/client";
 import { Button } from "#/components/ui/button";
 import { Skeleton } from "#/components/ui/skeleton";
@@ -18,6 +19,8 @@ function MatterLayout() {
 	const { matterId } = Route.useParams();
 	const project = useProject(matterId);
 	const sample = findMatter(matterId);
+	// Only real matters, a sample one has nothing on the api to record
+	useRecordView(project.data?.slug);
 
 	// The api first, since a real matter can take an address a sample one
 	// also has. A 404 there means it's a sample matter or nothing at all

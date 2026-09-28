@@ -135,6 +135,15 @@ marketing page on the root host and redirects to `/overview` on `app.`, so local
 section says files are encrypted at rest, which the api's Phase 7 hasn't built, so
 that has to land before the page goes live or the line comes out.
 
+**Duplicates, activity and recently viewed landed on 2026-09-28** (#56 to #58),
+asked for by the user against bibliolegis-api #87. A dropped file is hashed in
+the browser and checked before it uploads, with a dialog naming the matter a
+copy already belongs to. Recent activity on the overview and each real matter's
+Activity tab comes from the audit log, Recently viewed from the person's own
+visits, and `/settings` controls whether it shows and how many. The ask box
+clears once an answer comes back. Checked with lint, types, a build and the api
+against the dev database, not yet clicked through signed in.
+
 **Next:** the rest of Phase 4: aggregation answers as a table, query history
 once the api has `GET /queries`, and the loading and empty states it hasn't
 covered. Phase 5's admin pages have their endpoints already, and Phase 7's
@@ -269,7 +278,9 @@ its endpoint appears.
 - [x] Pin matters from their row on `/matters` or the matter's own header, per person, shown under "Pinned matters" in the sidebar. The pin shows straight away and rolls back if the api refuses
 - [x] A drop zone at the top of `/matters` that turns case files into matters, done on 2026-09-28 against the api's `/intakes` routes. Drop or choose any number of PDF and DOCX files and each one uploads with its own progress, then shows the stage the api is reading it at. One bar with a percentage covers the whole batch. Once the api has grouped the files the results link to each matter, marked new or added to, and the list below refreshes with them at the top. A batch still being read picks up again if the page is left and come back to in the same tab
 - [x] A file dropped a second time is caught before it uploads, done on 2026-09-28. The browser hashes each file with SHA-256 and asks `POST /documents/duplicates`, and a match opens a dialog naming the matter the copy belongs to with Go to matter and Continue uploading. Both drop zones do this, and in a matter's own Files tab a copy already in that matter offers Don't upload instead. If the check itself fails the upload goes ahead as before
-- [ ] Replace the rest of the sample data with real endpoints: activity (from the audit log), press and library need api work first
+- [x] Recent activity from the audit log, done on 2026-09-28. The overview and a real matter's Activity tab read `GET /activity`, refreshed every 30 seconds. The overview keeps the sample list until the firm has activity of its own, since nothing before that day was logged
+- [x] Recently viewed from `GET /users/me/recently-viewed`, done on 2026-09-28. Opening a real matter records a visit once, not once per tab. `/settings` has an Overview section to hide it and choose 3 or 8 matters
+- [ ] Replace the rest of the sample data with real endpoints: press and library need api work first
 - [x] Pages use the full width of the main area rather than a centred column, asked for on 2026-09-28. Documents and settings moved onto the shared `Page` wrapper to match
 - [ ] Search box and ⌘K
 - [x] The ask boxes call `POST /query`, done on 2026-09-28. The overview's asks across everything, a matter's own is kept to that matter's documents

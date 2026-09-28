@@ -10,8 +10,9 @@ function isPracticeArea(value: string | null): value is PracticeArea {
 	return practiceAreas.includes(value as PracticeArea);
 }
 
-// How long ago, the way the sample matters write it
-function updatedAgo(iso: string) {
+// How long ago, the way the sample matters write it. Also used by the
+// activity feed
+export function updatedAgo(iso: string) {
 	const minutes = Math.round((Date.now() - new Date(iso).getTime()) / 60000);
 	if (minutes < 1) return "just now";
 	if (minutes < 60) return `${minutes}m ago`;
