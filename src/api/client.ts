@@ -8,6 +8,9 @@ export type Project = Schemas["ProjectOut"];
 export type ProjectParty = Schemas["PartyOut"];
 export type ProjectDate = Schemas["DateOut"];
 export type Intake = Schemas["IntakeOut"];
+export type QueryAnswer = Schemas["QueryOut"];
+export type Citation = Schemas["CitationOut"];
+export type Passage = Schemas["PassageOut"];
 export type IntakeMatter = Schemas["IntakeMatterOut"];
 export type ProjectCreate = Schemas["ProjectCreate"];
 export type ProjectMember = Schemas["ProjectMemberOut"];
@@ -213,6 +216,23 @@ export function createApi({
 			unwrap(
 				await client.POST("/intakes/{intake_id}/seal", {
 					params: { path: { intake_id: intakeId } },
+				}),
+			),
+
+		getPassage: async (documentId: string, chunkIndex: number) =>
+			unwrap(
+				await client.GET("/documents/{document_id}/passages/{chunk_index}", {
+					params: {
+						path: { document_id: documentId, chunk_index: chunkIndex },
+					},
+				}),
+			),
+
+		// projectId keeps the answer to one matter's documents
+		query: async (question: string, projectId?: string) =>
+			unwrap(
+				await client.POST("/query", {
+					body: { question, project_id: projectId ?? null },
 				}),
 			),
 

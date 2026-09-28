@@ -246,7 +246,7 @@ its endpoint appears.
 - [ ] Replace the rest of the sample data with real endpoints: activity (from the audit log), press and library need api work first
 - [x] Pages use the full width of the main area rather than a centred column, asked for on 2026-09-28. Documents and settings moved onto the shared `Page` wrapper to match
 - [ ] Search box and ⌘K
-- [ ] The ask boxes call `POST /query` once it exists, see Phase 4
+- [x] The ask boxes call `POST /query`, done on 2026-09-28. The overview's asks across everything, a matter's own is kept to that matter's documents
 
 ## Phase 1: API types
 
@@ -277,13 +277,13 @@ Clerk's TanStack Start integration (`@clerk/tanstack-react-start`, the current p
 
 ## Phase 4: query and citations
 
-- [ ] Query page: a text input, calling `POST /query`, showing the answer
-- [ ] Citation display: each cited passage clickable through to the source document and highlighted location
+- [x] Query page: a text input, calling `POST /query`, showing the answer. It's the ask box on the overview and on each matter rather than a page of its own
+- [x] Citation display: each cited passage clickable through to the source document and highlighted location. Every `[n]` in an answer links to `/documents/{id}?passage={chunk}`, which quotes the passage in full from `GET /documents/{id}/passages/{chunk}`. The sources under the answer link to the document and its matter
 - [ ] Aggregation query results shown as a table or simple chart rather than a wall of text
 - [ ] Loading and empty states for the query page (no results found, query still running)
 - [ ] Query history page listing past queries for the logged in user
 - [x] `/settings` route where a user picks the model that answers their questions, from the list the backend offers rather than one hardcoded here. Phase 9's connected accounts land on the same page later. Done on 2026-09-27, the choice saves as soon as it's picked
-- [ ] Show which model answered on each answer, so a user comparing models can tell them apart. Split out of the settings item since it needs `/query` to exist
+- [x] Show which model answered on each answer, so a user comparing models can tell them apart. Split out of the settings item since it needs `/query` to exist
 
 ## Phase 5: admin
 
