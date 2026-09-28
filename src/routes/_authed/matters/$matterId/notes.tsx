@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { MicIcon, PlusIcon } from "lucide-react";
 import { Button } from "#/components/ui/button";
+import { useMatter } from "#/matters/context";
 import { sampleNotes } from "#/mock/data";
 import { Panel, PersonAvatar, personName, SectionTitle } from "#/shell/page";
 
@@ -9,6 +10,18 @@ export const Route = createFileRoute("/_authed/matters/$matterId/notes")({
 });
 
 function Notes() {
+	const matter = useMatter();
+	// The entries below are sample data written for the sample matters
+	if (matter.projectId) {
+		return (
+			<div>
+				<SectionTitle>Notes</SectionTitle>
+				<p className="text-sm text-muted-foreground">
+					No notes for this matter yet.
+				</p>
+			</div>
+		);
+	}
 	return (
 		<div>
 			<SectionTitle

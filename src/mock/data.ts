@@ -63,11 +63,14 @@ export type Issue = {
 
 export type Party = { name: string; role: string; ours?: boolean };
 
+// The shape every matter page reads. Sample matters are written in it below,
+// real ones are turned into it from the api by src/matters/adapt.ts
 export type Matter = {
+	// The slug, which is also the matter's address
 	id: string;
 	title: string;
 	reference: string;
-	area: PracticeArea;
+	area: PracticeArea | null;
 	tags: string[];
 	court: string;
 	judge?: string;
@@ -75,7 +78,7 @@ export type Matter = {
 	parties: Party[];
 	stages: Stage[];
 	stageIndex: number;
-	nextDate: { label: string; date: string };
+	nextDate: { label: string; date: string } | null;
 	lead: string;
 	team: string[];
 	documents: number;
@@ -85,6 +88,10 @@ export type Matter = {
 	alert?: { title: string; detail: string };
 	issues: Issue[];
 	suggestedQuestion: string;
+	// Only on real matters. Its absence is what marks a matter as sample data
+	projectId?: string;
+	pinned?: boolean;
+	dates?: { label: string; date: string }[];
 };
 
 const criminalStages = (dates: string[]): Stage[] =>

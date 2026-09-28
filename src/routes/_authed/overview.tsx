@@ -7,13 +7,13 @@ import {
 	UploadIcon,
 } from "lucide-react";
 import { Button } from "#/components/ui/button";
+import { useAllMatters } from "#/matters/queries";
 import {
 	activity,
 	currentUser,
 	daysUntil,
 	findMatter,
 	formatDate,
-	matters,
 	upcoming,
 } from "#/mock/data";
 import { AskBox } from "#/shell/AskBox";
@@ -30,8 +30,7 @@ export const Route = createFileRoute("/_authed/overview")({
 	component: OverviewPage,
 });
 
-const stats = [
-	{ label: "Open matters", value: matters.filter((m) => !m.closed).length },
+const sampleStats = [
 	{ label: "Hearings in the next 30 days", value: 3 },
 	{ label: "Documents read this week", value: "1,284" },
 	{ label: "Findings waiting for review", value: 4 },
@@ -39,6 +38,11 @@ const stats = [
 
 function OverviewPage() {
 	const firstName = currentUser.name.split(" ")[0];
+	const { matters } = useAllMatters();
+	const stats = [
+		{ label: "Open matters", value: matters.filter((m) => !m.closed).length },
+		...sampleStats,
+	];
 
 	return (
 		<Page>
@@ -190,7 +194,9 @@ function OverviewPage() {
 								>
 									<p className="truncate text-sm">{matter.title}</p>
 									<p className="text-xs text-muted-foreground">
-										{matter.area}, updated {matter.updated}
+										{[matter.area, `updated ${matter.updated}`]
+											.filter(Boolean)
+											.join(", ")}
 									</p>
 								</Link>
 							))}

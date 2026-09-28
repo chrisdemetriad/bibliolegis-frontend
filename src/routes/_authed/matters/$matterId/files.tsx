@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { FileIcon, ImageIcon, UploadIcon } from "lucide-react";
 import { Button } from "#/components/ui/button";
 import {
@@ -10,8 +10,12 @@ import {
 	TableRow,
 } from "#/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "#/components/ui/tabs";
+import { DocumentStatus } from "#/documents/DocumentStatus";
+import { formatUploadedAt } from "#/documents/format";
+import { useDocuments } from "#/documents/queries";
+import { UploadZone } from "#/documents/UploadZone";
+import { useMatter } from "#/matters/context";
 import { fileCategories, type MatterFile, sampleFiles } from "#/mock/data";
-import { useMatter } from "#/mock/useMatter";
 import { PersonAvatar, SectionTitle } from "#/shell/page";
 
 export const Route = createFileRoute("/_authed/matters/$matterId/files")({
@@ -29,6 +33,7 @@ const tabs = [
 
 function MatterFiles() {
 	const matter = useMatter();
+	if (matter.projectId) return <RealFiles projectId={matter.projectId} />;
 
 	return (
 		<div>
@@ -123,5 +128,67 @@ function FileTable({ files }: { files: MatterFile[] }) {
 				})}
 			</TableBody>
 		</Table>
+	);
+}
+
+function RealFiles({ projectId }: { projectId: string }) {
+	const { data, isPending, isError } = useDocuments();
+	const files = data?.filter((document) => document.project_id === projectId);
+
+	return (
+		<div className="space-y-6">
+			<div>
+				<SectionTitle>Files</SectionTitle>
+				<p className="-mt-1 text-sm text-muted-foreground">
+					Everything uploaded to this matter. Only people on the matter can see
+					these.
+				</p>
+			</div>
+			<UploadZone projectId={projectId} />
+			{isPending && <p className="text-sm text-muted-foreground">Loading…</p>}
+			{isError && (
+				<p className="text-sm text-destructive">
+					Couldn't load the files from the api.
+				</p>
+			)}
+			{files?.length === 0 && (
+				<p className="text-sm text-muted-foreground">No files yet.</p>
+			)}
+			{files && files.length > 0 && (
+				<Table>
+					<TableHeader>
+						<TableRow>
+							<TableHead>Name</TableHead>
+							<TableHead>Status</TableHead>
+							<TableHead className="max-md:hidden">Added</TableHead>
+						</TableRow>
+					</TableHeader>
+					<TableBody>
+						{files.map((file) => (
+							<TableRow key={file.id}>
+								<TableCell>
+									<Link
+										to="/documents/$documentId"
+										params={{ documentId: file.id }}
+										className="flex items-center gap-2 hover:underline"
+									>
+										<FileIcon className="size-4 shrink-0 text-muted-foreground" />
+										<span className="max-w-[28rem] truncate">
+											{file.filename}
+										</span>
+									</Link>
+								</TableCell>
+								<TableCell>
+									<DocumentStatus status={file.status} />
+								</TableCell>
+								<TableCell className="text-muted-foreground max-md:hidden">
+									{formatUploadedAt(file.uploaded_at)}
+								</TableCell>
+							</TableRow>
+						))}
+					</TableBody>
+				</Table>
+			)}
+		</div>
 	);
 }

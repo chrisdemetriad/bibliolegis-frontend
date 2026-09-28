@@ -1,8 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { SearchIcon } from "lucide-react";
 import { Button } from "#/components/ui/button";
+import { useMatter } from "#/matters/context";
 import { library } from "#/mock/data";
-import { useMatter } from "#/mock/useMatter";
 import { LibraryList } from "#/shell/lists";
 import { SectionTitle } from "#/shell/page";
 

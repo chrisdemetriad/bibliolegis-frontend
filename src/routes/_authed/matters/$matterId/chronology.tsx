@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { DownloadIcon, SparklesIcon } from "lucide-react";
 import { Button } from "#/components/ui/button";
+import { useMatter } from "#/matters/context";
 import { sampleChronology } from "#/mock/data";
 import { SectionTitle } from "#/shell/page";
 
@@ -9,6 +10,18 @@ export const Route = createFileRoute("/_authed/matters/$matterId/chronology")({
 });
 
 function Chronology() {
+	const matter = useMatter();
+	// The entries below are sample data written for the sample matters
+	if (matter.projectId) {
+		return (
+			<div>
+				<SectionTitle>Chronology</SectionTitle>
+				<p className="text-sm text-muted-foreground">
+					No chronology for this matter yet.
+				</p>
+			</div>
+		);
+	}
 	return (
 		<div>
 			<SectionTitle

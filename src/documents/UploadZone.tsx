@@ -30,7 +30,9 @@ function extensionOf(name: string) {
 	return dot === -1 ? "" : name.slice(dot).toLowerCase();
 }
 
-export function UploadZone() {
+// With a projectId the files go into that matter, without one they're
+// visible to the whole firm
+export function UploadZone({ projectId }: { projectId?: string } = {}) {
 	const api = useApi();
 	const queryClient = useQueryClient();
 	const inputId = useId();
@@ -67,6 +69,7 @@ export function UploadZone() {
 		]);
 		try {
 			await api.uploadDocument(file, {
+				projectId,
 				onProgress: (progress) => update(key, { progress }),
 			});
 			update(key, { state: "done", progress: 1 });

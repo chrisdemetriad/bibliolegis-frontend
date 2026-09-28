@@ -5,6 +5,8 @@ type Schemas = components["schemas"];
 
 export type Document = Schemas["DocumentOut"];
 export type Project = Schemas["ProjectOut"];
+export type ProjectParty = Schemas["PartyOut"];
+export type ProjectDate = Schemas["DateOut"];
 export type ProjectCreate = Schemas["ProjectCreate"];
 export type ProjectMember = Schemas["ProjectMemberOut"];
 export type MemberAdd = Schemas["MemberAdd"];
@@ -91,6 +93,30 @@ export function createApi({
 			),
 
 		listProjects: async () => unwrap(await client.GET("/projects")),
+
+		// Takes the id or the slug, the frontend addresses matters by slug
+		getProject: async (projectRef: string) =>
+			unwrap(
+				await client.GET("/projects/{project_ref}", {
+					params: { path: { project_ref: projectRef } },
+				}),
+			),
+
+		pinProject: async (projectRef: string) => {
+			unwrap(
+				await client.PUT("/projects/{project_ref}/pin", {
+					params: { path: { project_ref: projectRef } },
+				}),
+			);
+		},
+
+		unpinProject: async (projectRef: string) => {
+			unwrap(
+				await client.DELETE("/projects/{project_ref}/pin", {
+					params: { path: { project_ref: projectRef } },
+				}),
+			);
+		},
 
 		createProject: async (body: ProjectCreate) =>
 			unwrap(await client.POST("/projects", { body })),

@@ -40,11 +40,3 @@ export function useDocument(documentId: string) {
 			!(error instanceof ApiError && error.status === 404) && count < 3,
 	});
 }
-
-export function useProjects() {
-	const api = useApi();
-	return useQuery({
-		queryKey: ["projects"],
-		queryFn: () => api.listProjects(),
-	});
-}

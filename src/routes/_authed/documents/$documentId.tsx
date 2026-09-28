@@ -4,7 +4,8 @@ import { ApiError } from "#/api/client";
 import { DeleteDocument } from "#/documents/DeleteDocument";
 import { DocumentStatus } from "#/documents/DocumentStatus";
 import { formatUploadedAt } from "#/documents/format";
-import { useDocument, useProjects } from "#/documents/queries";
+import { useDocument } from "#/documents/queries";
+import { useProjects } from "#/matters/queries";
 import { Page } from "#/shell/page";
 
 export const Route = createFileRoute("/_authed/documents/$documentId")({

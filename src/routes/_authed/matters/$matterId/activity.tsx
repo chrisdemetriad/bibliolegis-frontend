@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useMatter } from "#/matters/context";
 import { activity } from "#/mock/data";
-import { useMatter } from "#/mock/useMatter";
 import { Panel, PersonAvatar, personName, SectionTitle } from "#/shell/page";
 
 export const Route = createFileRoute("/_authed/matters/$matterId/activity")({

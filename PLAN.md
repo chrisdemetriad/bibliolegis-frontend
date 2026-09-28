@@ -240,7 +240,9 @@ its endpoint appears.
 - [x] `/press`, `/library` and `/help`. Press lists the sources it will read (Reuters, BBC News, Sky News, national, business, legal and local titles) with a switch each
 - [ ] Press search on a schedule, reading each enabled source for the parties, case name and reference of every open matter. Needs an api job first
 - [x] Matters cover every practice area the firm might take on, crime and civil alike, each with its own tab
-- [ ] Replace sample data with real endpoints: matters (`GET /projects` exists), activity (from the audit log), press and library need api work first
+- [x] Real matters on `/matters`, from `GET /projects`, done on 2026-09-28. They sit above the sample ones, which stay under a "Sample data" label as the user asked. A matter's pages read it from `GET /projects/{slug}` and fall back to a sample matter only when the api says there's no such matter, so a real matter can take an address a sample one also had. Files and hearings show the real documents and dates, chronology and notes say there's nothing yet rather than showing another matter's sample entries
+- [x] Pin matters from their row on `/matters` or the matter's own header, per person, shown under "Pinned matters" in the sidebar. The pin shows straight away and rolls back if the api refuses
+- [ ] Replace the rest of the sample data with real endpoints: activity (from the audit log), press and library need api work first
 - [x] Pages use the full width of the main area rather than a centred column, asked for on 2026-09-28. Documents and settings moved onto the shared `Page` wrapper to match
 - [ ] Search box and ⌘K
 - [ ] The ask boxes call `POST /query` once it exists, see Phase 4

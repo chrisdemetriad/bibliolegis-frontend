@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { AlertTriangleIcon, ArrowRightIcon, CircleDotIcon } from "lucide-react";
+import { useMatter } from "#/matters/context";
 import { daysUntil, formatDate, matters } from "#/mock/data";
-import { useMatter } from "#/mock/useMatter";
 import { AskBox } from "#/shell/AskBox";
 import {
 	Panel,
@@ -17,10 +17,12 @@ export const Route = createFileRoute("/_authed/matters/$matterId/overview")({
 
 function MatterOverview() {
 	const matter = useMatter();
-	const days = daysUntil(matter.nextDate.date);
-	const related = matters
-		.filter((other) => other.id !== matter.id && other.area === matter.area)
-		.slice(0, 2);
+	// Related matters come from the sample set, so only sample matters get them
+	const related = matter.projectId
+		? []
+		: matters
+				.filter((other) => other.id !== matter.id && other.area === matter.area)
+				.slice(0, 2);
 
 	return (
 		<div className="space-y-8">
@@ -42,13 +44,17 @@ function MatterOverview() {
 			<Panel className="p-5">
 				<div className="mb-5 flex flex-wrap items-center justify-between gap-2">
 					<h2 className="text-sm font-medium">Where it stands</h2>
-					{!matter.closed && (
+					{!matter.closed && matter.nextDate && (
 						<p className="text-xs text-muted-foreground">
-							{matter.nextDate.label} in {days} days
+							{matter.nextDate.label} in {daysUntil(matter.nextDate.date)} days
 						</p>
 					)}
 				</div>
-				<StageTrack stages={matter.stages} current={matter.stageIndex} />
+				{matter.stages.length > 0 ? (
+					<StageTrack stages={matter.stages} current={matter.stageIndex} />
+				) : (
+					<KeyDates dates={matter.dates ?? []} />
+				)}
 			</Panel>
 
 			<section id="ask" className="scroll-mt-20">
@@ -99,37 +105,43 @@ function MatterOverview() {
 				<section>
 					<SectionTitle>Summary</SectionTitle>
 					<p className="text-sm leading-relaxed text-foreground/90">
-						{matter.summary}
+						{matter.summary || "No summary yet."}
 					</p>
 					<dl className="mt-4 grid grid-cols-2 gap-3 text-sm">
-						<div>
-							<dt className="text-xs text-muted-foreground">Client</dt>
-							<dd>{matter.client}</dd>
-						</div>
-						<div>
-							<dt className="text-xs text-muted-foreground">Next date</dt>
-							<dd>
-								{matter.nextDate.label}, {formatDate(matter.nextDate.date)}
-							</dd>
-						</div>
+						{matter.client && (
+							<div>
+								<dt className="text-xs text-muted-foreground">Client</dt>
+								<dd>{matter.client}</dd>
+							</div>
+						)}
+						{matter.nextDate && (
+							<div>
+								<dt className="text-xs text-muted-foreground">Next date</dt>
+								<dd>
+									{matter.nextDate.label}, {formatDate(matter.nextDate.date)}
+								</dd>
+							</div>
+						)}
 					</dl>
 				</section>
-				<section>
-					<SectionTitle>Team</SectionTitle>
-					<div className="space-y-2">
-						{matter.team.map((id) => (
-							<div key={id} className="flex items-center gap-2.5">
-								<PersonAvatar id={id} />
-								<p className="text-sm">
-									{personName(id)}
-									{id === matter.lead && (
-										<span className="text-muted-foreground">, lead</span>
-									)}
-								</p>
-							</div>
-						))}
-					</div>
-				</section>
+				{matter.team.length > 0 && (
+					<section>
+						<SectionTitle>Team</SectionTitle>
+						<div className="space-y-2">
+							{matter.team.map((id) => (
+								<div key={id} className="flex items-center gap-2.5">
+									<PersonAvatar id={id} />
+									<p className="text-sm">
+										{personName(id)}
+										{id === matter.lead && (
+											<span className="text-muted-foreground">, lead</span>
+										)}
+									</p>
+								</div>
+							))}
+						</div>
+					</section>
+				)}
 			</div>
 
 			{related.length > 0 && (
@@ -161,5 +173,36 @@ function MatterOverview() {
 				</section>
 			)}
 		</div>
+	);
+}
+
+function KeyDates({ dates }: { dates: { label: string; date: string }[] }) {
+	if (dates.length === 0) {
+		return (
+			<p className="text-sm text-muted-foreground">
+				No hearings or deadlines read from the documents yet.
+			</p>
+		);
+	}
+	return (
+		<ol className="divide-y">
+			{dates.map((entry) => {
+				const days = daysUntil(entry.date);
+				return (
+					<li
+						key={`${entry.label}-${entry.date}`}
+						className="flex items-center justify-between gap-3 py-2 text-sm first:pt-0 last:pb-0"
+					>
+						<span className={days < 0 ? "text-muted-foreground" : undefined}>
+							{entry.label}
+						</span>
+						<span className="shrink-0 text-xs text-muted-foreground tabular-nums">
+							{formatDate(entry.date)}
+							{days >= 0 && `, in ${days}d`}
+						</span>
+					</li>
+				);
+			})}
+		</ol>
 	);
 }
