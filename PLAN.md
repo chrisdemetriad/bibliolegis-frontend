@@ -160,8 +160,10 @@ doesn't otherwise use. Mounted once in `__root.tsx`, so any page can call
 shows one, so does saving a choice on `/settings` and pinning or unpinning a
 matter. See Phase 6 below for where this should go next.
 
-**Next:** the rest of Phase 4: aggregation answers as a table, query history
-once the api has `GET /queries`, and the loading and empty states it hasn't
+**Next:** Phase 11, press, asked for on 2026-09-28. The list and cards toggle
+can start on sample data straight away, the rest waits on bibliolegis-api's
+Phase 13 routes. After that, the rest of Phase 4: aggregation answers as a
+table, query history once the api has `GET /queries`, and the loading and empty states it hasn't
 covered. Phase 5's admin pages have their endpoints already, and Phase 7's
 deployment can start.
 
@@ -463,3 +465,24 @@ ahead, once mail and calendar are connected.
 - [ ] Nothing shown at all until an account is connected, with a one line
       explanation rather than an empty panel
 
+## Phase 11: press
+
+The front of bibliolegis-api's Phase 13, asked for on 2026-09-28 with R v
+Shepherd as the example. Replaces the sample press on `/press` and a matter's
+Press tab. Articles show a headline, excerpt, date and photo and link out to the
+original. The article text itself isn't kept, see that phase for why.
+
+- [ ] A matter's press sorted newest first, with a cards or list toggle kept in
+      the URL as `?view=cards` so it survives a reload and a shared link. Source
+      filter chips above it. `PressItem` gains a URL, an image, a real date and an
+      outlet slug
+- [ ] `/matters/$matterId/press/$outlet/$slug`, one article: photo, headline,
+      outlet, date, excerpt, the terms it matched and a clear link to the original.
+      Keep and dismiss buttons
+- [ ] Add an article by pasting its URL, showing what was read from the page
+      before it's saved
+- [ ] A sources panel on the matter's Press tab: its watch terms, exclusions and
+      "must also mention" terms, and feeds of its own. The firm wide list on
+      `/press` reads and saves real sources, and Add takes a feed URL
+- [ ] Search now calls the refresh route and shows when each source was last read
+      and any error it hit
