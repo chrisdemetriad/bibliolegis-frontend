@@ -160,9 +160,9 @@ doesn't otherwise use. Mounted once in `__root.tsx`, so any page can call
 shows one, so does saving a choice on `/settings` and pinning or unpinning a
 matter. See Phase 6 below for where this should go next.
 
-**Next:** Phase 11, press, asked for on 2026-09-28. The list and cards toggle
-can start on sample data straight away, the rest waits on bibliolegis-api's
-Phase 13 routes. After that, the rest of Phase 4: aggregation answers as a
+**Next:** the rest of Phase 11, press. The api's routes exist as of
+2026-09-28 and a real matter's Press tab reads them with a list and cards
+toggle. The article page, pasting a link and the sources panel are left. After that, the rest of Phase 4: aggregation answers as a
 table, query history once the api has `GET /queries`, and the loading and empty states it hasn't
 covered. Phase 5's admin pages have their endpoints already, and Phase 7's
 deployment can start.
@@ -472,10 +472,13 @@ Shepherd as the example. Replaces the sample press on `/press` and a matter's
 Press tab. Articles show a headline, excerpt, date and photo and link out to the
 original. The article text itself isn't kept, see that phase for why.
 
-- [ ] A matter's press sorted newest first, with a cards or list toggle kept in
+- [x] A matter's press sorted newest first, with a cards or list toggle kept in
       the URL as `?view=cards` so it survives a reload and a shared link. Source
-      filter chips above it. `PressItem` gains a URL, an image, a real date and an
-      outlet slug
+      filter chips above it. Done on 2026-09-28 in `src/press/`. A real matter's
+      Press tab reads `GET /projects/{ref}/press` and uses the api's own
+      `PressMentionOut` rather than stretching the sample `PressItem`, which sample
+      matters keep. The chips are per outlet, the BBC rather than the feed that
+      found it
 - [ ] `/matters/$matterId/press/$outlet/$slug`, one article: photo, headline,
       outlet, date, excerpt, the terms it matched and a clear link to the original.
       Keep and dismiss buttons

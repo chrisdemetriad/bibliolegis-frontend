@@ -22,6 +22,16 @@ export type Duplicate = Schemas["DuplicateOut"];
 export type Activity = Schemas["ActivityOut"];
 export type RecentlyViewed = Schemas["RecentlyViewedOut"];
 export type Preferences = Schemas["Preferences"];
+export type PressMention = Schemas["PressMentionOut"];
+export type PressArticle = Schemas["PressArticleOut"];
+export type PressTerms = Schemas["PressTerms"];
+export type PressTermsOut = Schemas["PressTermsOut"];
+export type PressSource = Schemas["PressSourceOut"];
+export type PressSourceCreate = Schemas["PressSourceCreate"];
+export type PressSourceUpdate = Schemas["PressSourceUpdate"];
+export type PressPreview = Schemas["PagePreviewOut"];
+export type PressRefresh = Schemas["PressRefreshOut"];
+export type MentionStatus = Schemas["MentionUpdate"]["status"];
 export type DocumentListQuery = NonNullable<
 	paths["/documents"]["get"]["parameters"]["query"]
 >;
@@ -283,6 +293,113 @@ export function createApi({
 			unwrap(
 				await client.DELETE("/documents/{document_id}", {
 					params: { path: { document_id: documentId } },
+				}),
+			);
+		},
+
+		// Press across every matter the caller is on, newest first
+		listPress: async () => unwrap(await client.GET("/press")),
+
+		listProjectPress: async (projectRef: string, includeDismissed = false) =>
+			unwrap(
+				await client.GET("/projects/{project_ref}/press", {
+					params: {
+						path: { project_ref: projectRef },
+						query: { include_dismissed: includeDismissed },
+					},
+				}),
+			),
+
+		getPressArticle: async (
+			projectRef: string,
+			outletSlug: string,
+			articleSlug: string,
+		) =>
+			unwrap(
+				await client.GET(
+					"/projects/{project_ref}/press/{outlet_slug}/{article_slug}",
+					{
+						params: {
+							path: {
+								project_ref: projectRef,
+								outlet_slug: outletSlug,
+								article_slug: articleSlug,
+							},
+						},
+					},
+				),
+			),
+
+		// What a pasted link's page says about itself, nothing is saved
+		previewPressLink: async (url: string) =>
+			unwrap(await client.POST("/press/preview", { body: { url } })),
+
+		addPressLink: async (projectRef: string, url: string) =>
+			unwrap(
+				await client.POST("/projects/{project_ref}/press", {
+					params: { path: { project_ref: projectRef } },
+					body: { url },
+				}),
+			),
+
+		updatePressMention: async (
+			projectRef: string,
+			mentionId: string,
+			status: MentionStatus,
+		) =>
+			unwrap(
+				await client.PATCH("/projects/{project_ref}/press/{mention_id}", {
+					params: { path: { project_ref: projectRef, mention_id: mentionId } },
+					body: { status },
+				}),
+			),
+
+		// Reads every feed the matter watches while the caller waits
+		refreshPress: async (projectRef: string) =>
+			unwrap(
+				await client.POST("/projects/{project_ref}/press/refresh", {
+					params: { path: { project_ref: projectRef } },
+				}),
+			),
+
+		getPressTerms: async (projectRef: string) =>
+			unwrap(
+				await client.GET("/projects/{project_ref}/press/terms", {
+					params: { path: { project_ref: projectRef } },
+				}),
+			),
+
+		setPressTerms: async (projectRef: string, body: PressTerms) =>
+			unwrap(
+				await client.PUT("/projects/{project_ref}/press/terms", {
+					params: { path: { project_ref: projectRef } },
+					body,
+				}),
+			),
+
+		// Firm wide sources, plus one matter's own when it's named
+		listPressSources: async (projectRef?: string) =>
+			unwrap(
+				await client.GET("/press/sources", {
+					params: { query: { project: projectRef } },
+				}),
+			),
+
+		addPressSource: async (body: PressSourceCreate) =>
+			unwrap(await client.POST("/press/sources", { body })),
+
+		updatePressSource: async (sourceId: string, body: PressSourceUpdate) =>
+			unwrap(
+				await client.PATCH("/press/sources/{source_id}", {
+					params: { path: { source_id: sourceId } },
+					body,
+				}),
+			),
+
+		deletePressSource: async (sourceId: string) => {
+			unwrap(
+				await client.DELETE("/press/sources/{source_id}", {
+					params: { path: { source_id: sourceId } },
 				}),
 			);
 		},

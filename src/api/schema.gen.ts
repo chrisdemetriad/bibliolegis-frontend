@@ -210,6 +210,88 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/press": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Firm Press
+         * @description Press across every matter the caller belongs to, newest first.
+         */
+        get: operations["list_firm_press_press_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/press/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Preview Press Link
+         * @description What a pasted link's page says about itself, before anything is saved.
+         */
+        post: operations["preview_press_link_press_preview_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/press/sources": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Press Sources
+         * @description Firm wide sources, plus one matter's own when `project` names it.
+         */
+        get: operations["list_press_sources_press_sources_get"];
+        put?: never;
+        /** Add Press Source */
+        post: operations["add_press_source_press_sources_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/press/sources/{source_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Delete Press Source
+         * @description Remove a source. What it already found stays.
+         */
+        delete: operations["delete_press_source_press_sources__source_id__delete"];
+        options?: never;
+        head?: never;
+        /** Update Press Source */
+        patch: operations["update_press_source_press_sources__source_id__patch"];
+        trace?: never;
+    };
     "/projects": {
         parameters: {
             query?: never;
@@ -285,6 +367,103 @@ export interface paths {
         post?: never;
         /** Unpin Project */
         delete: operations["unpin_project_projects__project_ref__pin_delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{project_ref}/press": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Project Press */
+        get: operations["list_project_press_projects__project_ref__press_get"];
+        put?: never;
+        /**
+         * Add Press Link
+         * @description Put a pasted article on a matter. Kept straight away, someone chose it.
+         */
+        post: operations["add_press_link_projects__project_ref__press_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{project_ref}/press/refresh": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Refresh Project Press
+         * @description Search now. Reads every feed this matter watches while the caller waits,
+         *     which is a few seconds for a handful of feeds.
+         */
+        post: operations["refresh_project_press_projects__project_ref__press_refresh_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{project_ref}/press/terms": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Press Terms */
+        get: operations["get_press_terms_projects__project_ref__press_terms_get"];
+        /**
+         * Set Press Terms
+         * @description Replace a matter's terms. An empty watch list goes back to the parties.
+         */
+        put: operations["set_press_terms_projects__project_ref__press_terms_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{project_ref}/press/{mention_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update Press Mention */
+        patch: operations["update_press_mention_projects__project_ref__press__mention_id__patch"];
+        trace?: never;
+    };
+    "/projects/{project_ref}/press/{outlet_slug}/{article_slug}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Press Article */
+        get: operations["get_press_article_projects__project_ref__press__outlet_slug___article_slug__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -702,10 +881,33 @@ export interface components {
              */
             user_id: string;
         };
+        /** MentionUpdate */
+        MentionUpdate: {
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "new" | "kept" | "dismissed";
+        };
         /** ModelChoice */
         ModelChoice: {
             /** Model */
             model: string;
+        };
+        /** PagePreviewOut */
+        PagePreviewOut: {
+            /** Description */
+            description: string | null;
+            /** Image Url */
+            image_url: string | null;
+            /** Published At */
+            published_at: string | null;
+            /** Site Name */
+            site_name: string;
+            /** Title */
+            title: string;
+            /** Url */
+            url: string;
         };
         /** PartyOut */
         PartyOut: {
@@ -736,6 +938,160 @@ export interface components {
             recently_viewed_count: 3 | 8;
             /** Show Recently Viewed */
             show_recently_viewed: boolean;
+        };
+        /** PressArticleOut */
+        PressArticleOut: {
+            /** Excerpt */
+            excerpt: string | null;
+            /**
+             * Fetched At
+             * Format: date-time
+             */
+            fetched_at: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Image Url */
+            image_url: string | null;
+            /** Outlet Name */
+            outlet_name: string;
+            /** Outlet Slug */
+            outlet_slug: string;
+            /** Published At */
+            published_at: string | null;
+            /** Slug */
+            slug: string;
+            /** Source Name */
+            source_name: string | null;
+            /** Title */
+            title: string;
+            /** Url */
+            url: string;
+        };
+        /** PressLink */
+        PressLink: {
+            /** Url */
+            url: string;
+        };
+        /** PressMentionOut */
+        PressMentionOut: {
+            /** Added By Hand */
+            added_by_hand: boolean;
+            article: components["schemas"]["PressArticleOut"];
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Matched Terms */
+            matched_terms: string[];
+            project: components["schemas"]["PressProjectOut"];
+            /** Status */
+            status: string;
+        };
+        /** PressProjectOut */
+        PressProjectOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+            /** Slug */
+            slug: string;
+        };
+        /** PressRefreshOut */
+        PressRefreshOut: {
+            /** Articles Added */
+            articles_added: number;
+            /** Mentions Added */
+            mentions_added: number;
+            /** Sources Failed */
+            sources_failed: number;
+            /** Sources Read */
+            sources_read: number;
+        };
+        /** PressSourceCreate */
+        PressSourceCreate: {
+            /** Category */
+            category?: string | null;
+            /**
+             * Kind
+             * @default rss
+             * @enum {string}
+             */
+            kind: "rss" | "google_news" | "guardian";
+            /** Name */
+            name: string;
+            /** Project */
+            project?: string | null;
+            /** Url */
+            url?: string | null;
+        };
+        /** PressSourceOut */
+        PressSourceOut: {
+            /** Article Count */
+            article_count: number;
+            /** Category */
+            category: string | null;
+            /** Enabled */
+            enabled: boolean;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Kind */
+            kind: string;
+            /** Last Error */
+            last_error: string | null;
+            /** Last Fetched At */
+            last_fetched_at: string | null;
+            /** Name */
+            name: string;
+            /** Project Id */
+            project_id: string | null;
+            /** Slug */
+            slug: string;
+            /** Url */
+            url: string | null;
+        };
+        /** PressSourceUpdate */
+        PressSourceUpdate: {
+            /** Category */
+            category?: string | null;
+            /** Enabled */
+            enabled?: boolean | null;
+            /** Name */
+            name?: string | null;
+        };
+        /** PressTerms */
+        PressTerms: {
+            /** Exclude */
+            exclude: string[];
+            /** Require */
+            require: string[];
+            /** Watch */
+            watch: string[];
+        };
+        /** PressTermsOut */
+        PressTermsOut: {
+            /** Exclude */
+            exclude: string[];
+            /** Require */
+            require: string[];
+            /** Watch */
+            watch: string[];
+            /** Watch Is Default */
+            watch_is_default: boolean;
         };
         /** ProjectCreate */
         ProjectCreate: {
@@ -1292,6 +1648,199 @@ export interface operations {
             };
         };
     };
+    list_firm_press_press_get: {
+        parameters: {
+            query?: {
+                include_dismissed?: boolean;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PressMentionOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    preview_press_link_press_preview_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PressLink"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PagePreviewOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_press_sources_press_sources_get: {
+        parameters: {
+            query?: {
+                project?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PressSourceOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    add_press_source_press_sources_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PressSourceCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PressSourceOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_press_source_press_sources__source_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                source_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_press_source_press_sources__source_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                source_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PressSourceUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PressSourceOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     list_projects_projects_get: {
         parameters: {
             query?: never;
@@ -1486,6 +2035,240 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_project_press_projects__project_ref__press_get: {
+        parameters: {
+            query?: {
+                include_dismissed?: boolean;
+            };
+            header?: never;
+            path: {
+                project_ref: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PressMentionOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    add_press_link_projects__project_ref__press_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_ref: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PressLink"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PressMentionOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    refresh_project_press_projects__project_ref__press_refresh_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_ref: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PressRefreshOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_press_terms_projects__project_ref__press_terms_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_ref: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PressTermsOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    set_press_terms_projects__project_ref__press_terms_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_ref: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PressTerms"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PressTermsOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_press_mention_projects__project_ref__press__mention_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_ref: string;
+                mention_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MentionUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PressMentionOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_press_article_projects__project_ref__press__outlet_slug___article_slug__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_ref: string;
+                outlet_slug: string;
+                article_slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PressMentionOut"];
+                };
             };
             /** @description Validation Error */
             422: {
