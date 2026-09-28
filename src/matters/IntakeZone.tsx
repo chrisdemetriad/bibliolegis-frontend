@@ -4,6 +4,7 @@ import {
 	ArrowRightIcon,
 	FileTextIcon,
 	LoaderCircleIcon,
+	RotateCwIcon,
 	UploadIcon,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
@@ -27,6 +28,9 @@ import { matterKeys } from "./queries";
 const ACCEPTED = [".pdf", ".docx"];
 
 const POLL_MS = 1500;
+
+// About 30 seconds of failed polls before giving up on the batch
+const MAX_POLL_MISSES = 20;
 
 // Upload is the quick part for most files, reading is what takes the time,
 // so it gets most of each file's share of the bar
@@ -57,6 +61,9 @@ type FileRow = {
 	state: "uploading" | "uploaded" | "refused" | "failed";
 	documentId?: string;
 	error?: string;
+	// Kept so an upload that failed can be sent again. Missing on rows picked
+	// back up from the api after the page was left
+	file?: File;
 };
 
 function extensionOf(name: string) {
@@ -139,12 +146,14 @@ export function IntakeZone() {
 	// before that the rows above say more than the api can
 	const uploading = rows.some((row) => row.state === "uploading");
 	useEffect(() => {
-		if (!intakeId || uploading || finished) return;
+		if (!intakeId || uploading || finished || error) return;
 		let cancelled = false;
+		let misses = 0;
 		const tick = async () => {
 			try {
 				const next = await api.getIntake(intakeId);
 				if (cancelled) return;
+				misses = 0;
 				setIntake(next);
 				if (next.status === "done" || next.status === "failed") {
 					writeStorage(null);
@@ -154,7 +163,11 @@ export function IntakeZone() {
 					await queryClient.invalidateQueries({ queryKey: documentKeys.all });
 				}
 			} catch (caught) {
-				if (!cancelled) {
+				// The batch carries on without us while the api restarts or the
+				// network drops, so a few misses in a row are waited out rather
+				// than hiding a batch that went on to finish fine
+				misses += 1;
+				if (!cancelled && misses >= MAX_POLL_MISSES) {
 					writeStorage(null);
 					setError(
 						errorMessage(caught, "Lost track of the upload, try again."),
@@ -168,7 +181,7 @@ export function IntakeZone() {
 			cancelled = true;
 			clearInterval(timer);
 		};
-	}, [api, intakeId, uploading, finished, queryClient]);
+	}, [api, intakeId, uploading, finished, error, queryClient]);
 
 	const update = (key: string, change: Partial<FileRow>) =>
 		setRows((current) =>
@@ -196,6 +209,7 @@ export function IntakeZone() {
 			return {
 				key: crypto.randomUUID(),
 				name: file.name,
+				file,
 				upload: 0,
 				state: refused ? "refused" : "uploading",
 				error: refused
@@ -293,17 +307,23 @@ export function IntakeZone() {
 	const percent = Math.round(overall * 100);
 	const failedCount = progress.filter((item) => item.failed).length;
 
+	// Uploads that never reached the api, which can be sent again as a new
+	// batch. Ones the api refused or couldn't read would fail the same way
+	const retryable = shown.filter((row) => row.state === "failed" && row.file);
+	const retry = (retried: FileRow[]) =>
+		void start(retried.flatMap((row) => (row.file ? [row.file] : [])));
+
 	const headline = error
 		? error
 		: finished
 			? intake?.status === "failed"
 				? (intake.error_message ??
 					"The files were read but couldn't be sorted into matters.")
-				: summary(
-						intake?.matters ?? [],
-						shown.length - failedCount,
-						failedCount,
-					)
+				: summary(intake?.matters ?? [], {
+						read: shown.length - failedCount,
+						notUploaded: retryable.length,
+						notRead: failedCount - retryable.length,
+					})
 			: uploading
 				? `Uploading ${shown.length === 1 ? "1 file" : `${shown.length} files`}`
 				: reading || intake?.status === "grouping"
@@ -311,6 +331,8 @@ export function IntakeZone() {
 					: "Reading the files";
 
 	const idle = shown.length === 0 && !intakeId && !error;
+	// Nothing came of it at all, rather than some of it working
+	const nothingMade = finished && (intake?.matters.length ?? 0) === 0;
 	const single = shown.length === 1;
 
 	return (
@@ -386,7 +408,7 @@ export function IntakeZone() {
 						{(!single || finished || error) && (
 							<div className="mb-5 flex items-end justify-between gap-4">
 								<div className="flex min-w-0 items-center gap-2">
-									{error || intake?.status === "failed" ? (
+									{error || intake?.status === "failed" || nothingMade ? (
 										<StatusIcon status="error" />
 									) : finished ? (
 										<StatusIcon status="success" />
@@ -428,6 +450,19 @@ export function IntakeZone() {
 									>
 										{progress[i].label}
 									</span>
+									{(finished || error) &&
+										row.state === "failed" &&
+										row.file && (
+											<Button
+												type="button"
+												size="xs"
+												variant="outline"
+												aria-label={`Retry ${row.name}`}
+												onClick={() => retry([row])}
+											>
+												<RotateCwIcon /> Retry
+											</Button>
+										)}
 									{single && (
 										<span className="w-10 shrink-0 text-right text-sm font-medium tabular-nums">
 											{percent}%
@@ -446,7 +481,17 @@ export function IntakeZone() {
 						)}
 
 						{(finished || error) && (
-							<div className="mt-5 flex justify-end">
+							<div className="mt-5 flex justify-end gap-2">
+								{retryable.length > 1 && (
+									<Button
+										type="button"
+										size="sm"
+										variant="outline"
+										onClick={() => retry(retryable)}
+									>
+										<RotateCwIcon /> Retry {retryable.length} failed uploads
+									</Button>
+								)}
 								<Button
 									type="button"
 									size="sm"
@@ -469,17 +514,25 @@ function plural(count: number, one: string, many: string) {
 }
 
 // "1 new matter added, 2 existing matters updated". No file count, the rows
-// above already list the files, only the ones that couldn't be read get a
-// mention
-function summary(matters: IntakeMatter[], read: number, failed: number) {
-	if (read <= 0) return "None of the files could be read";
+// above already list the files, only the ones that couldn't be uploaded or
+// read get a mention
+function summary(
+	matters: IntakeMatter[],
+	files: { read: number; notUploaded: number; notRead: number },
+) {
+	if (files.read <= 0 && files.notUploaded === 0) {
+		return "None of the files could be read";
+	}
 	const made = matters.filter((item) => item.is_new).length;
 	const joined = matters.length - made;
 	const parts = [
 		made > 0 && `${plural(made, "new matter", "new matters")} added`,
 		joined > 0 &&
 			`${plural(joined, "existing matter", "existing matters")} updated`,
-		failed > 0 && `${plural(failed, "file", "files")} couldn't be read`,
+		files.notUploaded > 0 &&
+			`${plural(files.notUploaded, "file", "files")} couldn't be uploaded`,
+		files.notRead > 0 &&
+			`${plural(files.notRead, "file", "files")} couldn't be read`,
 	].filter(Boolean);
 	return parts.join(", ") || "No matters added";
 }
