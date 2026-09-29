@@ -512,6 +512,12 @@ original. The article text itself isn't kept, see that phase for why.
       "325 found since 9 Dec 2015") and the page refreshes itself while a search
       runs. Pasting a link is a small button now. Only the top 8 outlet chips
       show, the rest behind "more outlets"
+- [x] Keep means something, asked on 2026-09-29 after the user kept an article
+      and couldn't find it again. A matter's press has All, Kept and Dismissed
+      tabs, kept in the address as `?show=kept`, and a kept article carries a
+      bookmark in the list. Keeping or dismissing from an article's page says
+      where it went. Firm sources on a matter's tab say On or Off in words, the
+      disabled switches looked like they should work
 - [x] Search now calls the refresh route and shows when each source was last read
       and any error it hit. Done on the matter's Press tab on
       2026-09-28, with a toast saying how many new articles and how many sources
