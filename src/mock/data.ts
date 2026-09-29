@@ -82,6 +82,8 @@ export type Matter = {
 	lead: string;
 	team: string[];
 	documents: number;
+	// Only on real matters, sample ones have no press
+	press?: number;
 	updated: string;
 	closed?: boolean;
 	summary: string;

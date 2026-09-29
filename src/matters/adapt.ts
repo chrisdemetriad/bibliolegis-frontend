@@ -58,6 +58,7 @@ export function projectToMatter(project: Project): Matter {
 		lead: "",
 		team: [],
 		documents: project.document_count,
+		press: project.press_count,
 		updated: updatedAgo(project.updated_at),
 		closed: project.status === "closed",
 		summary: project.summary ?? "",
