@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import {
+	BookmarkCheckIcon,
 	ExternalLinkIcon,
 	LayoutGridIcon,
 	ListIcon,
@@ -131,6 +132,11 @@ function Byline({ mention }: { mention: PressMention }) {
 			<span>{pressDate(mention.article.published_at)}</span>
 			{mention.status === "new" && (
 				<span className="rounded-md border px-1.5 py-px">New</span>
+			)}
+			{mention.status === "kept" && (
+				<span className="inline-flex items-center gap-1 rounded-md border px-1.5 py-px text-foreground">
+					<BookmarkCheckIcon className="size-3" /> Kept
+				</span>
 			)}
 		</div>
 	);

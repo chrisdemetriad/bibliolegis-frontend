@@ -218,22 +218,30 @@ export function SourceRow({
 					<Trash2Icon className="size-3.5" />
 				</button>
 			)}
-			<Switch
-				checked={source.enabled}
-				label={`Search ${source.name}`}
-				disabled={!canChange || updateSource.isPending}
-				onChange={(enabled) =>
-					updateSource.mutate(
-						{ id: source.id, enabled },
-						{
-							onError: (error) =>
-								toast.error(
-									errorMessage(error, "Couldn't change that source."),
-								),
-						},
-					)
-				}
-			/>
+			{!canChange ? (
+				// Someone who can't change it gets words, not a switch that
+				// looks like it should work
+				<span className="shrink-0 text-xs text-muted-foreground">
+					{source.enabled ? "On" : "Off"}
+				</span>
+			) : (
+				<Switch
+					checked={source.enabled}
+					label={`Search ${source.name}`}
+					disabled={updateSource.isPending}
+					onChange={(enabled) =>
+						updateSource.mutate(
+							{ id: source.id, enabled },
+							{
+								onError: (error) =>
+									toast.error(
+										errorMessage(error, "Couldn't change that source."),
+									),
+							},
+						)
+					}
+				/>
+			)}
 		</div>
 	);
 }

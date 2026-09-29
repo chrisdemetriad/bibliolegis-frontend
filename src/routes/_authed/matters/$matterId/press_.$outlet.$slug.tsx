@@ -7,6 +7,7 @@ import {
 	EyeOffIcon,
 	RotateCcwIcon,
 } from "lucide-react";
+import { toast } from "sonner";
 import { ApiError, type MentionStatus } from "#/api/client";
 import { Button } from "#/components/ui/button";
 import { Skeleton } from "#/components/ui/skeleton";
@@ -92,7 +93,19 @@ function Article({
 
 	const { article, status } = mention;
 	const change = (next: MentionStatus) =>
-		setStatus.mutate({ id: mention.id, status: next });
+		setStatus.mutate(
+			{ id: mention.id, status: next },
+			{
+				onSuccess: () => {
+					if (next === "kept")
+						toast.success("Kept. It's under Kept on the matter's Press tab");
+					if (next === "dismissed")
+						toast.success(
+							"Dismissed. It's under Dismissed if you want it back",
+						);
+				},
+			},
+		);
 
 	return (
 		<article className="max-w-3xl">

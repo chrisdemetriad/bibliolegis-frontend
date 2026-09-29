@@ -22,8 +22,14 @@ import { SectionTitle } from "#/shell/page";
 export const Route = createFileRoute("/_authed/matters/$matterId/press")({
 	// In the address so a reload or a shared link keeps the chosen view. List
 	// is the default and isn't written out
-	validateSearch: (search: Record<string, unknown>): { view?: "cards" } =>
-		search.view === "cards" ? { view: "cards" } : {},
+	validateSearch: (
+		search: Record<string, unknown>,
+	): { view?: "cards"; show?: "kept" | "dismissed" } => ({
+		...(search.view === "cards" ? { view: "cards" as const } : {}),
+		...(search.show === "kept" || search.show === "dismissed"
+			? { show: search.show }
+			: {}),
+	}),
 	component: MatterPress,
 });
 
@@ -53,14 +59,24 @@ function MatterPress() {
 }
 
 function RealPress({ projectRef }: { projectRef: string }) {
-	const { view: chosen } = Route.useSearch();
+	const { view: chosen, show } = Route.useSearch();
 	const view: PressView = chosen ?? "list";
 	const navigate = useNavigate({ from: Route.fullPath });
 	const sources = usePressSources(projectRef);
 	const searching = isSearching(sources.data);
 	const { data, isPending, isError } = useMatterPress(projectRef, {
+		includeDismissed: true,
 		searching,
 	});
+	const counts = {
+		all: data?.filter((m) => m.status !== "dismissed").length ?? 0,
+		kept: data?.filter((m) => m.status === "kept").length ?? 0,
+		dismissed: data?.filter((m) => m.status === "dismissed").length ?? 0,
+	};
+	const shown =
+		data?.filter((m) =>
+			show ? m.status === show : m.status !== "dismissed",
+		) ?? [];
 	const refresh = useRefreshPress(projectRef);
 	const [adding, setAdding] = useState(false);
 
@@ -105,7 +121,10 @@ function RealPress({ projectRef }: { projectRef: string }) {
 								view={view}
 								onChange={(next) =>
 									void navigate({
-										search: next === "cards" ? { view: "cards" } : {},
+										search: (prev) => ({
+											...prev,
+											view: next === "cards" ? "cards" : undefined,
+										}),
 										replace: true,
 									})
 								}
@@ -131,15 +150,47 @@ function RealPress({ projectRef }: { projectRef: string }) {
 				) : isError ? (
 					<p className="text-sm text-destructive">Couldn't load the press.</p>
 				) : (
-					<PressFeed
-						mentions={data}
-						view={view}
-						empty={
-							searching
-								? "Searching, articles appear here as they're found."
-								: "Nothing found yet. Add a source on the right, BBC or All news outlets say, and it searches straight away."
-						}
-					/>
+					<>
+						<div className="mb-3 flex gap-4 border-b text-sm">
+							{(
+								[
+									[undefined, "All", counts.all],
+									["kept", "Kept", counts.kept],
+									["dismissed", "Dismissed", counts.dismissed],
+								] as const
+							).map(([value, label, count]) => (
+								<button
+									key={label}
+									type="button"
+									aria-pressed={show === value}
+									onClick={() =>
+										void navigate({
+											search: (prev) => ({ ...prev, show: value }),
+											replace: true,
+										})
+									}
+									className="-mb-px border-b-2 border-transparent pb-2 text-muted-foreground aria-pressed:border-foreground aria-pressed:text-foreground"
+								>
+									{label}{" "}
+									<span className="text-xs text-muted-foreground">{count}</span>
+								</button>
+							))}
+						</div>
+						<PressFeed
+							key={show ?? "all"}
+							mentions={shown}
+							view={view}
+							empty={
+								show === "kept"
+									? "Nothing kept yet. Keep an article from its page to shortlist it here."
+									: show === "dismissed"
+										? "Nothing dismissed."
+										: searching
+											? "Searching, articles appear here as they're found."
+											: "Nothing found yet. Add a source on the right, BBC or All news outlets say, and it searches straight away."
+							}
+						/>
+					</>
 				)}
 			</div>
 			<aside className="space-y-6">
