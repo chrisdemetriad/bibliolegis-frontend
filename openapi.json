@@ -1543,6 +1543,10 @@
             ],
             "title": "Practice Area"
           },
+          "press_count": {
+            "title": "Press Count",
+            "type": "integer"
+          },
           "slug": {
             "title": "Slug",
             "type": "string"
@@ -1591,6 +1595,7 @@
           "updated_at",
           "pinned",
           "document_count",
+          "press_count",
           "parties",
           "dates"
         ],
