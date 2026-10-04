@@ -136,7 +136,9 @@ export function useDuplicateCheck(currentProjectId?: string) {
 				if (!open) settle(false);
 			}}
 		>
-			<AlertDialogContent>
+			{/* The list can run long, so half the screen when there's room for it
+			    and scroll rather than run off the top and bottom */}
+			<AlertDialogContent className="max-h-[calc(100dvh-2rem)] overflow-y-auto data-[size=default]:sm:max-w-[max(24rem,50vw)]">
 				<AlertDialogHeader>
 					<AlertDialogTitle>
 						{pending && pending.matches.length > 1
