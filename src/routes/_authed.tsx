@@ -5,6 +5,7 @@ import { SidebarInset, SidebarProvider } from "#/components/ui/sidebar";
 import { TooltipProvider } from "#/components/ui/tooltip";
 import { AppHeader } from "#/shell/AppHeader";
 import { AppSidebar } from "#/shell/AppSidebar";
+import { appHostUrl, isAppHost } from "#/site/host";
 
 // Runs on the server even when called from a client side navigation, so the
 // check reads the session cookie rather than trusting anything in the browser
@@ -23,6 +24,13 @@ export const Route = createFileRoute("/_authed")({
 			throw redirect({
 				href: `/sign-in?redirect_url=${encodeURIComponent(location.href)}`,
 			});
+		}
+		// Clerk's own fallback redirect is a relative /overview, which stays on
+		// whatever host sign in started from. Signing in from the root lands
+		// here still on the root, so this is what actually gets the signed in
+		// user onto app.
+		if (!isAppHost()) {
+			throw redirect({ href: appHostUrl(location.href) });
 		}
 		return { userId };
 	},
