@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect } from "react";
 import {
 	ApiError,
 	type MentionStatus,
@@ -7,8 +8,10 @@ import {
 	type PressSourceCreate,
 	type PressSourceUpdate,
 	type PressTerms,
+	type Project,
 } from "#/api/client";
 import { useApi } from "#/api/useApi";
+import { matterKeys } from "#/matters/queries";
 
 export const pressKeys = {
 	all: ["press"] as const,
@@ -47,11 +50,29 @@ export function useMatterPress(
 	{ includeDismissed = false, searching = false } = {},
 ) {
 	const api = useApi();
-	return useQuery({
+	const queryClient = useQueryClient();
+	const query = useQuery({
 		queryKey: pressKeys.matter(ref, includeDismissed),
 		queryFn: () => api.listProjectPress(ref, includeDismissed),
 		refetchInterval: searching ? SEARCHING_REFRESH_MS : false,
 	});
+
+	// The sidebar's count comes with the matter list. Keeping, dismissing,
+	// pasting a link and a running search all change it, so the list is
+	// fetched again whenever the two stop agreeing
+	const showing = query.data?.filter(
+		(mention) => mention.status !== "dismissed",
+	).length;
+	useEffect(() => {
+		if (showing === undefined) return;
+		const projects = queryClient.getQueryData<Project[]>(matterKeys.list());
+		const project = projects?.find((p) => p.slug === ref || p.id === ref);
+		if (project && project.press_count !== showing) {
+			queryClient.invalidateQueries({ queryKey: matterKeys.list() });
+		}
+	}, [queryClient, ref, showing]);
+
+	return query;
 }
 
 export function usePressArticle(ref: string, outlet: string, slug: string) {

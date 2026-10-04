@@ -1180,6 +1180,8 @@ export interface components {
             pinned: boolean;
             /** Practice Area */
             practice_area: string | null;
+            /** Press Count */
+            press_count: number;
             /** Slug */
             slug: string;
             /** Status */

@@ -58,7 +58,11 @@ function firmNav(openMatters: number): NavItem[] {
 	];
 }
 
-function matterNav(matterId: string, documents: number): NavItem[] {
+function matterNav(
+	matterId: string,
+	documents: number,
+	press?: number,
+): NavItem[] {
 	const base = `/matters/${matterId}`;
 	return [
 		{ label: "Overview", to: `${base}/overview`, icon: SparklesIcon },
@@ -72,7 +76,7 @@ function matterNav(matterId: string, documents: number): NavItem[] {
 		{ label: "Parties", to: `${base}/parties`, icon: UsersIcon },
 		{ label: "Research", to: `${base}/research`, icon: BookMarkedIcon },
 		{ label: "Notes", to: `${base}/notes`, icon: NotebookPenIcon },
-		{ label: "Press", to: `${base}/press`, icon: NewspaperIcon },
+		{ label: "Press", to: `${base}/press`, icon: NewspaperIcon, badge: press },
 		{ label: "Activity", to: `${base}/activity`, icon: MessageSquareTextIcon },
 	];
 }
@@ -177,7 +181,9 @@ export function AppSidebar() {
 								</p>
 							</div>
 							<SidebarGroupContent>
-								<NavList items={matterNav(matter.id, matter.documents)} />
+								<NavList
+									items={matterNav(matter.id, matter.documents, matter.press)}
+								/>
 							</SidebarGroupContent>
 						</SidebarGroup>
 					</>
