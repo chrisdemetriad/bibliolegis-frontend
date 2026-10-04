@@ -5,6 +5,15 @@ WORKDIR /app
 ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
 RUN corepack enable
 
+# Railway's dashboard variables don't reach a Dockerfile build on their own,
+# unlike its Railpack builds. Declaring them here is what makes Railway pass
+# them in, and the ENV lines are what let `pnpm build` below see them, since
+# Vite only bakes in whatever's in the environment at build time
+ARG VITE_API_URL
+ARG VITE_CLERK_PUBLISHABLE_KEY
+ENV VITE_API_URL=$VITE_API_URL
+ENV VITE_CLERK_PUBLISHABLE_KEY=$VITE_CLERK_PUBLISHABLE_KEY
+
 COPY package.json pnpm-lock.yaml ./
 RUN pnpm install --frozen-lockfile
 
