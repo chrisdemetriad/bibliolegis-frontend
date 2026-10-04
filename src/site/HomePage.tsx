@@ -1,4 +1,3 @@
-import { Link } from "@tanstack/react-router";
 import {
 	ArrowRight,
 	BookOpen,
@@ -23,6 +22,7 @@ import {
 import type { ReactNode } from "react";
 import { ChatPreview } from "./ChatPreview";
 import { HoursCalculator } from "./HoursCalculator";
+import { appHostUrl } from "./host";
 
 // Photos are Unsplash placeholders, listed in public/marketing/CREDITS.md,
 // to be swapped for bought or commissioned ones before launch
@@ -49,14 +49,16 @@ export function HomePage() {
 }
 
 function TryButton({ className = "" }: { className?: string }) {
+	// A plain link rather than a routed one. Sign up only exists on app., a
+	// different origin from wherever this renders, so this is a real
+	// navigation rather than a client side route change
 	return (
-		<Link
-			to="/sign-up/$"
-			params={{ _splat: "" }}
+		<a
+			href={appHostUrl("/sign-up")}
 			className={`inline-flex h-11 items-center gap-2 rounded-full bg-brass px-6 text-sm font-medium text-ink transition-colors hover:bg-brass/85 ${className}`}
 		>
 			Try it now <ArrowRight className="size-4" />
-		</Link>
+		</a>
 	);
 }
 
@@ -112,13 +114,12 @@ function SiteHeader() {
 					</a>
 				</nav>
 				<div className="flex items-center gap-5">
-					<Link
-						to="/sign-in/$"
-						params={{ _splat: "" }}
+					<a
+						href={appHostUrl("/sign-in")}
 						className="hidden text-sm text-white/75 hover:text-white sm:block"
 					>
 						Sign in
-					</Link>
+					</a>
 					<TryButton className="h-10 px-5" />
 				</div>
 			</Container>
