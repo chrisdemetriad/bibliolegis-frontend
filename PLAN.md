@@ -8,8 +8,17 @@ This can start against a stubbed or partially built API. It doesn't need to wait
 
 ## Where things stand
 
-Last updated 2026-09-28. Keep this block current, it's what a fresh session reads
+Last updated 2026-10-04. Keep this block current, it's what a fresh session reads
 to work out where to pick up.
+
+**Deployment started 2026-10-04.** The frontend is live on Railway, `bibliolegis.com`
+and `app.bibliolegis.com` both pointed at it, see Phase 7 below and BUILD_LOG that
+date for what it took to get there (a Dockerfile not forwarding build time
+variables, a corrupted `CLERK_SECRET_KEY`, and the decision to keep sign in and
+sign up on `app.` only rather than chase a shared session across both hosts
+right now). The rest of this status block is from 2026-09-28 and hasn't been
+swept for what's landed since, treat the phase checkboxes further down as the
+source of truth over the prose above them.
 
 **Done:** Phases 0 to 2, the UI foundation, Phase 3 apart from the metadata on
 the detail page, Phase 4's `/settings` route and the Phase 7 docs item pulled
@@ -333,7 +342,14 @@ choosing what to build next.
 - [ ] Pricing, once decided, and what "Try it now" promises (trial length, card or not)
 - [ ] Legal pages the footer will need: privacy policy, terms, cookies
 - [ ] Open Graph image and tags so a shared link shows a card
-- [ ] Decide whether the app host should send marketing visitors back to the root, and the root send app pages to `app.`. Nothing enforces either yet
+- [x] Decided 2026-10-04: sign in and sign up only resolve on app., the homepage
+      never checks or shows auth state. A real shared session across the two hosts
+      needs Clerk's production instance and a custom Frontend API domain, not done
+      yet, see bibliolegis-api's PLAN.md "Environments and domains". Try it now and
+      Sign in on the homepage are plain links to app.'s `/sign-up` and `/sign-in`
+      rather than routed ones, since they're a different origin now, and
+      `/sign-in/$` and `/sign-up/$` redirect across if hit on the root. See
+      BUILD_LOG 2026-10-04
 
 ## Phase 1: API types
 
@@ -395,13 +411,13 @@ development on `dev.bibliolegis.com`, each a Railway environment inside the one
 project. The bare root shows the public homepage from this same app, see "Homepage" above.
 TLS is free and automatic on Railway, so the domain is the only thing bought.
 
-- [ ] Frontend service added to the shared Railway project (see bibliolegis-api's PLAN.md Phase 0), built from this repo's Dockerfile for parity with local Docker runs
+- [x] Frontend service added to the shared Railway project, built from this repo's Dockerfile for parity with local Docker runs. Live on `bibliolegis.com` and `app.bibliolegis.com` since 2026-10-04, see BUILD_LOG that date. The api and its cron services aren't deployed yet, so the live site is still running on the frontend's own sample data
 - [ ] Backend API url read from a shared variable rather than duplicated per service. Railway scopes shared variables per environment, so the same name resolves to the production api in one and the development api in the other
-- [ ] Environment variables for anything frontend specific (Clerk publishable key) set in the deployment platform, not committed anywhere
-- [ ] `VITE_API_URL` is read at build time and baked into the bundle, not read at runtime, so it has to be present when the image is built rather than only when it starts. Getting this wrong gives a development frontend pointing at the production api, which is the failure worth designing against
+- [x] Environment variables for anything frontend specific (Clerk publishable key) set in the deployment platform, not committed anywhere. Still the development instance's keys, not production's
+- [ ] `VITE_API_URL` is read at build time and baked into the bundle, not read at runtime, so it has to be present when the image is built rather than only when it starts. Getting this wrong gives a development frontend pointing at the production api, which is the failure worth designing against. The Dockerfile now actually forwards Railway's build time variables through to this (`ARG`/`ENV` for both `VITE_` vars, 2026-10-04, bibliolegis-frontend #84), it didn't before, but there's no real api url to point at yet
 - [ ] Development build uses the development Clerk application's publishable key, not production's. Both are `VITE_` prefixed and so are readable by anyone using the app, which is fine for a publishable key and would not be for a secret one
 - [ ] Error tracking wired up (Sentry or similar)
-- [ ] Smoke test after each deploy against a deployed backend: login, upload, query returns a cited answer (coordinate with a backend deploy, see that repo's PLAN.md)
+- [ ] Smoke test after each deploy against a deployed backend: login, upload, query returns a cited answer (coordinate with a backend deploy, see that repo's PLAN.md). Signing in on `app.bibliolegis.com` was checked by hand on 2026-10-04, the rest waits on the api deploy
 
 ## Phase 8: voice
 
