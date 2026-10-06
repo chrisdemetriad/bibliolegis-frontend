@@ -13,9 +13,6 @@ import { Panel } from "#/shell/page";
 
 export type PressView = "list" | "cards";
 
-// Outlet chips shown before "more outlets"
-const TOP_OUTLETS = 8;
-
 // "14 Sep 2026", the way dates are written everywhere else in the app
 export function pressDate(iso: string | null | undefined) {
 	if (!iso) return "Date unknown";
@@ -130,6 +127,10 @@ function Byline({ mention }: { mention: PressMention }) {
 			</span>
 			<span>·</span>
 			<span>{pressDate(mention.article.published_at)}</span>
+			<span>·</span>
+			<span title="When it was put on the matter">
+				Added {pressDate(mention.created_at)}
+			</span>
 			{mention.status === "new" && (
 				<span className="rounded-md border px-1.5 py-px">New</span>
 			)}
@@ -219,21 +220,159 @@ function Card({
 	);
 }
 
-// Articles newest first as the api sends them, with a chip per outlet to
-// narrow the list down
+export type PressSort = "added" | "published" | "oldest";
+
+// Kept in the address so going into an article and back, or sharing the
+// link, keeps them. Defaults aren't written out
+export type PressFilters = {
+	sort?: "published" | "oldest";
+	outlet?: string;
+	from?: string;
+	to?: string;
+};
+
+const DAY = /^\d{4}-\d{2}-\d{2}$/;
+
+export function validatePressFilters(
+	search: Record<string, unknown>,
+): PressFilters {
+	const text = (value: unknown) =>
+		typeof value === "string" && value ? value : undefined;
+	const day = (value: unknown) =>
+		typeof value === "string" && DAY.test(value) ? value : undefined;
+	return {
+		...(search.sort === "published" || search.sort === "oldest"
+			? { sort: search.sort }
+			: {}),
+		...(text(search.outlet) ? { outlet: text(search.outlet) } : {}),
+		...(day(search.from) ? { from: day(search.from) } : {}),
+		...(day(search.to) ? { to: day(search.to) } : {}),
+	};
+}
+
+const SORTS: { value: PressSort; label: string }[] = [
+	{ value: "added", label: "Date added" },
+	{ value: "published", label: "Article date, newest" },
+	{ value: "oldest", label: "Article date, oldest" },
+];
+
+// The day in the reader's own time zone, as YYYY-MM-DD so it compares with a
+// date input's value as text
+function localDay(iso: string) {
+	return new Date(iso).toLocaleDateString("en-CA");
+}
+
+function byDate(
+	field: (m: PressMention) => string | null,
+	newestFirst: boolean,
+) {
+	// Undated last whichever way round
+	return (a: PressMention, b: PressMention) => {
+		const x = field(a);
+		const y = field(b);
+		if (!x || !y) return x ? -1 : y ? 1 : 0;
+		return newestFirst ? y.localeCompare(x) : x.localeCompare(y);
+	};
+}
+
+const selectClass =
+	"h-8 rounded-md border bg-background px-2 text-sm text-foreground";
+
+function FilterBar({
+	filters,
+	onChange,
+	outlets,
+	total,
+}: {
+	filters: PressFilters;
+	onChange: (filters: PressFilters) => void;
+	outlets: [string, { name: string; count: number }][];
+	total: number;
+}) {
+	const sort: PressSort = filters.sort ?? "added";
+	const set = (next: Partial<PressFilters>) =>
+		onChange({ ...filters, ...next });
+	const filtered = Boolean(filters.outlet || filters.from || filters.to);
+	return (
+		<div className="mb-3 flex flex-wrap items-center gap-2 text-sm">
+			<select
+				aria-label="Sort by"
+				value={sort}
+				onChange={(event) => {
+					const value = event.target.value as PressSort;
+					set({ sort: value === "added" ? undefined : value });
+				}}
+				className={selectClass}
+			>
+				{SORTS.map(({ value, label }) => (
+					<option key={value} value={value}>
+						{label}
+					</option>
+				))}
+			</select>
+			<select
+				aria-label="Publication"
+				value={filters.outlet ?? ""}
+				onChange={(event) => set({ outlet: event.target.value || undefined })}
+				className={cn(selectClass, "max-w-56")}
+			>
+				<option value="">All publications ({total})</option>
+				{outlets.map(([slug, { name, count }]) => (
+					<option key={slug} value={slug}>
+						{name} ({count})
+					</option>
+				))}
+			</select>
+			<span className="text-muted-foreground">
+				{sort === "added" ? "Added" : "Published"} from
+			</span>
+			<input
+				type="date"
+				aria-label="From"
+				value={filters.from ?? ""}
+				max={filters.to}
+				onChange={(event) => set({ from: event.target.value || undefined })}
+				className={selectClass}
+			/>
+			<span className="text-muted-foreground">to</span>
+			<input
+				type="date"
+				aria-label="To"
+				value={filters.to ?? ""}
+				min={filters.from}
+				onChange={(event) => set({ to: event.target.value || undefined })}
+				className={selectClass}
+			/>
+			{filtered && (
+				<button
+					type="button"
+					onClick={() => onChange(filters.sort ? { sort: filters.sort } : {})}
+					className="px-1.5 text-xs text-muted-foreground hover:text-foreground"
+				>
+					Clear filters
+				</button>
+			)}
+		</div>
+	);
+}
+
+// Newest added first unless asked otherwise, narrowed by publication and a
+// date range. The range is on whichever date the list is sorted by
 export function PressFeed({
 	mentions,
 	view,
+	filters,
+	onFiltersChange,
 	showMatter = false,
 	empty = "Nothing found yet.",
 }: {
 	mentions: PressMention[];
 	view: PressView;
+	filters: PressFilters;
+	onFiltersChange: (filters: PressFilters) => void;
 	showMatter?: boolean;
 	empty?: string;
 }) {
-	const [outlet, setOutlet] = useState<string | null>(null);
-	const [allOutlets, setAllOutlets] = useState(false);
 	const outlets = useMemo(() => {
 		const counts = new Map<string, { name: string; count: number }>();
 		for (const { article } of mentions) {
@@ -245,11 +384,31 @@ export function PressFeed({
 					count: 1,
 				});
 		}
-		return [...counts.entries()].sort((a, b) => b[1].count - a[1].count);
+		return [...counts.entries()].sort(
+			(a, b) => b[1].count - a[1].count || a[1].name.localeCompare(b[1].name),
+		);
 	}, [mentions]);
-	const shown = outlet
-		? mentions.filter((m) => m.article.outlet_slug === outlet)
-		: mentions;
+
+	const shown = useMemo(() => {
+		const sort: PressSort = filters.sort ?? "added";
+		const date = (m: PressMention) =>
+			sort === "added" ? m.created_at : m.article.published_at;
+		return mentions
+			.filter((m) => {
+				if (filters.outlet && m.article.outlet_slug !== filters.outlet)
+					return false;
+				if (!filters.from && !filters.to) return true;
+				const when = date(m);
+				// An undated article can't be said to fall inside a range
+				if (!when) return false;
+				const day = localDay(when);
+				return (
+					(!filters.from || day >= filters.from) &&
+					(!filters.to || day <= filters.to)
+				);
+			})
+			.sort(byDate(date, sort !== "oldest"));
+	}, [mentions, filters]);
 
 	if (mentions.length === 0) {
 		return (
@@ -259,41 +418,17 @@ export function PressFeed({
 
 	return (
 		<div>
-			{outlets.length > 1 && (
-				<div className="mb-3 flex flex-wrap gap-1.5">
-					{[
-						[null, { name: "All", count: mentions.length }] as const,
-						// A big case is in dozens of outlets, most of them once
-						...(allOutlets
-							? outlets
-							: outlets.filter(
-									([slug], i) => i < TOP_OUTLETS || slug === outlet,
-								)),
-					].map(([slug, { name, count }]) => (
-						<button
-							key={slug ?? "all"}
-							type="button"
-							aria-pressed={outlet === slug}
-							onClick={() => setOutlet(slug)}
-							className="rounded-full border px-2.5 py-0.5 text-xs text-muted-foreground aria-pressed:border-foreground aria-pressed:text-foreground"
-						>
-							{name} <span className="opacity-60">{count}</span>
-						</button>
-					))}
-					{outlets.length > TOP_OUTLETS && (
-						<button
-							type="button"
-							onClick={() => setAllOutlets(!allOutlets)}
-							className="px-1.5 py-0.5 text-xs text-muted-foreground hover:text-foreground"
-						>
-							{allOutlets
-								? "Fewer"
-								: `${outlets.length - TOP_OUTLETS} more outlets`}
-						</button>
-					)}
-				</div>
-			)}
-			{view === "cards" ? (
+			<FilterBar
+				filters={filters}
+				onChange={onFiltersChange}
+				outlets={outlets}
+				total={mentions.length}
+			/>
+			{shown.length === 0 ? (
+				<p className="py-12 text-center text-sm text-muted-foreground">
+					Nothing matches these filters.
+				</p>
+			) : view === "cards" ? (
 				<div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
 					{shown.map((mention) => (
 						<Card key={mention.id} mention={mention} showMatter={showMatter} />

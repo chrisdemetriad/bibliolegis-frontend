@@ -4,19 +4,29 @@ import { useState } from "react";
 import type { PressSource } from "#/api/client";
 import { Button } from "#/components/ui/button";
 import { Skeleton } from "#/components/ui/skeleton";
-import { PressFeed, type PressView, ViewToggle } from "#/press/PressFeed";
+import {
+	PressFeed,
+	type PressFilters,
+	type PressView,
+	ViewToggle,
+	validatePressFilters,
+} from "#/press/PressFeed";
 import { AddSource, SOURCE_CATEGORIES, SourceRow } from "#/press/PressSettings";
 import { useFirmPress, useMe, usePressSources } from "#/press/queries";
 import { Page, PageHeader, Panel, SectionTitle } from "#/shell/page";
 
 export const Route = createFileRoute("/_authed/press")({
-	validateSearch: (search: Record<string, unknown>): { view?: "cards" } =>
-		search.view === "cards" ? { view: "cards" } : {},
+	validateSearch: (
+		search: Record<string, unknown>,
+	): PressFilters & { view?: "cards" } => ({
+		...validatePressFilters(search),
+		...(search.view === "cards" ? { view: "cards" as const } : {}),
+	}),
 	component: PressPage,
 });
 
 function PressPage() {
-	const { view: chosen } = Route.useSearch();
+	const { view: chosen, ...filters } = Route.useSearch();
 	const view: PressView = chosen ?? "list";
 	const navigate = useNavigate({ from: Route.fullPath });
 	const { data, isPending, isError } = useFirmPress();
@@ -26,13 +36,16 @@ function PressPage() {
 			<PageHeader
 				title="Press"
 				sample={false}
-				description="News about the matters you're on, newest first. Every source on the right is searched for every open matter, back to the matter's earliest date when it's added and for anything new every few hours. A matter's own terms and sources are on its Press tab."
+				description="News about the matters you're on, newest added first. Every source on the right is searched for every open matter, back to the matter's earliest date when it's added and for anything new every few hours. A matter's own terms and sources are on its Press tab."
 				actions={
 					<ViewToggle
 						view={view}
 						onChange={(next) =>
 							void navigate({
-								search: next === "cards" ? { view: "cards" } : {},
+								search: (prev) => ({
+									...prev,
+									view: next === "cards" ? ("cards" as const) : undefined,
+								}),
 								replace: true,
 							})
 						}
@@ -53,6 +66,13 @@ function PressPage() {
 						<PressFeed
 							mentions={data}
 							view={view}
+							filters={filters}
+							onFiltersChange={(next) =>
+								void navigate({
+									search: ({ view }) => ({ view, ...next }),
+									replace: true,
+								})
+							}
 							showMatter
 							empty="Nothing found yet for any of your matters."
 						/>

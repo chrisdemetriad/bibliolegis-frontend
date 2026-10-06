@@ -8,7 +8,13 @@ import { Skeleton } from "#/components/ui/skeleton";
 import { useMatter } from "#/matters/context";
 import { press } from "#/mock/data";
 import { AddLink } from "#/press/AddLink";
-import { PressFeed, type PressView, ViewToggle } from "#/press/PressFeed";
+import {
+	PressFeed,
+	type PressFilters,
+	type PressView,
+	ViewToggle,
+	validatePressFilters,
+} from "#/press/PressFeed";
 import { MatterSources, WatchTerms } from "#/press/PressSettings";
 import {
 	isSearching,
@@ -24,7 +30,8 @@ export const Route = createFileRoute("/_authed/matters/$matterId/press")({
 	// is the default and isn't written out
 	validateSearch: (
 		search: Record<string, unknown>,
-	): { view?: "cards"; show?: "kept" | "dismissed" } => ({
+	): PressFilters & { view?: "cards"; show?: "kept" | "dismissed" } => ({
+		...validatePressFilters(search),
 		...(search.view === "cards" ? { view: "cards" as const } : {}),
 		...(search.show === "kept" || search.show === "dismissed"
 			? { show: search.show }
@@ -59,7 +66,7 @@ function MatterPress() {
 }
 
 function RealPress({ projectRef }: { projectRef: string }) {
-	const { view: chosen, show } = Route.useSearch();
+	const { view: chosen, show, ...filters } = Route.useSearch();
 	const view: PressView = chosen ?? "list";
 	const navigate = useNavigate({ from: Route.fullPath });
 	const sources = usePressSources(projectRef);
@@ -136,8 +143,8 @@ function RealPress({ projectRef }: { projectRef: string }) {
 				</SectionTitle>
 				<p className="-mt-1 mb-4 text-sm text-muted-foreground">
 					Everything the sources on the right have found about this matter,
-					newest first. They're searched back to the matter's earliest date when
-					added and for anything new every few hours.
+					newest added first. They're searched back to the matter's earliest
+					date when added and for anything new every few hours.
 				</p>
 				{adding && (
 					<AddLink projectRef={projectRef} onDone={() => setAdding(false)} />
@@ -180,6 +187,13 @@ function RealPress({ projectRef }: { projectRef: string }) {
 							key={show ?? "all"}
 							mentions={shown}
 							view={view}
+							filters={filters}
+							onFiltersChange={(next) =>
+								void navigate({
+									search: ({ view, show }) => ({ view, show, ...next }),
+									replace: true,
+								})
+							}
 							empty={
 								show === "kept"
 									? "Nothing kept yet. Keep an article from its page to shortlist it here."
