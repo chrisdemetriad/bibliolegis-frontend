@@ -1,4 +1,9 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import {
+	createFileRoute,
+	Link,
+	useCanGoBack,
+	useRouter,
+} from "@tanstack/react-router";
 import { ArrowLeftIcon, QuoteIcon } from "lucide-react";
 import { ApiError } from "#/api/client";
 import { DeleteDocument } from "#/documents/DeleteDocument";
@@ -22,6 +27,8 @@ function DocumentPage() {
 	const { passage } = Route.useSearch();
 	const { data: document, isPending, error } = useDocument(documentId);
 	const { data: projects } = useProjects();
+	const router = useRouter();
+	const canGoBack = useCanGoBack();
 
 	const project = document?.project_id
 		? projects?.find((candidate) => candidate.id === document.project_id)
@@ -29,13 +36,29 @@ function DocumentPage() {
 
 	return (
 		<Page>
-			<Link
-				to="/matters"
-				className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
-			>
-				<ArrowLeftIcon className="size-4" />
-				Matters
-			</Link>
+			{/* Back rather than a link, so a citation followed from an answer
+			returns to the page with that answer still showing. Opened
+			straight from an address there's nothing to go back to, so it
+			goes to the document's matter instead */}
+			{canGoBack ? (
+				<button
+					type="button"
+					onClick={() => router.history.back()}
+					className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
+				>
+					<ArrowLeftIcon className="size-4" />
+					Back to overview
+				</button>
+			) : (
+				<Link
+					to={project ? "/matters/$matterId/overview" : "/overview"}
+					params={project ? { matterId: project.slug } : {}}
+					className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
+				>
+					<ArrowLeftIcon className="size-4" />
+					Back to overview
+				</Link>
+			)}
 
 			{isPending && <p className="mt-6 text-muted-foreground">Loading…</p>}
 			{error && (
@@ -126,7 +149,7 @@ function CitedPassage({
 				: `Page ${data.page_start}`;
 
 	return (
-		<figure className="mt-6 rounded-lg border-l-4 border-primary bg-muted/60 px-4 py-3">
+		<figure className="mt-6 rounded-lg border-l-4 border-foreground/25 bg-muted/60 px-4 py-3">
 			<figcaption className="mb-2 flex items-center gap-2 text-xs text-muted-foreground">
 				<QuoteIcon className="size-3" />
 				The passage the answer cited{pages && `, ${pages.toLowerCase()}`}

@@ -15,6 +15,13 @@ import { Skeleton } from "#/components/ui/skeleton";
 import { StatusIcon } from "#/components/ui/status-icon";
 import { Panel } from "./page";
 
+type Asked = { question: string; answer: QueryAnswer };
+
+// The last answer in each place an ask box sits, so following a citation to
+// its passage and coming back still shows the answer. Only ever written in the
+// browser, a mutation never runs on the server, and gone on a reload
+const lastAnswers = new Map<string, Asked>();
+
 // Asks POST /query and shows the answer with every claim linked to the
 // passage it came from. With a projectId only that matter's documents are
 // searched, without one everything the user can see is
@@ -29,11 +36,18 @@ export function AskBox({
 }) {
 	const api = useApi();
 	const [question, setQuestion] = useState("");
+	const place = projectId ?? "everything";
+	const [last, setLast] = useState(() => lastAnswers.get(place));
 	const ask = useMutation({
 		mutationFn: (text: string) => api.query(text, projectId),
 		// Cleared only once there's an answer, so a failed ask keeps the
 		// question there to try again. The answer panel still shows it
-		onSuccess: () => setQuestion(""),
+		onSuccess: (answer, text) => {
+			setQuestion("");
+			const asked = { question: text, answer };
+			lastAnswers.set(place, asked);
+			setLast(asked);
+		},
 	});
 
 	const submit = () => {
@@ -89,7 +103,7 @@ export function AskBox({
 				</Panel>
 			)}
 
-			{ask.isSuccess && <Answer question={ask.variables} answer={ask.data} />}
+			{last && !ask.isPending && !ask.isError && <Answer {...last} />}
 		</div>
 	);
 }
