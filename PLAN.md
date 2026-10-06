@@ -195,13 +195,15 @@ that wasn't and a flagged answer, not yet clicked through signed in.
 
 **Next:** the rest of Phase 4: aggregation answers as a
 table and the loading and empty states the query page hasn't covered. Phase
-5's admin pages have their endpoints already, and Phase 7's deployment can
-start.
+5's admin pages have their endpoints already.
 
-Phase 7, deployment, can also start out of order. Nothing is deployed to Railway
-yet, the shared project holds only Postgres. The holding route is enough to prove
-the pipeline end to end. A deployed frontend will need its own origin adding to the
-api's `CORS_ALLOWED_ORIGINS`, see that repo's Phase 9.
+Phase 7, deployment, is mostly done, bibliolegis-api's Phase 9 landed 2026-10-06.
+`VITE_API_URL` points at `https://api.bibliolegis.com` now rather than
+`PLACEHOLDER`, and that repo's `CORS_ALLOWED_ORIGINS` already carries this
+app's two origins. None of that means a real request gets anywhere yet, the
+api behind that domain has no database schema, see bibliolegis-api's PLAN.md
+for what's still blocked there. The live site still runs on this app's own
+sample data until that's sorted.
 
 The schema drift check in CI is live as of 2026-09-27. It reads bibliolegis-api's
 `openapi.json` with a read only deploy key on that repo, stored here as the
@@ -430,7 +432,7 @@ TLS is free and automatic on Railway, so the domain is the only thing bought.
 - [x] Frontend service added to the shared Railway project, built from this repo's Dockerfile for parity with local Docker runs. Live on `bibliolegis.com` and `app.bibliolegis.com` since 2026-10-04, see BUILD_LOG that date. The api and its cron services aren't deployed yet, so the live site is still running on the frontend's own sample data
 - [ ] Backend API url read from a shared variable rather than duplicated per service. Railway scopes shared variables per environment, so the same name resolves to the production api in one and the development api in the other
 - [x] Environment variables for anything frontend specific (Clerk publishable key) set in the deployment platform, not committed anywhere. Still the development instance's keys, not production's
-- [ ] `VITE_API_URL` is read at build time and baked into the bundle, not read at runtime, so it has to be present when the image is built rather than only when it starts. Getting this wrong gives a development frontend pointing at the production api, which is the failure worth designing against. The Dockerfile now actually forwards Railway's build time variables through to this (`ARG`/`ENV` for both `VITE_` vars, 2026-10-04, bibliolegis-frontend #84), it didn't before, but there's no real api url to point at yet
+- [x] `VITE_API_URL` is read at build time and baked into the bundle, not read at runtime, so it has to be present when the image is built rather than only when it starts. Getting this wrong gives a development frontend pointing at the production api, which is the failure worth designing against. The Dockerfile now actually forwards Railway's build time variables through to this (`ARG`/`ENV` for both `VITE_` vars, 2026-10-04, bibliolegis-frontend #84). Confirmed working 2026-10-06 once bibliolegis-api's Phase 9 gave this a real url to point at: changing the variable from its `PLACEHOLDER` value to `https://api.bibliolegis.com` rebuilt and redeployed clean. The api behind that domain has no database schema yet, see that repo's PLAN.md, so this only proves the build mechanism, not that a real request gets anywhere
 - [ ] Development build uses the development Clerk application's publishable key, not production's. Both are `VITE_` prefixed and so are readable by anyone using the app, which is fine for a publishable key and would not be for a secret one
 - [ ] Error tracking wired up (Sentry or similar)
 - [ ] Smoke test after each deploy against a deployed backend: login, upload, query returns a cited answer (coordinate with a backend deploy, see that repo's PLAN.md). Signing in on `app.bibliolegis.com` was checked by hand on 2026-10-04, the rest waits on the api deploy
