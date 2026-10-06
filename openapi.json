@@ -2498,7 +2498,7 @@
     },
     "/documents/{document_id}/file": {
       "get": {
-        "description": "The file as it was uploaded, for the viewer and for downloading.\n\nInline by default so the browser can show it, `?download=true` asks for\nan attachment instead. Under the original filename either way, rather\nthan the uuid it's stored under. A row whose file has gone from disk 404s\nwith its own message, since that's a storage problem and not a document\nthe caller can't see.",
+        "description": "The file as it was uploaded, for the viewer and for downloading.\n\nInline by default so the browser can show it, `?download=true` asks for\nan attachment instead. Under the original filename either way, rather\nthan the uuid it's stored under. A row whose file has gone from storage 404s\nwith its own message, since that's a storage problem and not a document\nthe caller can't see.\n\nPassed through the api rather than redirecting to a presigned bucket url,\nso the file stays behind the same sign in as everything else and the\nbrowser never needs the bucket to answer it cross origin.",
         "operationId": "get_document_file_documents__document_id__file_get",
         "parameters": [
           {
