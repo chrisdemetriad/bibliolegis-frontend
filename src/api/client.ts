@@ -221,6 +221,16 @@ export function createApi({
 			),
 
 		// The response always says pending, ingestion runs after it returns.
+		// The file as uploaded. Fetched rather than linked to, an <iframe> or
+		// <a href> can't carry the bearer token
+		getDocumentFile: async (documentId: string) =>
+			unwrap(
+				await client.GET("/documents/{document_id}/file", {
+					params: { path: { document_id: documentId } },
+					parseAs: "blob",
+				}),
+			) as Blob,
+
 		// Poll getDocument to see it reach done or failed
 		uploadDocument: async (
 			file: File,

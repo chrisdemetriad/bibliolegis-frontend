@@ -102,6 +102,32 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/documents/{document_id}/file": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Document File
+         * @description The file as it was uploaded, for the viewer and for downloading.
+         *
+         *     Inline by default so the browser can show it, `?download=true` asks for
+         *     an attachment instead. Under the original filename either way, rather
+         *     than the uuid it's stored under. A row whose file has gone from disk 404s
+         *     with its own message, since that's a storage problem and not a document
+         *     the caller can't see.
+         */
+        get: operations["get_document_file_documents__document_id__file_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/documents/{document_id}/passages/{chunk_index}": {
         parameters: {
             query?: never;
@@ -219,7 +245,7 @@ export interface paths {
         };
         /**
          * List Firm Press
-         * @description Press across every matter the caller belongs to, newest first.
+         * @description Press across every matter the caller belongs to, newest added first.
          */
         get: operations["list_firm_press_press_get"];
         put?: never;
@@ -1622,6 +1648,39 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_document_file_documents__document_id__file_get: {
+        parameters: {
+            query?: {
+                download?: boolean;
+            };
+            header?: never;
+            path: {
+                document_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/octet-stream": unknown;
+                };
             };
             /** @description Validation Error */
             422: {

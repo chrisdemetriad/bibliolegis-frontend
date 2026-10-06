@@ -8,12 +8,9 @@ import { Button } from "#/components/ui/button";
 import { Progress } from "#/components/ui/progress";
 import { StatusIcon } from "#/components/ui/status-icon";
 import { cn } from "#/lib/utils";
+import { ACCEPTED, ACCEPTED_LABEL } from "./accepted";
 import { useDuplicateCheck } from "./duplicates";
 import { documentKeys } from "./queries";
-
-// The api checks this too. Checking here as well means a wrong file fails
-// straight away instead of after it's been sent
-const ACCEPTED = [".pdf", ".docx"];
 
 type Upload = {
 	key: string;
@@ -55,7 +52,7 @@ export function UploadZone({ projectId }: { projectId?: string } = {}) {
 					name: file.name,
 					state: "failed",
 					progress: 0,
-					error: `${extension || "Files with no extension"} can't be uploaded, only PDF and DOCX.`,
+					error: `${extension || "Files with no extension"} can't be uploaded, only ${ACCEPTED_LABEL}.`,
 				},
 				...current,
 			]);
@@ -118,12 +115,10 @@ export function UploadZone({ projectId }: { projectId?: string } = {}) {
 				)}
 			>
 				<UploadIcon className="size-6 text-muted-foreground" />
-				<span className="font-medium">
-					Drop PDF or DOCX files here, or click to choose
-				</span>
+				<span className="font-medium">Drop files here, or click to choose</span>
 				<span className="text-sm text-muted-foreground">
-					Each one is read and indexed after it uploads, which can take a minute
-					for a scanned bundle
+					{ACCEPTED_LABEL}. Each one is read and indexed after it uploads, which
+					can take a minute for a scanned bundle
 				</span>
 				<input
 					id={inputId}

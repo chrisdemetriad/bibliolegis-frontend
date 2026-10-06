@@ -18,6 +18,7 @@ export const documentKeys = {
 	detail: (id: string) => [...documentKeys.all, "detail", id] as const,
 	passage: (id: string, chunkIndex: number) =>
 		[...documentKeys.all, "passage", id, chunkIndex] as const,
+	file: (id: string) => [...documentKeys.all, "file", id] as const,
 };
 
 export function useDocuments() {

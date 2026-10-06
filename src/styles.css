@@ -238,3 +238,17 @@ body {
 		transform: translateX(100%);
 	}
 }
+
+/* docx-preview's own wrapper is a grey slab with fixed padding. Swapped for
+the viewer's background, with pages that sit like the PDF ones do */
+.docx-view .docx-wrapper {
+	background: transparent;
+	padding: 1.5rem;
+	gap: 1rem;
+}
+.docx-view .docx-wrapper > section.docx {
+	margin-bottom: 0;
+	box-shadow:
+		0 1px 2px rgb(0 0 0 / 0.08),
+		0 0 0 1px rgb(0 0 0 / 0.05);
+}
