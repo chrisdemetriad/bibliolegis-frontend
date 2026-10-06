@@ -55,6 +55,11 @@ export function AddLink({
 					<XIcon />
 				</Button>
 			</form>
+			<p className="mt-2 text-xs text-muted-foreground">
+				The address of one article, not a feed or a site's homepage. It goes on
+				this matter as Kept and isn't searched again. To follow an outlet or a
+				feed, add it as a source.
+			</p>
 			{preview.isError && (
 				<p className="mt-2 text-sm text-destructive">
 					{errorMessage(preview.error, "Couldn't read that page.")}
