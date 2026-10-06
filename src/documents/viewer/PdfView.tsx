@@ -1,5 +1,5 @@
 import { MinusIcon, PlusIcon } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { Document, Page, pdfjs } from "react-pdf";
 import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
@@ -146,14 +146,19 @@ function LazyPage({
 			className="shrink-0 bg-white shadow-sm ring-1 ring-black/5"
 			style={{ width, minHeight: height }}
 		>
+			{/* A page suspends while pdf.js reads it. Without a boundary of its
+			own the nearest one is round the whole viewer, which hides the lot
+			for a moment and throws the scroll position back to the top */}
 			{near && (
-				<Page
-					pageNumber={number}
-					width={width}
-					loading={null}
-					renderAnnotationLayer
-					renderTextLayer
-				/>
+				<Suspense fallback={null}>
+					<Page
+						pageNumber={number}
+						width={width}
+						loading={null}
+						renderAnnotationLayer
+						renderTextLayer
+					/>
+				</Suspense>
 			)}
 		</div>
 	);
