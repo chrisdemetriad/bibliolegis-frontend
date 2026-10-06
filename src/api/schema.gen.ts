@@ -115,9 +115,13 @@ export interface paths {
          *
          *     Inline by default so the browser can show it, `?download=true` asks for
          *     an attachment instead. Under the original filename either way, rather
-         *     than the uuid it's stored under. A row whose file has gone from disk 404s
+         *     than the uuid it's stored under. A row whose file has gone from storage 404s
          *     with its own message, since that's a storage problem and not a document
          *     the caller can't see.
+         *
+         *     Passed through the api rather than redirecting to a presigned bucket url,
+         *     so the file stays behind the same sign in as everything else and the
+         *     browser never needs the bucket to answer it cross origin.
          */
         get: operations["get_document_file_documents__document_id__file_get"];
         put?: never;
