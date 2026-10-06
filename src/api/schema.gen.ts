@@ -99,7 +99,14 @@ export interface paths {
         delete: operations["delete_document_documents__document_id__delete"];
         options?: never;
         head?: never;
-        patch?: never;
+        /**
+         * Rename Document
+         * @description Rename a document, keeping its extension.
+         *
+         *     409 if another document in the same matter already has the name, so the
+         *     person can pick another rather than get a "(2)" they didn't ask for.
+         */
+        patch: operations["rename_document_documents__document_id__patch"];
         trace?: never;
     };
     "/documents/{document_id}/file": {
@@ -911,6 +918,11 @@ export interface components {
              */
             uploaded_at: string;
         };
+        /** DocumentRename */
+        DocumentRename: {
+            /** Name */
+            name: string;
+        };
         /** DuplicateCheck */
         DuplicateCheck: {
             /** Sha256 */
@@ -1652,6 +1664,41 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    rename_document_documents__document_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                document_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DocumentRename"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DocumentOut"];
+                };
             };
             /** @description Validation Error */
             422: {

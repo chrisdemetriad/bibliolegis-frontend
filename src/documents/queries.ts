@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ApiError, type Document } from "#/api/client";
 import { useApi } from "#/api/useApi";
 
@@ -51,5 +51,34 @@ export function usePassage(documentId: string, chunkIndex: number) {
 		queryFn: () => api.getPassage(documentId, chunkIndex),
 		retry: (count, error) =>
 			!(error instanceof ApiError && error.status === 404) && count < 3,
+	});
+}
+
+export function useRenameDocument() {
+	const api = useApi();
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: ({ id, name }: { id: string; name: string }) =>
+			api.renameDocument(id, name),
+		onSuccess: async (document) => {
+			queryClient.setQueryData<Document[]>(documentKeys.list(), (list) =>
+				list?.map((each) => (each.id === document.id ? document : each)),
+			);
+			await queryClient.invalidateQueries({
+				queryKey: documentKeys.detail(document.id),
+			});
+		},
+	});
+}
+
+export function useDeleteDocument() {
+	const api = useApi();
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: (id: string) => api.deleteDocument(id),
+		onSuccess: async (_, id) => {
+			queryClient.removeQueries({ queryKey: documentKeys.detail(id) });
+			await queryClient.invalidateQueries({ queryKey: documentKeys.list() });
+		},
 	});
 }

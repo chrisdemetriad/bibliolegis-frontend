@@ -308,6 +308,16 @@ export function createApi({
 		findDuplicates: async (sha256: string[]) =>
 			unwrap(await client.POST("/documents/duplicates", { body: { sha256 } })),
 
+		// name is without the extension, the api keeps the one it was
+		// uploaded with. 409 when the matter already has a file called that
+		renameDocument: async (documentId: string, name: string) =>
+			unwrap(
+				await client.PATCH("/documents/{document_id}", {
+					params: { path: { document_id: documentId } },
+					body: { name },
+				}),
+			),
+
 		deleteDocument: async (documentId: string) => {
 			unwrap(
 				await client.DELETE("/documents/{document_id}", {
