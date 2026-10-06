@@ -11,6 +11,7 @@ import {
 	LibraryIcon,
 	LifeBuoyIcon,
 	type LucideIcon,
+	MessageCircleQuestionIcon,
 	MessageSquareTextIcon,
 	NewspaperIcon,
 	NotebookPenIcon,
@@ -55,6 +56,11 @@ function firmNav(openMatters: number): NavItem[] {
 		},
 		{ label: "Library", to: "/library", icon: LibraryIcon },
 		{ label: "Press", to: "/press", icon: NewspaperIcon },
+		{
+			label: "History",
+			to: "/history",
+			icon: MessageCircleQuestionIcon,
+		},
 	];
 }
 

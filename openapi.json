@@ -183,6 +183,134 @@
         "title": "Body_upload_document_documents_post",
         "type": "object"
       },
+      "CaseMetadataOut": {
+        "properties": {
+          "case_date": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Case Date"
+          },
+          "court": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Court"
+          },
+          "extracted_at": {
+            "format": "date-time",
+            "title": "Extracted At",
+            "type": "string"
+          },
+          "location": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Location"
+          },
+          "needs_review": {
+            "title": "Needs Review",
+            "type": "boolean"
+          },
+          "offence_text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Offence Text"
+          },
+          "offence_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Offence Type"
+          },
+          "review_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Review Reason"
+          },
+          "sentence_months": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sentence Months"
+          },
+          "sentence_text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sentence Text"
+          },
+          "sentence_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sentence Type"
+          }
+        },
+        "required": [
+          "offence_type",
+          "offence_text",
+          "location",
+          "court",
+          "case_date",
+          "sentence_months",
+          "sentence_type",
+          "sentence_text",
+          "needs_review",
+          "review_reason",
+          "extracted_at"
+        ],
+        "title": "CaseMetadataOut",
+        "type": "object"
+      },
       "ChatModelOut": {
         "properties": {
           "id": {
@@ -347,6 +475,84 @@
           "source_document_id"
         ],
         "title": "DateOut",
+        "type": "object"
+      },
+      "DocumentDetailOut": {
+        "properties": {
+          "case_metadata": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CaseMetadataOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "error_message": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error Message"
+          },
+          "filename": {
+            "title": "Filename",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "ingestion_stage": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ingestion Stage"
+          },
+          "project_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Project Id"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "uploaded_at": {
+            "format": "date-time",
+            "title": "Uploaded At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "filename",
+          "status",
+          "project_id",
+          "uploaded_at",
+          "error_message",
+          "ingestion_stage",
+          "case_metadata"
+        ],
+        "title": "DocumentDetailOut",
         "type": "object"
       },
       "DocumentOut": {
@@ -1602,8 +1808,116 @@
         "title": "ProjectOut",
         "type": "object"
       },
+      "QueryHistoryOut": {
+        "properties": {
+          "answer": {
+            "title": "Answer",
+            "type": "string"
+          },
+          "citations": {
+            "items": {
+              "$ref": "#/components/schemas/CitationOut"
+            },
+            "title": "Citations",
+            "type": "array"
+          },
+          "conversation_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Conversation Id"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "flagged": {
+            "title": "Flagged",
+            "type": "boolean"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "model": {
+            "title": "Model",
+            "type": "string"
+          },
+          "project": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/QueryHistoryProjectOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "question": {
+            "title": "Question",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "question",
+          "answer",
+          "citations",
+          "model",
+          "project",
+          "conversation_id",
+          "flagged",
+          "created_at"
+        ],
+        "title": "QueryHistoryOut",
+        "type": "object"
+      },
+      "QueryHistoryProjectOut": {
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "slug": {
+            "title": "Slug",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "slug",
+          "name"
+        ],
+        "title": "QueryHistoryProjectOut",
+        "type": "object"
+      },
       "QueryIn": {
         "properties": {
+          "conversation_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Conversation Id"
+          },
           "project_id": {
             "anyOf": [
               {
@@ -1642,6 +1956,15 @@
             "title": "Citations",
             "type": "array"
           },
+          "conversation_id": {
+            "format": "uuid",
+            "title": "Conversation Id",
+            "type": "string"
+          },
+          "flagged": {
+            "title": "Flagged",
+            "type": "boolean"
+          },
           "model": {
             "title": "Model",
             "type": "string"
@@ -1655,7 +1978,9 @@
           "answer",
           "citations",
           "model",
-          "path"
+          "path",
+          "conversation_id",
+          "flagged"
         ],
         "title": "QueryOut",
         "type": "object"
@@ -2118,7 +2443,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/DocumentOut"
+                  "$ref": "#/components/schemas/DocumentDetailOut"
                 }
               }
             },
@@ -3231,6 +3556,71 @@
           }
         },
         "summary": "Record View"
+      }
+    },
+    "/queries": {
+      "get": {
+        "description": "A caller's own past questions and their answers, newest first.\n\nOnly the asker's own. A question someone asked is theirs, not news for\nthe rest of the matter, which is also why the activity feed leaves\nqueries out, see app/activity.py.",
+        "operationId": "list_queries_queries_get",
+        "parameters": [
+          {
+            "description": "a matter's id or slug",
+            "in": "query",
+            "name": "project",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "a matter's id or slug",
+              "title": "Project"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/QueryHistoryOut"
+                  },
+                  "title": "Response List Queries Queries Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "List Queries"
       }
     },
     "/query": {

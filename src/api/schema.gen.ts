@@ -490,6 +490,30 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/queries": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Queries
+         * @description A caller's own past questions and their answers, newest first.
+         *
+         *     Only the asker's own. A question someone asked is theirs, not news for
+         *     the rest of the matter, which is also why the activity feed leaves
+         *     queries out, see app/activity.py.
+         */
+        get: operations["list_queries_queries_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/query": {
         parameters: {
             query?: never;
@@ -723,6 +747,34 @@ export interface components {
             /** Project Id */
             project_id?: string | null;
         };
+        /** CaseMetadataOut */
+        CaseMetadataOut: {
+            /** Case Date */
+            case_date: string | null;
+            /** Court */
+            court: string | null;
+            /**
+             * Extracted At
+             * Format: date-time
+             */
+            extracted_at: string;
+            /** Location */
+            location: string | null;
+            /** Needs Review */
+            needs_review: boolean;
+            /** Offence Text */
+            offence_text: string | null;
+            /** Offence Type */
+            offence_type: string | null;
+            /** Review Reason */
+            review_reason: string | null;
+            /** Sentence Months */
+            sentence_months: number | null;
+            /** Sentence Text */
+            sentence_text: string | null;
+            /** Sentence Type */
+            sentence_type: string | null;
+        };
         /** ChatModelOut */
         ChatModelOut: {
             /** Id */
@@ -774,6 +826,30 @@ export interface components {
             on_date: string;
             /** Source Document Id */
             source_document_id: string | null;
+        };
+        /** DocumentDetailOut */
+        DocumentDetailOut: {
+            case_metadata: components["schemas"]["CaseMetadataOut"] | null;
+            /** Error Message */
+            error_message: string | null;
+            /** Filename */
+            filename: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Ingestion Stage */
+            ingestion_stage: string | null;
+            /** Project Id */
+            project_id: string | null;
+            /** Status */
+            status: string;
+            /**
+             * Uploaded At
+             * Format: date-time
+             */
+            uploaded_at: string;
         };
         /** DocumentOut */
         DocumentOut: {
@@ -1196,8 +1272,48 @@ export interface components {
              */
             updated_at: string;
         };
+        /** QueryHistoryOut */
+        QueryHistoryOut: {
+            /** Answer */
+            answer: string;
+            /** Citations */
+            citations: components["schemas"]["CitationOut"][];
+            /** Conversation Id */
+            conversation_id: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Flagged */
+            flagged: boolean;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Model */
+            model: string;
+            project: components["schemas"]["QueryHistoryProjectOut"] | null;
+            /** Question */
+            question: string;
+        };
+        /** QueryHistoryProjectOut */
+        QueryHistoryProjectOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+            /** Slug */
+            slug: string;
+        };
         /** QueryIn */
         QueryIn: {
+            /** Conversation Id */
+            conversation_id?: string | null;
             /** Project Id */
             project_id?: string | null;
             /** Question */
@@ -1209,6 +1325,13 @@ export interface components {
             answer: string;
             /** Citations */
             citations: components["schemas"]["CitationOut"][];
+            /**
+             * Conversation Id
+             * Format: uuid
+             */
+            conversation_id: string;
+            /** Flagged */
+            flagged: boolean;
             /** Model */
             model: string;
             /** Path */
@@ -1459,7 +1582,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["DocumentOut"];
+                    "application/json": components["schemas"]["DocumentDetailOut"];
                 };
             };
             /** @description Validation Error */
@@ -2321,6 +2444,39 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_queries_queries_get: {
+        parameters: {
+            query?: {
+                /** @description a matter's id or slug */
+                project?: string | null;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QueryHistoryOut"][];
+                };
             };
             /** @description Validation Error */
             422: {
