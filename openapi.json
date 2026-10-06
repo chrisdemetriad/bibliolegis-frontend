@@ -647,6 +647,21 @@
         "title": "DocumentOut",
         "type": "object"
       },
+      "DocumentRename": {
+        "properties": {
+          "name": {
+            "maxLength": 255,
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "title": "DocumentRename",
+        "type": "object"
+      },
       "DuplicateCheck": {
         "properties": {
           "sha256": {
@@ -2494,6 +2509,55 @@
           }
         },
         "summary": "Get Document"
+      },
+      "patch": {
+        "description": "Rename a document, keeping its extension.\n\n409 if another document in the same matter already has the name, so the\nperson can pick another rather than get a \"(2)\" they didn't ask for.",
+        "operationId": "rename_document_documents__document_id__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "document_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Document Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DocumentRename"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DocumentOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Rename Document"
       }
     },
     "/documents/{document_id}/file": {
