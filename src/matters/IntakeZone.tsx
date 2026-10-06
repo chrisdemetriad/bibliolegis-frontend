@@ -18,14 +18,11 @@ import { useApi } from "#/api/useApi";
 import { Button } from "#/components/ui/button";
 import { progressColour } from "#/components/ui/progress";
 import { StatusIcon } from "#/components/ui/status-icon";
+import { ACCEPTED, ACCEPTED_LABEL } from "#/documents/accepted";
 import { useDuplicateCheck } from "#/documents/duplicates";
 import { documentKeys } from "#/documents/queries";
 import { cn } from "#/lib/utils";
 import { matterKeys } from "./queries";
-
-// The api checks this too. Checking here means a wrong file is refused
-// straight away rather than after it's been sent
-const ACCEPTED = [".pdf", ".docx"];
 
 const POLL_MS = 1500;
 
@@ -213,7 +210,7 @@ export function IntakeZone() {
 				upload: 0,
 				state: refused ? "refused" : "uploading",
 				error: refused
-					? `${extension || "Files with no extension"} can't be read, only PDF and DOCX`
+					? `${extension || "Files with no extension"} can't be read, only ${ACCEPTED_LABEL}`
 					: undefined,
 			};
 		});
@@ -384,9 +381,9 @@ export function IntakeZone() {
 						</span>
 						<p className="font-medium">Drop case files here to open matters</p>
 						<p className="max-w-lg text-sm text-muted-foreground">
-							PDF or DOCX, as many as you like. Each file is read, then files
-							from the same case are put together into one matter. A file about
-							a matter you already have joins that one.
+							{ACCEPTED_LABEL}, as many as you like. Each file is read, then
+							files from the same case are put together into one matter. A file
+							about a matter you already have joins that one.
 						</p>
 						<Button
 							type="button"

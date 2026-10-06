@@ -2496,6 +2496,53 @@
         "summary": "Get Document"
       }
     },
+    "/documents/{document_id}/file": {
+      "get": {
+        "description": "The file as it was uploaded, for the viewer and for downloading.\n\nInline by default so the browser can show it, `?download=true` asks for\nan attachment instead. Under the original filename either way, rather\nthan the uuid it's stored under. A row whose file has gone from disk 404s\nwith its own message, since that's a storage problem and not a document\nthe caller can't see.",
+        "operationId": "get_document_file_documents__document_id__file_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "document_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Document Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "download",
+            "required": false,
+            "schema": {
+              "default": false,
+              "title": "Download",
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/octet-stream": {}
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Document File"
+      }
+    },
     "/documents/{document_id}/passages/{chunk_index}": {
       "get": {
         "description": "One passage of a document, what a citation in an answer points at.\n\nChecked against the document's own visibility first, so a passage of a\ndocument the caller can't see 404s the same way the document does.",
@@ -2714,7 +2761,7 @@
     },
     "/press": {
       "get": {
-        "description": "Press across every matter the caller belongs to, newest first.",
+        "description": "Press across every matter the caller belongs to, newest added first.",
         "operationId": "list_firm_press_press_get",
         "parameters": [
           {
