@@ -97,6 +97,40 @@ export function PersonAvatar({
 	);
 }
 
+// Titles and letters after a name that would otherwise become the initials,
+// "Mr J Smith KC" is JS
+const notInitials = new Set([
+	"mr",
+	"mrs",
+	"ms",
+	"miss",
+	"dr",
+	"qc",
+	"kc",
+	"llp",
+]);
+
+// An avatar for someone who isn't one of the firm's people, counsel read from
+// a document
+export function NameAvatar({ name }: { name: string }) {
+	const words = name
+		.replace(/[^\p{L}\s]/gu, "")
+		.split(/\s+/)
+		.filter((word) => word && !notInitials.has(word.toLowerCase()));
+	const initials =
+		words.length > 1
+			? `${words[0][0]}${words[words.length - 1][0]}`
+			: (words[0]?.slice(0, 2) ?? "");
+	return (
+		<span
+			title={name}
+			className="inline-flex size-7 shrink-0 items-center justify-center rounded-full border bg-muted text-[0.65rem] font-medium text-muted-foreground uppercase"
+		>
+			{initials}
+		</span>
+	);
+}
+
 export function personName(id: string) {
 	return people[id]?.name ?? "Bibliolegis";
 }
@@ -109,9 +143,14 @@ export function StageTrack({
 	current: number;
 }) {
 	return (
-		<ol className="grid grid-cols-5 gap-2 max-sm:grid-cols-1 max-sm:gap-3">
+		<ol
+			className="grid gap-2 max-sm:grid-cols-1! max-sm:gap-3"
+			style={{
+				gridTemplateColumns: `repeat(${stages.length}, minmax(0, 1fr))`,
+			}}
+		>
 			{stages.map((stage, i) => (
-				<li key={stage.name} className="min-w-0">
+				<li key={`${stage.name}-${stage.date}`} className="min-w-0">
 					<div className="mb-3 flex h-3 items-center gap-1.5 max-sm:hidden">
 						{i < current ? (
 							<CheckIcon className="size-3 text-muted-foreground" />

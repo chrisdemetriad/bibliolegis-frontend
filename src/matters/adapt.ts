@@ -23,7 +23,8 @@ export function updatedAgo(iso: string) {
 
 // A matter from the api in the shape the matter pages already read, so every
 // page works for real matters without a second version of each. Anything the
-// api doesn't have yet, stages, issues and the team, comes through empty
+// api doesn't have yet, stages, issues and the firm's own team, comes through
+// empty
 export function projectToMatter(project: Project): Matter {
 	const today = TODAY.toISOString().slice(0, 10);
 	const dates = project.dates.map((entry) => ({
@@ -55,6 +56,11 @@ export function projectToMatter(project: Project): Matter {
 		// The api sends dates soonest first, so the first one not yet passed
 		nextDate: dates.find((entry) => entry.date >= today) ?? null,
 		dates,
+		// Missing from an api deployed before counsel were read
+		counsel: (project.counsel ?? []).map((entry) => ({
+			name: entry.name,
+			actingFor: entry.acting_for,
+		})),
 		lead: "",
 		team: [],
 		documents: project.document_count,
