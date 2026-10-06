@@ -149,8 +149,9 @@ function Answer({
 type Block = { key: string; kind: "list" | "paragraph"; lines: string[] };
 
 // The model is asked for plain paragraphs and dash lists, nothing else, so
-// that's all this reads. Anything else comes through as a paragraph
-function blocks(text: string): Block[] {
+// that's all this reads. Anything else comes through as a paragraph.
+// Exported so the query history page can render a stored answer the same way
+export function blocks(text: string): Block[] {
 	const out: Block[] = [];
 	for (const [i, chunk] of text.split(/\n\s*\n/).entries()) {
 		const lines = chunk
@@ -173,8 +174,8 @@ function blocks(text: string): Block[] {
 
 // Turns each [3] in the answer into a link to the passage it cites. A number
 // the api didn't return a citation for is left out rather than shown as a
-// link to nothing
-function withCitations(text: string, byNumber: Map<number, Citation>) {
+// link to nothing. Exported for the query history page, same reason as blocks
+export function withCitations(text: string, byNumber: Map<number, Citation>) {
 	const parts: ReactNode[] = [];
 	for (const [i, part] of text.split(/(\[\d+\])/).entries()) {
 		const match = /^\[(\d+)\]$/.exec(part);
@@ -201,14 +202,14 @@ function withCitations(text: string, byNumber: Map<number, Citation>) {
 	return parts;
 }
 
-function pages(citation: Pick<Citation, "page_start" | "page_end">) {
+export function pages(citation: Pick<Citation, "page_start" | "page_end">) {
 	if (citation.page_start == null) return "";
 	return citation.page_end && citation.page_end !== citation.page_start
 		? `, pp. ${citation.page_start} to ${citation.page_end}`
 		: `, p. ${citation.page_start}`;
 }
 
-function Source({ citation }: { citation: Citation }) {
+export function Source({ citation }: { citation: Citation }) {
 	return (
 		<li className="rounded-lg bg-muted px-3 py-2 text-xs">
 			<div className="flex flex-wrap items-center gap-x-2 gap-y-1">

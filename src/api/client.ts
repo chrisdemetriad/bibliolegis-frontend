@@ -9,6 +9,7 @@ export type ProjectParty = Schemas["PartyOut"];
 export type ProjectDate = Schemas["DateOut"];
 export type Intake = Schemas["IntakeOut"];
 export type QueryAnswer = Schemas["QueryOut"];
+export type QueryHistoryItem = Schemas["QueryHistoryOut"];
 export type Citation = Schemas["CitationOut"];
 export type Passage = Schemas["PassageOut"];
 export type IntakeMatter = Schemas["IntakeMatterOut"];
@@ -281,6 +282,14 @@ export function createApi({
 			unwrap(
 				await client.POST("/query", {
 					body: { question, project_id: projectId ?? null },
+				}),
+			),
+
+		// The caller's own past questions and answers, newest first
+		listQueries: async (projectRef?: string, limit?: number) =>
+			unwrap(
+				await client.GET("/queries", {
+					params: { query: { project: projectRef, limit } },
 				}),
 			),
 

@@ -177,10 +177,26 @@ scratch copy with the api mocked, not yet clicked through with a real Clerk
 session. More sources come from the api's Google News and Guardian adapters with
 no change here.
 
+**Query history landed on 2026-10-06.** `/history`, a new item in the firm nav,
+reads `GET /queries` and lists the caller's own past questions newest first,
+each with the answer rendered the same way `AskBox` renders a live one,
+including citation links and lists. `src/shell/AskBox.tsx`'s formatting
+helpers (`blocks`, `withCitations`, `pages`, `Source`) are exported now rather
+than living only there, so this page reads an answer stored days ago the same
+way the ask box reads one that just came back. Also shows the model that
+answered, which matter a question was scoped to when there was one, and
+`Answer.flagged`, the citation warning Phase 6 added to the api that nothing
+here surfaced until now. `openapi.json` was stale since 2026-10-04 and needed
+`pnpm api:sync` first, picking up everything the api added since, not only
+`GET /queries`. Checked in headless Chrome against a scratch copy with the
+sign in guard off and the api mocked with fixture data covering a citation
+with a page number and one without, a question scoped to a matter and one
+that wasn't and a flagged answer, not yet clicked through signed in.
+
 **Next:** the rest of Phase 4: aggregation answers as a
-table, query history once the api has `GET /queries`, and the loading and empty states it hasn't
-covered. Phase 5's admin pages have their endpoints already, and Phase 7's
-deployment can start.
+table and the loading and empty states the query page hasn't covered. Phase
+5's admin pages have their endpoints already, and Phase 7's deployment can
+start.
 
 Phase 7, deployment, can also start out of order. Nothing is deployed to Railway
 yet, the shared project holds only Postgres. The holding route is enough to prove
@@ -384,7 +400,7 @@ Clerk's TanStack Start integration (`@clerk/tanstack-react-start`, the current p
 - [x] Citation display: each cited passage clickable through to the source document and highlighted location. Every `[n]` in an answer links to `/documents/{id}?passage={chunk}`, which quotes the passage in full from `GET /documents/{id}/passages/{chunk}`. The sources under the answer link to the document and its matter
 - [ ] Aggregation query results shown as a table or simple chart rather than a wall of text
 - [ ] Loading and empty states for the query page (no results found, query still running)
-- [ ] Query history page listing past queries for the logged in user
+- [x] Query history page listing past queries for the logged in user. `/history`, done 2026-10-06 against bibliolegis-api's `GET /queries`, landed on its side 2026-10-04. Reuses `AskBox`'s answer formatting and citation links rather than a second copy of them, exported from there for it. Shows the model that answered, the matter a question was scoped to when there was one and `Answer.flagged`, which nothing in this repo surfaced before now
 - [x] `/settings` route where a user picks the model that answers their questions, from the list the backend offers rather than one hardcoded here. Phase 9's connected accounts land on the same page later. Done on 2026-09-27, the choice saves as soon as it's picked
 - [x] Show which model answered on each answer, so a user comparing models can tell them apart. Split out of the settings item since it needs `/query` to exist
 
