@@ -4,6 +4,7 @@ import { useAskPanel, useMatter } from "#/matters/context";
 import { daysUntil, formatDate, matters } from "#/mock/data";
 import { AskBox } from "#/shell/AskBox";
 import {
+	NameAvatar,
 	Panel,
 	PersonAvatar,
 	personName,
@@ -18,6 +19,11 @@ export const Route = createFileRoute("/_authed/matters/$matterId/overview")({
 function MatterOverview() {
 	const matter = useMatter();
 	const { open: askOpen } = useAskPanel();
+	const counsel = matter.counsel ?? [];
+	const timeline =
+		matter.stages.length > 0
+			? { stages: matter.stages, current: matter.stageIndex, hidden: 0 }
+			: datesTimeline(matter.dates ?? []);
 	// Related matters come from the sample set, so only sample matters get them
 	const related = matter.projectId
 		? []
@@ -65,7 +71,7 @@ function MatterOverview() {
 						)}
 					</dl>
 				</section>
-				{matter.team.length > 0 && (
+				{matter.team.length > 0 ? (
 					<section>
 						<SectionTitle>Team</SectionTitle>
 						<div className="space-y-2">
@@ -82,6 +88,27 @@ function MatterOverview() {
 							))}
 						</div>
 					</section>
+				) : (
+					counsel.length > 0 && (
+						<section>
+							<SectionTitle>Team</SectionTitle>
+							<div className="space-y-2">
+								{counsel.map((entry) => (
+									<div key={entry.name} className="flex items-center gap-2.5">
+										<NameAvatar name={entry.name} />
+										<p className="text-sm">
+											{entry.name}
+											{entry.actingFor && (
+												<span className="text-muted-foreground">
+													, for {entry.actingFor}
+												</span>
+											)}
+										</p>
+									</div>
+								))}
+							</div>
+						</section>
+					)
 				)}
 			</div>
 
@@ -105,10 +132,24 @@ function MatterOverview() {
 						</p>
 					)}
 				</div>
-				{matter.stages.length > 0 ? (
-					<StageTrack stages={matter.stages} current={matter.stageIndex} />
+				{timeline.stages.length > 0 ? (
+					<>
+						<StageTrack stages={timeline.stages} current={timeline.current} />
+						{timeline.hidden > 0 && (
+							<Link
+								to="/matters/$matterId/hearings"
+								params={{ matterId: matter.id }}
+								className="mt-4 inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
+							>
+								All {timeline.stages.length + timeline.hidden} dates
+								<ArrowRightIcon className="size-3" />
+							</Link>
+						)}
+					</>
 				) : (
-					<KeyDates dates={matter.dates ?? []} />
+					<p className="text-sm text-muted-foreground">
+						No hearings or deadlines read from the documents yet.
+					</p>
 				)}
 			</Panel>
 
@@ -183,33 +224,30 @@ function MatterOverview() {
 	);
 }
 
-function KeyDates({ dates }: { dates: { label: string; date: string }[] }) {
-	if (dates.length === 0) {
-		return (
-			<p className="text-sm text-muted-foreground">
-				No hearings or deadlines read from the documents yet.
-			</p>
-		);
+// More than this and the labels, which come from the documents and run long,
+// get too narrow to read
+const TIMELINE_MAX = 5;
+
+// A real matter's dates drawn the same way a sample matter's stages are. The
+// current one is the next date still to come, or the last one once they've all
+// passed. With more dates than fit, the ones around the current date show
+function datesTimeline(dates: { label: string; date: string }[]) {
+	const stages = dates.map((entry) => ({
+		name: entry.label,
+		date: formatDate(entry.date),
+	}));
+	const upcoming = dates.findIndex((entry) => daysUntil(entry.date) >= 0);
+	const current = upcoming === -1 ? dates.length - 1 : upcoming;
+	if (stages.length <= TIMELINE_MAX) {
+		return { stages, current, hidden: 0 };
 	}
-	return (
-		<ol className="divide-y">
-			{dates.map((entry) => {
-				const days = daysUntil(entry.date);
-				return (
-					<li
-						key={`${entry.label}-${entry.date}`}
-						className="flex items-center justify-between gap-3 py-2 text-sm first:pt-0 last:pb-0"
-					>
-						<span className={days < 0 ? "text-muted-foreground" : undefined}>
-							{entry.label}
-						</span>
-						<span className="shrink-0 text-xs text-muted-foreground tabular-nums">
-							{formatDate(entry.date)}
-							{days >= 0 && `, in ${days}d`}
-						</span>
-					</li>
-				);
-			})}
-		</ol>
+	const start = Math.min(
+		Math.max(0, current - Math.floor(TIMELINE_MAX / 2)),
+		stages.length - TIMELINE_MAX,
 	);
+	return {
+		stages: stages.slice(start, start + TIMELINE_MAX),
+		current: current - start,
+		hidden: stages.length - TIMELINE_MAX,
+	};
 }

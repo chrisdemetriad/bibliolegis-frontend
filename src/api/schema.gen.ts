@@ -815,6 +815,13 @@ export interface components {
             /** Text */
             text: string;
         };
+        /** CounselOut */
+        CounselOut: {
+            /** Acting For */
+            acting_for: string | null;
+            /** Name */
+            name: string;
+        };
         /** DateOut */
         DateOut: {
             /** Label */
@@ -1230,6 +1237,8 @@ export interface components {
             case_reference: string | null;
             /** Client Reference */
             client_reference: string | null;
+            /** Counsel */
+            counsel: components["schemas"]["CounselOut"][];
             /** Court */
             court: string | null;
             /**

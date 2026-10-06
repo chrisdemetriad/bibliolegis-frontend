@@ -96,6 +96,8 @@ export type Matter = {
 	// When the matter was opened, an ISO timestamp. Real matters only
 	createdAt?: string;
 	dates?: { label: string; date: string }[];
+	// Barristers and solicitors read from a real matter's documents
+	counsel?: { name: string; actingFor: string | null }[];
 };
 
 const criminalStages = (dates: string[]): Stage[] =>

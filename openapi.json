@@ -445,6 +445,31 @@
         "title": "CitationOut",
         "type": "object"
       },
+      "CounselOut": {
+        "properties": {
+          "acting_for": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Acting For"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "acting_for"
+        ],
+        "title": "CounselOut",
+        "type": "object"
+      },
       "DateOut": {
         "properties": {
           "label": {
@@ -1680,6 +1705,13 @@
             ],
             "title": "Client Reference"
           },
+          "counsel": {
+            "items": {
+              "$ref": "#/components/schemas/CounselOut"
+            },
+            "title": "Counsel",
+            "type": "array"
+          },
           "court": {
             "anyOf": [
               {
@@ -1803,6 +1835,7 @@
           "document_count",
           "press_count",
           "parties",
+          "counsel",
           "dates"
         ],
         "title": "ProjectOut",
