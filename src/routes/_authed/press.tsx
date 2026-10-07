@@ -2,6 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { PlusIcon } from "lucide-react";
 import { useState } from "react";
 import type { PressSource } from "#/api/client";
+import { useMe } from "#/auth/queries";
 import { Button } from "#/components/ui/button";
 import { Skeleton } from "#/components/ui/skeleton";
 import {
@@ -12,7 +13,7 @@ import {
 	validatePressFilters,
 } from "#/press/PressFeed";
 import { AddSource, SOURCE_CATEGORIES, SourceRow } from "#/press/PressSettings";
-import { useFirmPress, useMe, usePressSources } from "#/press/queries";
+import { useFirmPress, usePressSources } from "#/press/queries";
 import { Page, PageHeader, Panel, SectionTitle } from "#/shell/page";
 
 export const Route = createFileRoute("/_authed/press")({
@@ -90,6 +91,7 @@ function PressPage() {
 // everyone else sees them without the switches working
 function FirmSources() {
 	const { data: sources, isPending } = usePressSources();
+	// The caller's role decides whether the firm's feeds can be changed
 	const { data: me } = useMe();
 	const isAdmin = me?.role === "admin";
 	const [adding, setAdding] = useState(false);

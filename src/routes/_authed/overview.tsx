@@ -1,3 +1,4 @@
+import { useUser } from "@clerk/tanstack-react-start";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
 	AlertTriangleIcon,
@@ -17,7 +18,6 @@ import { updatedAgo } from "#/matters/adapt";
 import { useAllMatters } from "#/matters/queries";
 import {
 	activity,
-	currentUser,
 	daysUntil,
 	findMatter,
 	formatDate,
@@ -44,7 +44,8 @@ const sampleStats = [
 ];
 
 function OverviewPage() {
-	const firstName = currentUser.name.split(" ")[0];
+	const { user } = useUser();
+	const firstName = user?.firstName;
 	const { matters } = useAllMatters();
 	const recentActivity = useActivity();
 	const preferences = usePreferences();
@@ -59,7 +60,7 @@ function OverviewPage() {
 	return (
 		<Page>
 			<PageHeader
-				title={`Good evening, ${firstName}`}
+				title={firstName ? `Good evening, ${firstName}` : "Good evening"}
 				description="What's moved across your matters since you were last in."
 				actions={
 					<>
