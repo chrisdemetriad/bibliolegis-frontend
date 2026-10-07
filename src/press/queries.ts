@@ -209,9 +209,3 @@ export function useAddPressLink(ref: string) {
 		onSuccess: () => queryClient.invalidateQueries({ queryKey: pressKeys.all }),
 	});
 }
-
-// The caller's role, which decides whether the firm's feeds can be changed
-export function useMe() {
-	const api = useApi();
-	return useQuery({ queryKey: ["users", "me"], queryFn: () => api.me() });
-}

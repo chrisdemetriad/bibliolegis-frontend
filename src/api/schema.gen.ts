@@ -602,6 +602,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/users/me/job-title": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Set My Job Title */
+        put: operations["set_my_job_title_users_me_job_title_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/users/me/model": {
         parameters: {
             query?: never;
@@ -996,6 +1013,11 @@ export interface components {
             matters: components["schemas"]["IntakeMatterOut"][];
             /** Status */
             status: string;
+        };
+        /** JobTitle */
+        JobTitle: {
+            /** Job Title */
+            job_title?: string | null;
         };
         /** MemberAdd */
         MemberAdd: {
@@ -1437,6 +1459,8 @@ export interface components {
              * Format: uuid
              */
             id: string;
+            /** Job Title */
+            job_title: string | null;
             /** Last Name */
             last_name: string | null;
             /** Role */
@@ -2677,6 +2701,39 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["UserProfile"];
+                };
+            };
+        };
+    };
+    set_my_job_title_users_me_job_title_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["JobTitle"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["JobTitle"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

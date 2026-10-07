@@ -115,6 +115,13 @@ export function createApi({
 
 		me: async () => unwrap(await client.GET("/users/me")),
 
+		setMyJobTitle: async (jobTitle: string) =>
+			unwrap(
+				await client.PUT("/users/me/job-title", {
+					body: { job_title: jobTitle },
+				}),
+			),
+
 		listChatModels: async () => unwrap(await client.GET("/chat-models")),
 
 		getMyModel: async () => unwrap(await client.GET("/users/me/model")),

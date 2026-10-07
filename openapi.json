@@ -849,6 +849,24 @@
         "title": "IntakeOut",
         "type": "object"
       },
+      "JobTitle": {
+        "properties": {
+          "job_title": {
+            "anyOf": [
+              {
+                "maxLength": 100,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Job Title"
+          }
+        },
+        "title": "JobTitle",
+        "type": "object"
+      },
       "MemberAdd": {
         "properties": {
           "access_level": {
@@ -2126,6 +2144,17 @@
             "title": "Id",
             "type": "string"
           },
+          "job_title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Job Title"
+          },
           "last_name": {
             "anyOf": [
               {
@@ -2148,7 +2177,8 @@
           "email",
           "first_name",
           "last_name",
-          "role"
+          "role",
+          "job_title"
         ],
         "title": "UserProfile",
         "type": "object"
@@ -3843,6 +3873,44 @@
           }
         },
         "summary": "Get Me"
+      }
+    },
+    "/users/me/job-title": {
+      "put": {
+        "operationId": "set_my_job_title_users_me_job_title_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/JobTitle"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobTitle"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Set My Job Title"
       }
     },
     "/users/me/model": {

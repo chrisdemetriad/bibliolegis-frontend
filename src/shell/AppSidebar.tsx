@@ -1,4 +1,4 @@
-import { UserButton } from "@clerk/tanstack-react-start";
+import { UserButton, useUser } from "@clerk/tanstack-react-start";
 import { Link, useLocation, useParams } from "@tanstack/react-router";
 import {
 	ArrowLeftIcon,
@@ -21,6 +21,8 @@ import {
 	SparklesIcon,
 	UsersIcon,
 } from "lucide-react";
+import { JobTitlePage } from "#/auth/JobTitlePage";
+import { useMe } from "#/auth/queries";
 import { Kbd } from "#/components/ui/kbd";
 import {
 	Sidebar,
@@ -128,6 +130,9 @@ export function AppSidebar() {
 		: undefined;
 	const pinned = matters.filter((candidate) => candidate.pinned);
 	const openMatters = matters.filter((candidate) => !candidate.closed).length;
+	const { user } = useUser();
+	const email = user?.primaryEmailAddress?.emailAddress;
+	const { data: me } = useMe();
 
 	return (
 		<Sidebar variant="inset" collapsible="icon">
@@ -237,14 +242,27 @@ export function AppSidebar() {
 					]}
 				/>
 				<div className="mt-1 flex items-center gap-2.5 border-t px-1 pt-3">
-					{/* Clerk's own button, so signing out stays Clerk's UI. The name
-					beside it is sample data until the api returns one */}
-					<UserButton />
+					{/* Clerk's own button, so signing out stays Clerk's UI. Someone
+					who signed up without a name gets their email instead, and
+					someone without a job title gets their email under their name */}
+					<UserButton>
+						<UserButton.UserProfilePage
+							label="Job title"
+							url="job-title"
+							labelIcon={<BriefcaseIcon className="size-4" />}
+						>
+							<JobTitlePage />
+						</UserButton.UserProfilePage>
+					</UserButton>
 					<div className="min-w-0 leading-tight group-data-[collapsible=icon]:hidden">
-						<p className="truncate text-sm font-medium">{currentUser.name}</p>
-						<p className="truncate text-xs text-muted-foreground">
-							{currentUser.role}
+						<p className="truncate text-sm font-medium">
+							{user?.fullName || email}
 						</p>
+						{(me?.job_title || user?.fullName) && (
+							<p className="truncate text-xs text-muted-foreground">
+								{me?.job_title || email}
+							</p>
+						)}
 					</div>
 				</div>
 			</SidebarFooter>
