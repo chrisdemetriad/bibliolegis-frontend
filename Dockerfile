@@ -11,8 +11,10 @@ RUN corepack enable
 # Vite only bakes in whatever's in the environment at build time
 ARG VITE_API_URL
 ARG VITE_CLERK_PUBLISHABLE_KEY
+ARG VITE_POSTHOG_KEY
 ENV VITE_API_URL=$VITE_API_URL
 ENV VITE_CLERK_PUBLISHABLE_KEY=$VITE_CLERK_PUBLISHABLE_KEY
+ENV VITE_POSTHOG_KEY=$VITE_POSTHOG_KEY
 
 COPY package.json pnpm-lock.yaml ./
 RUN pnpm install --frozen-lockfile

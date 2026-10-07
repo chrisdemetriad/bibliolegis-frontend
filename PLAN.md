@@ -358,7 +358,7 @@ choosing what to build next.
 - [ ] Replace the photos with bought or commissioned ones, or credit the photographers
 - [ ] Encryption at rest built in the api (its Phase 7) before the page claims it in production
 - [ ] Pricing, once decided, and what "Try it now" promises (trial length, card or not)
-- [ ] Legal pages the footer will need: privacy policy, terms, cookies
+- [ ] Legal pages the footer will need: privacy policy, terms, cookies. The privacy policy has to name PostHog, which records usage and masked session replays from 2026-10-07. No cookie banner is needed for it while it stays on memory persistence
 - [ ] Open Graph image and tags so a shared link shows a card
 - [x] Decided 2026-10-04: sign in and sign up only resolve on app., the homepage
       never checks or shows auth state. A real shared session across the two hosts
@@ -438,7 +438,7 @@ TLS is free and automatic on Railway, so the domain is the only thing bought.
 - [x] Environment variables for anything frontend specific (Clerk publishable key) set in the deployment platform, not committed anywhere. Still the development instance's keys, not production's
 - [x] `VITE_API_URL` is read at build time and baked into the bundle, not read at runtime, so it has to be present when the image is built rather than only when it starts. Getting this wrong gives a development frontend pointing at the production api, which is the failure worth designing against. The Dockerfile now actually forwards Railway's build time variables through to this (`ARG`/`ENV` for both `VITE_` vars, 2026-10-04, bibliolegis-frontend #84). Confirmed working 2026-10-06 once bibliolegis-api's Phase 9 gave this a real url to point at: changing the variable from its `PLACEHOLDER` value to `https://api.bibliolegis.com` rebuilt and redeployed clean. The api behind that domain has no database schema yet, see that repo's PLAN.md, so this only proves the build mechanism, not that a real request gets anywhere
 - [ ] Development build uses the development Clerk application's publishable key, not production's. Both are `VITE_` prefixed and so are readable by anyone using the app, which is fine for a publishable key and would not be for a secret one
-- [ ] Error tracking wired up (Sentry or similar)
+- [x] Error tracking wired up (Sentry or similar). Done 2026-10-07 with PostHog's EU cloud rather than Sentry, which also gives analytics, heatmaps and session replay. `src/analytics` starts it in the browser only when `VITE_POSTHOG_KEY` is set. Nothing goes in cookies or storage, matter, file and document names are masked out of every address it sends, clicks are kept without their text and replays mask all text with images and canvases blocked. Checked in headless Chrome against a local stand in for PostHog that logged every request
 - [ ] Smoke test after each deploy against a deployed backend: login, upload, query returns a cited answer (coordinate with a backend deploy, see that repo's PLAN.md). Signing in on `app.bibliolegis.com` was checked by hand on 2026-10-04, the rest waits on the api deploy
 
 ## Phase 8: voice
