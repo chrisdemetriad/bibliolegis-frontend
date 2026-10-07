@@ -99,10 +99,12 @@ export function Analytics() {
 
 	useEffect(() => {
 		if (!KEY || !isLoaded) return;
-		// The Clerk id only, no name or email. PostHog can tell one person's
-		// sessions apart without knowing who they are
+		// Keyed on the Clerk id, with the email so a person's sessions and
+		// errors can be found by who they are. The terms say so
 		if (isSignedIn && user && identified.current !== user.id) {
-			posthog.identify(user.id);
+			posthog.identify(user.id, {
+				email: user.primaryEmailAddress?.emailAddress,
+			});
 			identified.current = user.id;
 		} else if (!isSignedIn && identified.current) {
 			posthog.reset();

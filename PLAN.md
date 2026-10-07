@@ -358,7 +358,7 @@ choosing what to build next.
 - [ ] Replace the photos with bought or commissioned ones, or credit the photographers
 - [ ] Encryption at rest built in the api (its Phase 7) before the page claims it in production
 - [ ] Pricing, once decided, and what "Try it now" promises (trial length, card or not)
-- [ ] Legal pages the footer will need: privacy policy, terms, cookies. The privacy policy has to name PostHog, which records usage and masked session replays from 2026-10-07. No cookie banner is needed for it while it stays on memory persistence
+- [ ] Legal pages the footer will need: privacy policy, terms, cookies. The privacy policy has to name PostHog, which records usage and masked session replays from 2026-10-07. No cookie banner is needed for it while it stays on memory persistence. The terms have to say signed in users are identified to PostHog by their email, from 2026-10-07
 - [ ] Open Graph image and tags so a shared link shows a card
 - [x] Decided 2026-10-04: sign in and sign up only resolve on app., the homepage
       never checks or shows auth state. A real shared session across the two hosts
