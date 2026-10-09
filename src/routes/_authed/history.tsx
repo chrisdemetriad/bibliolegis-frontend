@@ -3,7 +3,8 @@ import { BriefcaseIcon, FlagIcon } from "lucide-react";
 import type { Citation, QueryHistoryItem } from "#/api/client";
 import { useQueryHistory } from "#/history/queries";
 import { updatedAgo } from "#/matters/adapt";
-import { blocks, Source, withCitations } from "#/shell/AskBox";
+import { AnsweredBy, blocks, Source, withCitations } from "#/shell/AskBox";
+import { claimsByCitation } from "#/shell/excerpt";
 import { Page, PageHeader, Panel } from "#/shell/page";
 
 export const Route = createFileRoute("/_authed/history")({
@@ -46,6 +47,7 @@ function HistoryEntry({ item }: { item: QueryHistoryItem }) {
 	const byNumber = new Map<number, Citation>(
 		item.citations.map((citation) => [citation.number, citation]),
 	);
+	const claims = claimsByCitation(item.answer);
 
 	return (
 		<Panel className="p-4">
@@ -76,13 +78,19 @@ function HistoryEntry({ item }: { item: QueryHistoryItem }) {
 			{item.citations.length > 0 && (
 				<ol className="mt-4 space-y-2">
 					{item.citations.map((citation) => (
-						<Source key={citation.number} citation={citation} />
+						<Source
+							key={citation.number}
+							citation={citation}
+							claim={claims.get(citation.number)}
+						/>
 					))}
 				</ol>
 			)}
 
 			<div className="mt-3 flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
-				<span>Answered by {item.model}</span>
+				<span>
+					<AnsweredBy model={item.model} />
+				</span>
 				{item.project && (
 					<Link
 						to="/matters/$matterId/overview"

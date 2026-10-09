@@ -5,26 +5,37 @@ import {
 	useRouter,
 } from "@tanstack/react-router";
 import { ArrowLeftIcon, QuoteIcon } from "lucide-react";
+import { useEffect, useRef } from "react";
 import { ApiError } from "#/api/client";
 import { DeleteDocument } from "#/documents/DeleteDocument";
 import { DocumentStatus } from "#/documents/DocumentStatus";
 import { formatUploadedAt } from "#/documents/format";
 import { useDocument, usePassage } from "#/documents/queries";
 import { useProjects } from "#/matters/queries";
+import { Highlighted } from "#/shell/excerpt";
 import { Page } from "#/shell/page";
 
 export const Route = createFileRoute("/_authed/documents/$documentId")({
-	// ?passage= is the chunk a citation in an answer pointed at
-	validateSearch: (search: Record<string, unknown>): { passage?: number } => {
+	// ?passage= is the chunk a citation in an answer pointed at and
+	// ?highlight= the words in it the answer rests on, space separated
+	validateSearch: (
+		search: Record<string, unknown>,
+	): { passage?: number; highlight?: string } => {
 		const passage = Number(search.passage);
-		return Number.isInteger(passage) && passage >= 0 ? { passage } : {};
+		const highlight =
+			typeof search.highlight === "string" && search.highlight.trim()
+				? search.highlight.trim()
+				: undefined;
+		return Number.isInteger(passage) && passage >= 0
+			? { passage, highlight }
+			: {};
 	},
 	component: DocumentPage,
 });
 
 function DocumentPage() {
 	const { documentId } = Route.useParams();
-	const { passage } = Route.useSearch();
+	const { passage, highlight } = Route.useSearch();
 	const { data: document, isPending, error } = useDocument(documentId);
 	const { data: projects } = useProjects();
 	const router = useRouter();
@@ -102,7 +113,11 @@ function DocumentPage() {
 					)}
 
 					{passage !== undefined && (
-						<CitedPassage documentId={documentId} chunkIndex={passage} />
+						<CitedPassage
+							documentId={documentId}
+							chunkIndex={passage}
+							highlight={highlight?.split(" ") ?? []}
+						/>
 					)}
 
 					<dl className="mt-6 grid grid-cols-[max-content_1fr] gap-x-8 gap-y-3 text-sm">
@@ -132,15 +147,25 @@ function DocumentPage() {
 }
 
 // The passage an answer cited, quoted in full so it can be checked against
-// what the answer said about it
+// what the answer said about it. A long passage puts the words the answer
+// rested on well below the fold, so the first of them is scrolled to
 function CitedPassage({
 	documentId,
 	chunkIndex,
+	highlight,
 }: {
 	documentId: string;
 	chunkIndex: number;
+	highlight: string[];
 }) {
 	const { data, isPending, isError } = usePassage(documentId, chunkIndex);
+	const quote = useRef<HTMLQuoteElement>(null);
+	useEffect(() => {
+		if (data)
+			quote.current
+				?.querySelector("mark")
+				?.scrollIntoView({ block: "center", behavior: "smooth" });
+	}, [data]);
 	const pages =
 		data?.page_start == null
 			? null
@@ -162,8 +187,11 @@ function CitedPassage({
 				</p>
 			)}
 			{data && (
-				<blockquote className="text-sm leading-relaxed whitespace-pre-wrap">
-					<mark className="bg-transparent text-foreground">{data.text}</mark>
+				<blockquote
+					ref={quote}
+					className="text-sm leading-relaxed whitespace-pre-wrap"
+				>
+					<Highlighted text={data.text} terms={highlight} />
 				</blockquote>
 			)}
 		</figure>
