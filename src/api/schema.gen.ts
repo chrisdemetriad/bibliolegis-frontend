@@ -1373,6 +1373,7 @@ export interface components {
             /** Question */
             question: string;
             searched: components["schemas"]["SearchedOut"] | null;
+            support: components["schemas"]["SupportOut"] | null;
         };
         /** QueryHistoryProjectOut */
         QueryHistoryProjectOut: {
@@ -1415,6 +1416,7 @@ export interface components {
             /** Path */
             path: string;
             searched: components["schemas"]["SearchedOut"] | null;
+            support: components["schemas"]["SupportOut"] | null;
         };
         /** RecentlyViewedOut */
         RecentlyViewedOut: {
@@ -1455,6 +1457,13 @@ export interface components {
             is_active: boolean;
             /** Role */
             role: string;
+        };
+        /** SupportOut */
+        SupportOut: {
+            /** Checked */
+            checked: number;
+            /** Unmatched */
+            unmatched: string[];
         };
         /** UserProfile */
         UserProfile: {

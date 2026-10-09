@@ -1944,6 +1944,16 @@
                 "type": "null"
               }
             ]
+          },
+          "support": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SupportOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "required": [
@@ -1957,6 +1967,7 @@
           "flagged",
           "answered",
           "searched",
+          "support",
           "created_at"
         ],
         "title": "QueryHistoryOut",
@@ -2068,6 +2079,16 @@
                 "type": "null"
               }
             ]
+          },
+          "support": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SupportOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "required": [
@@ -2078,7 +2099,8 @@
           "conversation_id",
           "flagged",
           "answered",
-          "searched"
+          "searched",
+          "support"
         ],
         "title": "QueryOut",
         "type": "object"
@@ -2165,6 +2187,27 @@
           "created_at"
         ],
         "title": "StaffAccount",
+        "type": "object"
+      },
+      "SupportOut": {
+        "properties": {
+          "checked": {
+            "title": "Checked",
+            "type": "integer"
+          },
+          "unmatched": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Unmatched",
+            "type": "array"
+          }
+        },
+        "required": [
+          "checked",
+          "unmatched"
+        ],
+        "title": "SupportOut",
         "type": "object"
       },
       "UserProfile": {
