@@ -10,6 +10,7 @@ export type ProjectDate = Schemas["DateOut"];
 export type Intake = Schemas["IntakeOut"];
 export type QueryAnswer = Schemas["QueryOut"];
 export type QueryHistoryItem = Schemas["QueryHistoryOut"];
+export type SearchedFiles = Schemas["SearchedOut"];
 export type Citation = Schemas["CitationOut"];
 export type Passage = Schemas["PassageOut"];
 export type IntakeMatter = Schemas["IntakeMatterOut"];

@@ -1349,6 +1349,8 @@ export interface components {
         QueryHistoryOut: {
             /** Answer */
             answer: string;
+            /** Answered */
+            answered: boolean;
             /** Citations */
             citations: components["schemas"]["CitationOut"][];
             /** Conversation Id */
@@ -1370,6 +1372,7 @@ export interface components {
             project: components["schemas"]["QueryHistoryProjectOut"] | null;
             /** Question */
             question: string;
+            searched: components["schemas"]["SearchedOut"] | null;
         };
         /** QueryHistoryProjectOut */
         QueryHistoryProjectOut: {
@@ -1396,6 +1399,8 @@ export interface components {
         QueryOut: {
             /** Answer */
             answer: string;
+            /** Answered */
+            answered: boolean;
             /** Citations */
             citations: components["schemas"]["CitationOut"][];
             /**
@@ -1409,6 +1414,7 @@ export interface components {
             model: string;
             /** Path */
             path: string;
+            searched: components["schemas"]["SearchedOut"] | null;
         };
         /** RecentlyViewedOut */
         RecentlyViewedOut: {
@@ -1423,6 +1429,13 @@ export interface components {
         RoleChange: {
             /** Role */
             role: string;
+        };
+        /** SearchedOut */
+        SearchedOut: {
+            /** Documents */
+            documents: number;
+            /** Images */
+            images: number;
         };
         /** StaffAccount */
         StaffAccount: {
