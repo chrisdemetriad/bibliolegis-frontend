@@ -18,6 +18,7 @@ export const Route = createFileRoute("/_authed/matters/$matterId/overview")({
 
 function MatterOverview() {
 	const matter = useMatter();
+	const { matterId } = Route.useParams();
 	const { open: askOpen } = useAskPanel();
 	const counsel = matter.counsel ?? [];
 	const timeline =
@@ -119,6 +120,7 @@ function MatterOverview() {
 						scope={matter.title}
 						placeholder={matter.suggestedQuestion}
 						projectId={matter.projectId}
+						matterSlug={matterId}
 					/>
 				</section>
 			)}

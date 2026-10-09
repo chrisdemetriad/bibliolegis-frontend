@@ -7,7 +7,12 @@ import {
 	SparklesIcon,
 } from "lucide-react";
 import { Fragment, type ReactNode, useState } from "react";
-import { type Citation, errorMessage, type QueryAnswer } from "#/api/client";
+import {
+	type Citation,
+	errorMessage,
+	type QueryAnswer,
+	type SearchedFiles,
+} from "#/api/client";
 import { useApi } from "#/api/useApi";
 import { Button } from "#/components/ui/button";
 import { Kbd } from "#/components/ui/kbd";
@@ -25,15 +30,18 @@ const lastAnswers = new Map<string, Asked>();
 
 // Asks POST /query and shows the answer with every claim linked to the
 // passage it came from. With a projectId only that matter's documents are
-// searched, without one everything the user can see is
+// searched, without one everything the user can see is. matterSlug is the
+// same matter's, for linking a decline to its files
 export function AskBox({
 	placeholder,
 	scope,
 	projectId,
+	matterSlug,
 }: {
 	placeholder: string;
 	scope: string;
 	projectId?: string;
+	matterSlug?: string;
 }) {
 	const api = useApi();
 	const [question, setQuestion] = useState("");
@@ -104,7 +112,9 @@ export function AskBox({
 				</Panel>
 			)}
 
-			{last && !ask.isPending && !ask.isError && <Answer {...last} />}
+			{last && !ask.isPending && !ask.isError && (
+				<Answer {...last} matterSlug={matterSlug} />
+			)}
 		</div>
 	);
 }
@@ -121,9 +131,11 @@ function Question({ text }: { text: string }) {
 function Answer({
 	question,
 	answer,
+	matterSlug,
 }: {
 	question: string;
 	answer: QueryAnswer;
+	matterSlug?: string;
 }) {
 	const byNumber = new Map(
 		answer.citations.map((citation) => [citation.number, citation]),
@@ -144,6 +156,9 @@ function Answer({
 					) : (
 						<p key={block.key}>{withCitations(block.lines[0], byNumber)}</p>
 					),
+				)}
+				{answer.searched && (
+					<Searched searched={answer.searched} matterSlug={matterSlug} />
 				)}
 			</div>
 
@@ -227,6 +242,50 @@ export function pages(citation: Pick<Citation, "page_start" | "page_end">) {
 	return citation.page_end && citation.page_end !== citation.page_start
 		? `, pp. ${citation.page_start} to ${citation.page_end}`
 		: `, p. ${citation.page_start}`;
+}
+
+function plural(count: number, one: string) {
+	return `${count} ${one}${count === 1 ? "" : "s"}`;
+}
+
+// Said under a decline in place of passages that don't answer the question,
+// so it's clear the whole matter was looked through rather than a corner of
+// it. Links to the matter's files, or to the matters when the question was
+// asked across all of them
+export function Searched({
+	searched,
+	matterSlug,
+}: {
+	searched: SearchedFiles;
+	matterSlug?: string;
+}) {
+	const total = searched.documents + searched.images;
+	const files = matterSlug ? (
+		<Link
+			to="/matters/$matterId/files/{-$fileSlug}"
+			params={{ matterId: matterSlug }}
+			className="underline underline-offset-2 hover:text-muted-foreground"
+		>
+			{plural(total, "file")}
+		</Link>
+	) : (
+		<Link
+			to="/matters"
+			className="underline underline-offset-2 hover:text-muted-foreground"
+		>
+			{plural(total, "file")}
+		</Link>
+	);
+	if (total === 0) return <p>There are no read {files} to search yet.</p>;
+	return (
+		<p>
+			I searched {files}
+			{searched.documents > 0 &&
+				searched.images > 0 &&
+				` (${plural(searched.images, "image")}, ${plural(searched.documents, "document")})`}
+			.
+		</p>
+	);
 }
 
 export function AnsweredBy({ model }: { model: string }) {

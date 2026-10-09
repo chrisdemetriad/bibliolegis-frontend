@@ -3,7 +3,13 @@ import { BriefcaseIcon, FlagIcon } from "lucide-react";
 import type { Citation, QueryHistoryItem } from "#/api/client";
 import { useQueryHistory } from "#/history/queries";
 import { updatedAgo } from "#/matters/adapt";
-import { AnsweredBy, blocks, Source, withCitations } from "#/shell/AskBox";
+import {
+	AnsweredBy,
+	blocks,
+	Searched,
+	Source,
+	withCitations,
+} from "#/shell/AskBox";
 import { claimsByCitation } from "#/shell/excerpt";
 import { Page, PageHeader, Panel } from "#/shell/page";
 
@@ -72,6 +78,9 @@ function HistoryEntry({ item }: { item: QueryHistoryItem }) {
 					) : (
 						<p key={block.key}>{withCitations(block.lines[0], byNumber)}</p>
 					),
+				)}
+				{item.searched && (
+					<Searched searched={item.searched} matterSlug={item.project?.slug} />
 				)}
 			</div>
 

@@ -1880,6 +1880,10 @@
             "title": "Answer",
             "type": "string"
           },
+          "answered": {
+            "title": "Answered",
+            "type": "boolean"
+          },
           "citations": {
             "items": {
               "$ref": "#/components/schemas/CitationOut"
@@ -1930,6 +1934,16 @@
           "question": {
             "title": "Question",
             "type": "string"
+          },
+          "searched": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SearchedOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "required": [
@@ -1941,6 +1955,8 @@
           "project",
           "conversation_id",
           "flagged",
+          "answered",
+          "searched",
           "created_at"
         ],
         "title": "QueryHistoryOut",
@@ -2015,6 +2031,10 @@
             "title": "Answer",
             "type": "string"
           },
+          "answered": {
+            "title": "Answered",
+            "type": "boolean"
+          },
           "citations": {
             "items": {
               "$ref": "#/components/schemas/CitationOut"
@@ -2038,6 +2058,16 @@
           "path": {
             "title": "Path",
             "type": "string"
+          },
+          "searched": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SearchedOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "required": [
@@ -2046,7 +2076,9 @@
           "model",
           "path",
           "conversation_id",
-          "flagged"
+          "flagged",
+          "answered",
+          "searched"
         ],
         "title": "QueryOut",
         "type": "object"
@@ -2080,6 +2112,24 @@
           "role"
         ],
         "title": "RoleChange",
+        "type": "object"
+      },
+      "SearchedOut": {
+        "properties": {
+          "documents": {
+            "title": "Documents",
+            "type": "integer"
+          },
+          "images": {
+            "title": "Images",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "documents",
+          "images"
+        ],
+        "title": "SearchedOut",
         "type": "object"
       },
       "StaffAccount": {
