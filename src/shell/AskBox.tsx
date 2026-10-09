@@ -13,6 +13,7 @@ import { Button } from "#/components/ui/button";
 import { Kbd } from "#/components/ui/kbd";
 import { Skeleton } from "#/components/ui/skeleton";
 import { StatusIcon } from "#/components/ui/status-icon";
+import { claimsByCitation, excerpt, Highlighted } from "./excerpt";
 import { Panel } from "./page";
 
 type Asked = { question: string; answer: QueryAnswer };
@@ -127,6 +128,7 @@ function Answer({
 	const byNumber = new Map(
 		answer.citations.map((citation) => [citation.number, citation]),
 	);
+	const claims = claimsByCitation(answer.answer);
 
 	return (
 		<Panel className="p-4" aria-live="polite">
@@ -148,13 +150,17 @@ function Answer({
 			{answer.citations.length > 0 && (
 				<ol className="mt-4 space-y-2">
 					{answer.citations.map((citation) => (
-						<Source key={citation.number} citation={citation} />
+						<Source
+							key={citation.number}
+							citation={citation}
+							claim={claims.get(citation.number)}
+						/>
 					))}
 				</ol>
 			)}
 
 			<p className="mt-3 text-xs text-muted-foreground">
-				Answered by {answer.model}
+				<AnsweredBy model={answer.model} />
 			</p>
 		</Panel>
 	);
@@ -223,33 +229,61 @@ export function pages(citation: Pick<Citation, "page_start" | "page_end">) {
 		: `, p. ${citation.page_start}`;
 }
 
-export function Source({ citation }: { citation: Citation }) {
+export function AnsweredBy({ model }: { model: string }) {
 	return (
-		<li className="rounded-lg bg-muted px-3 py-2 text-xs">
-			<div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+		<>
+			Answered by {model}. Go to{" "}
+			<Link to="/settings" className="underline hover:text-foreground">
+				Settings
+			</Link>{" "}
+			to change the model.
+		</>
+	);
+}
+
+// The whole card opens the passage, through the filename link stretched over
+// it, so the matter link above sits on top and still goes to the matter.
+// `claim` is the part of the answer citing this source, which picks the bit
+// of the passage to show and the words in it to highlight
+export function Source({
+	citation,
+	claim,
+}: {
+	citation: Citation;
+	claim?: string;
+}) {
+	const shown = excerpt(citation.text, claim);
+	return (
+		<li className="group relative cursor-pointer rounded-lg bg-muted px-3 py-2 text-xs transition-colors hover:bg-accent">
+			{citation.project_slug && (
+				<Link
+					to="/matters/$matterId/overview"
+					params={{ matterId: citation.project_slug }}
+					className="relative z-10 mb-1 inline-flex items-center gap-1 text-muted-foreground hover:text-foreground hover:underline"
+				>
+					<BriefcaseIcon className="size-3" />
+					{citation.project_name}
+				</Link>
+			)}
+			<div className="flex items-center gap-2">
 				<QuoteIcon className="size-3 shrink-0 text-muted-foreground" />
 				<span className="font-medium">{citation.number}.</span>
 				<Link
 					to="/documents/$documentId"
 					params={{ documentId: citation.document_id }}
-					search={{ passage: citation.chunk_index ?? undefined }}
-					className="font-medium hover:underline"
+					search={{
+						passage: citation.chunk_index ?? undefined,
+						highlight: shown.terms.length ? shown.terms.join(" ") : undefined,
+					}}
+					className="font-medium after:absolute after:inset-0 after:rounded-lg group-hover:underline"
 				>
 					{citation.filename}
 					{pages(citation)}
 				</Link>
-				{citation.project_slug && (
-					<Link
-						to="/matters/$matterId/overview"
-						params={{ matterId: citation.project_slug }}
-						className="inline-flex items-center gap-1 text-muted-foreground hover:text-foreground hover:underline"
-					>
-						<BriefcaseIcon className="size-3" />
-						{citation.project_name}
-					</Link>
-				)}
 			</div>
-			<p className="mt-1 line-clamp-2 text-muted-foreground">{citation.text}</p>
+			<p className="mt-1 line-clamp-3 text-muted-foreground">
+				<Highlighted text={shown.text} terms={shown.terms} />
+			</p>
 		</li>
 	);
 }
