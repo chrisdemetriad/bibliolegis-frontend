@@ -8,6 +8,7 @@ import {
 	blocks,
 	Searched,
 	Source,
+	SupportLabel,
 	withCitations,
 } from "#/shell/AskBox";
 import { claimsByCitation } from "#/shell/excerpt";
@@ -97,6 +98,7 @@ function HistoryEntry({ item }: { item: QueryHistoryItem }) {
 			)}
 
 			<div className="mt-3 flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
+				{item.support && <SupportLabel support={item.support} />}
 				<span>
 					<AnsweredBy model={item.model} />
 				</span>

@@ -3,11 +3,14 @@ import { Link } from "@tanstack/react-router";
 import {
 	ArrowRightIcon,
 	BriefcaseIcon,
+	CircleAlertIcon,
+	CircleCheckIcon,
 	QuoteIcon,
 	SparklesIcon,
 } from "lucide-react";
 import { Fragment, type ReactNode, useState } from "react";
 import {
+	type AnswerSupport,
 	type Citation,
 	errorMessage,
 	type QueryAnswer,
@@ -18,6 +21,11 @@ import { Button } from "#/components/ui/button";
 import { Kbd } from "#/components/ui/kbd";
 import { Skeleton } from "#/components/ui/skeleton";
 import { StatusIcon } from "#/components/ui/status-icon";
+import {
+	Tooltip,
+	TooltipContent,
+	TooltipTrigger,
+} from "#/components/ui/tooltip";
 import { claimsByCitation, excerpt, Highlighted } from "./excerpt";
 import { Panel } from "./page";
 
@@ -174,9 +182,12 @@ function Answer({
 				</ol>
 			)}
 
-			<p className="mt-3 text-xs text-muted-foreground">
-				<AnsweredBy model={answer.model} />
-			</p>
+			<div className="mt-3 flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
+				{answer.support && <SupportLabel support={answer.support} />}
+				<span>
+					<AnsweredBy model={answer.model} />
+				</span>
+			</div>
 		</Panel>
 	);
 }
@@ -285,6 +296,58 @@ export function Searched({
 				` (${plural(searched.images, "image")}, ${plural(searched.documents, "document")})`}
 			.
 		</p>
+	);
+}
+
+// Whether the answer's lines are borne out by the passages they cite, worked
+// out by the api rather than asked of the model. Deliberately not a
+// percentage, see generation/support.py in bibliolegis-api for why
+export function SupportLabel({ support }: { support: AnswerSupport }) {
+	if (support.checked === 0) return null;
+	const missed = support.unmatched.length;
+	const label =
+		missed === 0
+			? "Every line checked against its source"
+			: missed === 1
+				? "1 line couldn't be matched to its source"
+				: `${missed} lines couldn't be matched to their source`;
+	return (
+		<Tooltip>
+			<TooltipTrigger asChild>
+				<button
+					type="button"
+					className={
+						missed === 0
+							? "inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-foreground/80"
+							: "inline-flex items-center gap-1 rounded-full border border-warning-border bg-warning px-2 py-0.5 text-warning-foreground"
+					}
+				>
+					{missed === 0 ? (
+						<CircleCheckIcon className="size-3" />
+					) : (
+						<CircleAlertIcon className="size-3" />
+					)}
+					{label}
+				</button>
+			</TooltipTrigger>
+			<TooltipContent className="block space-y-2 leading-relaxed">
+				<p>
+					Each line that states a figure or a name was checked: it has to cite a
+					passage, and those figures and names have to appear in it. This
+					doesn't check the reasoning, so read the passages for anything that
+					matters.
+				</p>
+				{missed > 0 && (
+					<ul className="list-disc space-y-1 pl-4">
+						{support.unmatched.map((line) => (
+							<li key={line} className="line-clamp-2">
+								{line}
+							</li>
+						))}
+					</ul>
+				)}
+			</TooltipContent>
+		</Tooltip>
 	);
 }
 
