@@ -60,7 +60,9 @@ function termPattern(found: string[]) {
 // A figure is what a short answer usually hangs on, so a sentence carrying
 // the same number counts for more than one sharing a word
 function score(sentence: string, claimTerms: string[]) {
-	const lower = sentence.toLowerCase();
+	// A judgment numbers its paragraphs, and "11. Against extradition" isn't
+	// the 11 in "11 convictions"
+	const lower = sentence.toLowerCase().replace(/^["“]?\d{1,3}\.(\s|$)/, "");
 	let total = 0;
 	const hit: string[] = [];
 	for (const term of claimTerms) {
