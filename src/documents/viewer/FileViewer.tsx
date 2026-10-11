@@ -39,6 +39,7 @@ const views = {
 	pdf: lazy(() => import("./PdfView")),
 	docx: lazy(() => import("./DocxView")),
 	xlsx: lazy(() => import("./SheetView")),
+	email: lazy(() => import("./EmlView")),
 	image: lazy(() => import("./ImageView")),
 };
 
