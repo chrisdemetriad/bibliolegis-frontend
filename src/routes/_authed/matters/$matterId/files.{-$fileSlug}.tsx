@@ -138,6 +138,7 @@ const sampleExtensions = {
 	pdf: "pdf",
 	docx: "docx",
 	xlsx: "xlsx",
+	email: "eml",
 	image: "jpg",
 };
 

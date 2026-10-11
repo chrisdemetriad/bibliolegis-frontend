@@ -4,14 +4,16 @@ import {
 	FileTextIcon,
 	ImageIcon,
 	type LucideIcon,
+	MailIcon,
 } from "lucide-react";
 
-export type FileKind = "pdf" | "docx" | "xlsx" | "image";
+export type FileKind = "pdf" | "docx" | "xlsx" | "email" | "image";
 
 const kinds: Record<string, FileKind> = {
 	pdf: "pdf",
 	docx: "docx",
 	xlsx: "xlsx",
+	eml: "email",
 	jpg: "image",
 	jpeg: "image",
 	png: "image",
@@ -27,6 +29,7 @@ const icons: Record<FileKind, LucideIcon> = {
 	pdf: FileTextIcon,
 	docx: FileTextIcon,
 	xlsx: FileSpreadsheetIcon,
+	email: MailIcon,
 	image: ImageIcon,
 };
 
