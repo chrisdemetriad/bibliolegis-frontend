@@ -20,6 +20,7 @@ import {
 	DialogTrigger,
 } from "#/components/ui/dialog";
 import { Input } from "#/components/ui/input";
+import { Kbd, KbdGroup } from "#/components/ui/kbd";
 import { Label } from "#/components/ui/label";
 import {
 	Select,
@@ -88,6 +89,7 @@ function FeedbackForm({ onDone }: { onDone: () => void }) {
 	const [pending, setPending] = useState(false);
 	const [sent, setSent] = useState(false);
 	const [dragging, setDragging] = useState(false);
+	const [preview, setPreview] = useState<Screenshot | null>(null);
 	const fileInput = useRef<HTMLInputElement>(null);
 	const pageUrl = window.location.href;
 
@@ -289,20 +291,42 @@ function FeedbackForm({ onDone }: { onDone: () => void }) {
 
 				<div className="grid gap-1.5">
 					<Label htmlFor="feedback-message">Message</Label>
-					<Textarea
-						id="feedback-message"
-						autoFocus
-						value={message}
-						maxLength={20_000}
-						rows={5}
-						className="max-h-64 min-h-28"
-						placeholder="You can drop screenshots or Cmd+V / Ctrl+V (paste) images on here to point out any issues."
-						aria-invalid={errors.message !== undefined}
-						onChange={(event) => {
-							setMessage(event.target.value);
-							setErrors((e) => ({ ...e, message: undefined }));
-						}}
-					/>
+					<div className="relative">
+						<Textarea
+							id="feedback-message"
+							autoFocus
+							value={message}
+							maxLength={20_000}
+							rows={5}
+							className="max-h-64 min-h-28"
+							aria-describedby={message ? undefined : "feedback-hint"}
+							aria-invalid={errors.message !== undefined}
+							onChange={(event) => {
+								setMessage(event.target.value);
+								setErrors((e) => ({ ...e, message: undefined }));
+							}}
+						/>
+						{/* A placeholder attribute can only hold plain text, the keys
+						need to be drawn as keys */}
+						{!message && (
+							<p
+								id="feedback-hint"
+								className="pointer-events-none absolute inset-x-2.5 top-2 text-base leading-relaxed text-muted-foreground md:text-sm"
+							>
+								You can drop screenshots or paste images on here with{" "}
+								<KbdGroup>
+									<Kbd>⌘</Kbd>
+									<Kbd>V</Kbd>
+								</KbdGroup>{" "}
+								or{" "}
+								<KbdGroup>
+									<Kbd>Ctrl</Kbd>
+									<Kbd>V</Kbd>
+								</KbdGroup>{" "}
+								to point out any issues.
+							</p>
+						)}
+					</div>
 					{errors.message && (
 						<p role="alert" className="text-xs text-destructive">
 							{errors.message}
@@ -321,11 +345,36 @@ function FeedbackForm({ onDone }: { onDone: () => void }) {
 										current.map((c) => (c.id === s.id ? { ...c, size } : c)),
 									)
 								}
+								onOpen={() => setPreview(s)}
 								onRemove={() => remove(s.id)}
 							/>
 						))}
 					</ul>
 				)}
+				<Dialog
+					open={preview !== null}
+					onOpenChange={(next) => {
+						if (!next) setPreview(null);
+					}}
+				>
+					{/* Nested, so Esc and its close button only shut the preview and
+					leave the feedback form open behind it */}
+					<DialogContent className="max-h-[90vh] p-2 sm:max-w-[min(90vw,72rem)]">
+						<DialogTitle className="truncate pt-1.5 pr-10 pl-1.5 text-sm">
+							{preview?.file.name}
+						</DialogTitle>
+						<DialogDescription className="sr-only">
+							A preview of the attached image
+						</DialogDescription>
+						{preview && (
+							<img
+								src={preview.url}
+								alt={preview.file.name}
+								className="max-h-[calc(90vh-4rem)] w-full rounded-lg object-contain"
+							/>
+						)}
+					</DialogContent>
+				</Dialog>
 				{errors.screenshots && (
 					<p role="alert" className="-mt-2 text-xs text-destructive">
 						{errors.screenshots}
@@ -370,21 +419,22 @@ function FeedbackForm({ onDone }: { onDone: () => void }) {
 function ScreenshotChip({
 	screenshot,
 	onLoad,
+	onOpen,
 	onRemove,
 }: {
 	screenshot: Screenshot;
 	onLoad: (size: { width: number; height: number }) => void;
+	onOpen: () => void;
 	onRemove: () => void;
 }) {
 	const { file, url, size } = screenshot;
 	return (
 		<li className="group relative flex max-w-56 items-center gap-2 rounded-lg border bg-muted/50 py-1 pr-7 pl-1">
-			<a
-				href={url}
-				target="_blank"
-				rel="noreferrer"
-				className="shrink-0"
-				aria-label={`Open ${file.name}`}
+			<button
+				type="button"
+				onClick={onOpen}
+				className="shrink-0 cursor-zoom-in rounded"
+				aria-label={`Preview ${file.name}`}
 			>
 				<img
 					src={url}
@@ -397,7 +447,7 @@ function ScreenshotChip({
 						})
 					}
 				/>
-			</a>
+			</button>
 			<div className="min-w-0 text-xs leading-tight">
 				<p className="flex items-center gap-1 truncate font-medium">
 					<ImageIcon className="size-3 shrink-0 text-muted-foreground" />
