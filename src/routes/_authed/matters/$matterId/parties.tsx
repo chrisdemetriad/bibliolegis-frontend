@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { ShieldCheckIcon, UserPlusIcon } from "lucide-react";
 import { Button } from "#/components/ui/button";
 import { useMatter } from "#/matters/context";
+import { NotImplemented } from "#/shell/NotImplemented";
 import { Panel, SectionTitle } from "#/shell/page";
 
 export const Route = createFileRoute("/_authed/matters/$matterId/parties")({
@@ -16,9 +17,11 @@ function Parties() {
 			<section>
 				<SectionTitle
 					action={
-						<Button size="sm" variant="outline">
-							<UserPlusIcon /> Add party
-						</Button>
+						<NotImplemented>
+							<Button size="sm" variant="outline">
+								<UserPlusIcon /> Add party
+							</Button>
+						</NotImplemented>
 					}
 				>
 					Parties

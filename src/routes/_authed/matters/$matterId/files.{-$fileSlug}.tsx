@@ -46,6 +46,7 @@ import { FileViewer, useDownload } from "#/documents/viewer/FileViewer";
 import { iconFor, kindOf, type ViewerFile } from "#/documents/viewer/kinds";
 import { useMatter } from "#/matters/context";
 import { fileCategories, type MatterFile, sampleFiles } from "#/mock/data";
+import { NotImplemented } from "#/shell/NotImplemented";
 import { PersonAvatar, SectionTitle } from "#/shell/page";
 
 // The open file is in the address, /files/letter-before-claim, so it can be
@@ -190,9 +191,11 @@ function SampleFiles() {
 		<div>
 			<SectionTitle
 				action={
-					<Button size="sm" variant="outline">
-						<UploadIcon /> Add files
-					</Button>
+					<NotImplemented>
+						<Button size="sm" variant="outline">
+							<UploadIcon /> Add files
+						</Button>
+					</NotImplemented>
 				}
 			>
 				Files

@@ -24,6 +24,7 @@ import {
 	upcoming,
 } from "#/mock/data";
 import { AskBox } from "#/shell/AskBox";
+import { NotImplemented } from "#/shell/NotImplemented";
 import {
 	Page,
 	PageHeader,
@@ -69,9 +70,11 @@ function OverviewPage() {
 								<UploadIcon /> Upload
 							</Link>
 						</Button>
-						<Button size="sm">
-							<PlusIcon /> New matter
-						</Button>
+						<NotImplemented>
+							<Button size="sm">
+								<PlusIcon /> New matter
+							</Button>
+						</NotImplemented>
 					</>
 				}
 			/>
@@ -118,12 +121,14 @@ function OverviewPage() {
 				<section>
 					<SectionTitle
 						action={
-							<button
-								type="button"
-								className="text-xs text-muted-foreground hover:text-foreground"
-							>
-								View all
-							</button>
+							<NotImplemented>
+								<button
+									type="button"
+									className="text-xs text-muted-foreground hover:text-foreground"
+								>
+									View all
+								</button>
+							</NotImplemented>
 						}
 					>
 						Recent activity

@@ -23,6 +23,7 @@ import {
 	useRefreshPress,
 } from "#/press/queries";
 import { PressList } from "#/shell/lists";
+import { NotImplemented } from "#/shell/NotImplemented";
 import { SectionTitle } from "#/shell/page";
 
 export const Route = createFileRoute("/_authed/matters/$matterId/press")({
@@ -49,9 +50,11 @@ function MatterPress() {
 		<div>
 			<SectionTitle
 				action={
-					<Button size="sm" variant="outline">
-						<BellIcon /> Alert me
-					</Button>
+					<NotImplemented>
+						<Button size="sm" variant="outline">
+							<BellIcon /> Alert me
+						</Button>
+					</NotImplemented>
 				}
 			>
 				Press

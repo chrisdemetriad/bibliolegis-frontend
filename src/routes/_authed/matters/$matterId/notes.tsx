@@ -3,6 +3,7 @@ import { MicIcon, PlusIcon } from "lucide-react";
 import { Button } from "#/components/ui/button";
 import { useMatter } from "#/matters/context";
 import { sampleNotes } from "#/mock/data";
+import { NotImplemented } from "#/shell/NotImplemented";
 import { Panel, PersonAvatar, personName, SectionTitle } from "#/shell/page";
 
 export const Route = createFileRoute("/_authed/matters/$matterId/notes")({
@@ -27,12 +28,16 @@ function Notes() {
 			<SectionTitle
 				action={
 					<div className="flex gap-2">
-						<Button size="sm" variant="outline">
-							<MicIcon /> Dictate
-						</Button>
-						<Button size="sm" variant="outline">
-							<PlusIcon /> New note
-						</Button>
+						<NotImplemented>
+							<Button size="sm" variant="outline">
+								<MicIcon /> Dictate
+							</Button>
+						</NotImplemented>
+						<NotImplemented>
+							<Button size="sm" variant="outline">
+								<PlusIcon /> New note
+							</Button>
+						</NotImplemented>
 					</div>
 				}
 			>
