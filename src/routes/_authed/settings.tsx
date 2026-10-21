@@ -4,8 +4,16 @@ import { toast } from "sonner";
 import { usePreferences, useSavePreferences } from "#/activity/queries";
 import { type ChatModel, errorMessage, type Preferences } from "#/api/client";
 import { useApi } from "#/api/useApi";
+import { Checkbox } from "#/components/ui/checkbox";
 import { Label } from "#/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "#/components/ui/radio-group";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "#/components/ui/select";
+import { ToggleGroup, ToggleGroupItem } from "#/components/ui/toggle-group";
 import { Page } from "#/shell/page";
 
 export const Route = createFileRoute("/_authed/settings")({
@@ -44,6 +52,9 @@ function SettingsPage() {
 	];
 
 	function chooseModel(id: string) {
+		// A single toggle group clears its value when the chosen chip is pressed
+		// again, there's always meant to be one model
+		if (!id || id === selected) return;
 		const label = models.data?.find((model) => model.id === id)?.label ?? id;
 		save.mutate(id, {
 			onSuccess: () => toast.success(`Switched to ${label}`),
@@ -73,38 +84,51 @@ function SettingsPage() {
 				)}
 
 				{models.data && mine.data && (
-					<RadioGroup
-						className="mt-4 gap-6"
-						value={selected}
-						onValueChange={chooseModel}
-						aria-labelledby="model-heading"
-					>
+					<div className="mt-4 space-y-5">
 						{providers.map((provider) => (
-							<fieldset key={provider} className="space-y-3">
-								<legend className="mb-3 text-sm font-medium text-muted-foreground">
+							<div key={provider} className="space-y-2">
+								<h3
+									id={`provider-${provider}`}
+									className="text-sm font-medium text-muted-foreground"
+								>
 									{providerNames[provider]}
-								</legend>
-								{models.data
-									.filter((model) => model.provider === provider)
-									.map((model) => (
-										<div key={model.id} className="flex items-center gap-3">
-											<RadioGroupItem
+								</h3>
+								<ToggleGroup
+									type="single"
+									variant="outline"
+									spacing={2}
+									className="flex-wrap"
+									value={
+										models.data.some(
+											(model) =>
+												model.provider === provider && model.id === selected,
+										)
+											? selected
+											: ""
+									}
+									onValueChange={chooseModel}
+									aria-labelledby={`provider-${provider}`}
+								>
+									{models.data
+										.filter((model) => model.provider === provider)
+										.map((model) => (
+											<ToggleGroupItem
+												key={model.id}
 												value={model.id}
-												id={`model-${model.id}`}
-											/>
-											<Label htmlFor={`model-${model.id}`}>
+												className="h-9 rounded-full px-4 data-[state=on]:border-primary data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
+											>
 												{model.label}
 												{model.is_default && (
-													<span className="font-normal text-muted-foreground">
-														(default)
+													<span className="text-xs font-normal opacity-70">
+														default
 													</span>
 												)}
-											</Label>
-										</div>
-									))}
-							</fieldset>
+											</ToggleGroupItem>
+										))}
+								</ToggleGroup>
+							</div>
 						))}
-					</RadioGroup>
+					</div>
 				)}
 
 				<p className="mt-4 h-5 text-sm" aria-live="polite">
@@ -156,12 +180,11 @@ function OverviewSettings() {
 			{current && (
 				<div className="mt-4 space-y-4">
 					<div className="flex items-center gap-3">
-						<input
+						<Checkbox
 							id="show-recently-viewed"
-							type="checkbox"
 							checked={current.show_recently_viewed}
-							onChange={(event) => {
-								const shown = event.target.checked;
+							onCheckedChange={(checked) => {
+								const shown = checked === true;
 								save.mutate(
 									{ ...current, show_recently_viewed: shown },
 									{
@@ -174,7 +197,6 @@ function OverviewSettings() {
 									},
 								);
 							}}
-							className="size-4 accent-primary"
 						/>
 						<Label htmlFor="show-recently-viewed">Show Recently viewed</Label>
 					</div>
@@ -187,13 +209,12 @@ function OverviewSettings() {
 						>
 							How many matters to list
 						</Label>
-						<select
-							id="recently-viewed-count"
-							value={current.recently_viewed_count}
+						<Select
+							value={String(current.recently_viewed_count)}
 							disabled={!current.show_recently_viewed}
-							onChange={(event) => {
+							onValueChange={(value) => {
 								const count = Number(
-									event.target.value,
+									value,
 								) as Preferences["recently_viewed_count"];
 								save.mutate(
 									{ ...current, recently_viewed_count: count },
@@ -203,14 +224,18 @@ function OverviewSettings() {
 									},
 								);
 							}}
-							className="h-8 rounded-md border bg-background px-2 text-sm disabled:opacity-50"
 						>
-							{RECENTLY_VIEWED_COUNTS.map((count) => (
-								<option key={count} value={count}>
-									{count}
-								</option>
-							))}
-						</select>
+							<SelectTrigger id="recently-viewed-count" size="sm">
+								<SelectValue />
+							</SelectTrigger>
+							<SelectContent>
+								{RECENTLY_VIEWED_COUNTS.map((count) => (
+									<SelectItem key={count} value={String(count)}>
+										{count}
+									</SelectItem>
+								))}
+							</SelectContent>
+						</Select>
 					</div>
 				</div>
 			)}
