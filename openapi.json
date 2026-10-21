@@ -529,6 +529,10 @@
             "title": "Filename",
             "type": "string"
           },
+          "flagged_passages": {
+            "title": "Flagged Passages",
+            "type": "integer"
+          },
           "id": {
             "format": "uuid",
             "title": "Id",
@@ -575,7 +579,8 @@
           "uploaded_at",
           "error_message",
           "ingestion_stage",
-          "case_metadata"
+          "case_metadata",
+          "flagged_passages"
         ],
         "title": "DocumentDetailOut",
         "type": "object"
@@ -1921,6 +1926,10 @@
             "title": "Model",
             "type": "string"
           },
+          "off_topic": {
+            "title": "Off Topic",
+            "type": "boolean"
+          },
           "project": {
             "anyOf": [
               {
@@ -1966,6 +1975,7 @@
           "conversation_id",
           "flagged",
           "answered",
+          "off_topic",
           "searched",
           "support",
           "created_at"
@@ -2066,6 +2076,10 @@
             "title": "Model",
             "type": "string"
           },
+          "off_topic": {
+            "title": "Off Topic",
+            "type": "boolean"
+          },
           "path": {
             "title": "Path",
             "type": "string"
@@ -2099,6 +2113,7 @@
           "conversation_id",
           "flagged",
           "answered",
+          "off_topic",
           "searched",
           "support"
         ],
