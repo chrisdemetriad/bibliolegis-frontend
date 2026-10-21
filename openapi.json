@@ -157,6 +157,57 @@
         "title": "Body_add_intake_document_intakes__intake_id__documents_post",
         "type": "object"
       },
+      "Body_send_feedback_feedback_post": {
+        "properties": {
+          "kind": {
+            "enum": [
+              "idea",
+              "problem",
+              "question"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "message": {
+            "maxLength": 20000,
+            "title": "Message",
+            "type": "string"
+          },
+          "name": {
+            "maxLength": 200,
+            "title": "Name",
+            "type": "string"
+          },
+          "page_url": {
+            "default": "",
+            "maxLength": 2000,
+            "title": "Page Url",
+            "type": "string"
+          },
+          "screenshots": {
+            "anyOf": [
+              {
+                "items": {
+                  "contentMediaType": "application/octet-stream",
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Screenshots"
+          }
+        },
+        "required": [
+          "kind",
+          "name",
+          "message"
+        ],
+        "title": "Body_send_feedback_feedback_post",
+        "type": "object"
+      },
       "Body_upload_document_documents_post": {
         "properties": {
           "file": {
@@ -2793,6 +2844,37 @@
           }
         },
         "summary": "Get Passage"
+      }
+    },
+    "/feedback": {
+      "post": {
+        "operationId": "send_feedback_feedback_post",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_send_feedback_feedback_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Send Feedback"
       }
     },
     "/health": {

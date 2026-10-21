@@ -162,6 +162,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/feedback": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Send Feedback */
+        post: operations["send_feedback_feedback_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/health": {
         parameters: {
             query?: never;
@@ -793,6 +810,25 @@ export interface components {
         Body_add_intake_document_intakes__intake_id__documents_post: {
             /** File */
             file: string;
+        };
+        /** Body_send_feedback_feedback_post */
+        Body_send_feedback_feedback_post: {
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "idea" | "problem" | "question";
+            /** Message */
+            message: string;
+            /** Name */
+            name: string;
+            /**
+             * Page Url
+             * @default
+             */
+            page_url: string;
+            /** Screenshots */
+            screenshots?: string[] | null;
         };
         /** Body_upload_document_documents_post */
         Body_upload_document_documents_post: {
@@ -1816,6 +1852,37 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["PassageOut"];
                 };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    send_feedback_feedback_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["Body_send_feedback_feedback_post"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Validation Error */
             422: {

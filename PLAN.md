@@ -424,6 +424,7 @@ Clerk's TanStack Start integration (`@clerk/tanstack-react-start`, the current p
 - [ ] Basic responsive layout pass once the core pages exist
 - [ ] Consistent error boundary/toast pattern across pages rather than one off handling per page. Sonner's toaster landed on 2026-09-28, mounted once in `__root.tsx`, with a success toast on each file finishing upload in `/matters/{slug}/files`, on saving a setting on `/settings` and on pinning or unpinning a matter. Use `toast` from `sonner` for any other confirmation as it's added rather than a new one off pattern, but keep the inline status text pages already show for errors and in progress states, a toast is for the moment something finishes. The error boundary half of this item is still open
 - [ ] Accessibility pass on the core flows (upload, query, login)
+- [x] Feedback button in the header. Opens a modal with a type (Problem, Idea or Question), name, the page it was opened on and a message, with images attached by dropping, pasting or browsing. Sent to `POST /feedback`, which emails it through Resend
 
 ## Phase 7: deployment
 
