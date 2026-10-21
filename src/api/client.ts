@@ -35,6 +35,7 @@ export type PressSourceUpdate = Schemas["PressSourceUpdate"];
 export type PressPreview = Schemas["PagePreviewOut"];
 export type PressRefresh = Schemas["PressRefreshOut"];
 export type MentionStatus = Schemas["MentionUpdate"]["status"];
+export type FeedbackKind = Schemas["Body_send_feedback_feedback_post"]["kind"];
 export type DocumentListQuery = NonNullable<
 	paths["/documents"]["get"]["parameters"]["query"]
 >;
@@ -123,6 +124,29 @@ export function createApi({
 					body: { job_title: jobTitle },
 				}),
 			),
+
+		// Emailed to the team rather than stored, screenshots go as attachments
+		sendFeedback: async ({
+			kind,
+			name,
+			message,
+			pageUrl,
+			screenshots,
+		}: {
+			kind: FeedbackKind;
+			name: string;
+			message: string;
+			pageUrl: string;
+			screenshots: File[];
+		}) => {
+			const form = new FormData();
+			form.append("kind", kind);
+			form.append("name", name);
+			form.append("message", message);
+			form.append("page_url", pageUrl);
+			for (const file of screenshots) form.append("screenshots", file);
+			await postWithProgress<null>("/feedback", form);
+		},
 
 		listChatModels: async () => unwrap(await client.GET("/chat-models")),
 

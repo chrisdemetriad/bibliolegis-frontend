@@ -4,6 +4,7 @@ import { Fragment } from "react";
 import { Button } from "#/components/ui/button";
 import { Separator } from "#/components/ui/separator";
 import { SidebarTrigger } from "#/components/ui/sidebar";
+import { FeedbackButton } from "#/feedback/Feedback";
 import { useAllMatters } from "#/matters/queries";
 import { NotImplemented } from "#/shell/NotImplemented";
 import { ThemeToggle } from "#/theme/ThemeToggle";
@@ -87,6 +88,7 @@ export function AppHeader() {
 				))}
 			</nav>
 			<div className="ml-auto flex items-center gap-1">
+				<FeedbackButton />
 				<ThemeToggle />
 				<NotImplemented>
 					<Button
