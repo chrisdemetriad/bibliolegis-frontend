@@ -3,6 +3,7 @@ import { DownloadIcon, SparklesIcon } from "lucide-react";
 import { Button } from "#/components/ui/button";
 import { useMatter } from "#/matters/context";
 import { sampleChronology } from "#/mock/data";
+import { NotImplemented } from "#/shell/NotImplemented";
 import { SectionTitle } from "#/shell/page";
 
 export const Route = createFileRoute("/_authed/matters/$matterId/chronology")({
@@ -27,12 +28,16 @@ function Chronology() {
 			<SectionTitle
 				action={
 					<div className="flex gap-2">
-						<Button size="sm" variant="outline">
-							<SparklesIcon /> Rebuild from documents
-						</Button>
-						<Button size="sm" variant="outline">
-							<DownloadIcon /> Export to Word
-						</Button>
+						<NotImplemented>
+							<Button size="sm" variant="outline">
+								<SparklesIcon /> Rebuild from documents
+							</Button>
+						</NotImplemented>
+						<NotImplemented>
+							<Button size="sm" variant="outline">
+								<DownloadIcon /> Export to Word
+							</Button>
+						</NotImplemented>
 					</div>
 				}
 			>

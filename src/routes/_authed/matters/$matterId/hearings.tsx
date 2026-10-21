@@ -3,6 +3,7 @@ import { CalendarPlusIcon, GavelIcon, TimerIcon } from "lucide-react";
 import { Button } from "#/components/ui/button";
 import { useMatter } from "#/matters/context";
 import { daysUntil, formatDate, upcoming } from "#/mock/data";
+import { NotImplemented } from "#/shell/NotImplemented";
 import { Panel, PersonAvatar, SectionTitle } from "#/shell/page";
 
 export const Route = createFileRoute("/_authed/matters/$matterId/hearings")({
@@ -19,9 +20,11 @@ function Hearings() {
 			<section>
 				<SectionTitle
 					action={
-						<Button size="sm" variant="outline">
-							<CalendarPlusIcon /> Add to calendar
-						</Button>
+						<NotImplemented>
+							<Button size="sm" variant="outline">
+								<CalendarPlusIcon /> Add to calendar
+							</Button>
+						</NotImplemented>
 					}
 				>
 					Hearings and deadlines

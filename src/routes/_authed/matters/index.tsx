@@ -16,6 +16,7 @@ import {
 	type Matter,
 	practiceAreas,
 } from "#/mock/data";
+import { NotImplemented } from "#/shell/NotImplemented";
 import { Page, PageHeader, PersonAvatar, SampleBadge } from "#/shell/page";
 
 export const Route = createFileRoute("/_authed/matters/")({
@@ -48,12 +49,16 @@ function MattersPage() {
 				description="Every file the firm is working on. A matter holds its documents, research, dates and notes in one place."
 				actions={
 					<>
-						<Button variant="outline" size="sm">
-							<FilterIcon /> Filter
-						</Button>
-						<Button size="sm">
-							<PlusIcon /> New matter
-						</Button>
+						<NotImplemented>
+							<Button variant="outline" size="sm">
+								<FilterIcon /> Filter
+							</Button>
+						</NotImplemented>
+						<NotImplemented>
+							<Button size="sm">
+								<PlusIcon /> New matter
+							</Button>
+						</NotImplemented>
 					</>
 				}
 			/>

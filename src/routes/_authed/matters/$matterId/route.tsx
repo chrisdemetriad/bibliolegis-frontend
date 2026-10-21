@@ -23,6 +23,7 @@ import { MatterMenu } from "#/matters/MatterMenu";
 import { PinButton } from "#/matters/PinButton";
 import { useProject } from "#/matters/queries";
 import { findMatter, type Matter } from "#/mock/data";
+import { NotImplemented } from "#/shell/NotImplemented";
 import { Page, SampleBadge } from "#/shell/page";
 
 export const Route = createFileRoute("/_authed/matters/$matterId")({
@@ -145,9 +146,11 @@ function MatterFrame({ matter }: { matter: Matter }) {
 								title={matter.title}
 							/>
 						)}
-						<Button variant="ghost" size="icon-sm" aria-label="Share matter">
-							<ShareIcon />
-						</Button>
+						<NotImplemented>
+							<Button variant="ghost" size="icon-sm" aria-label="Share matter">
+								<ShareIcon />
+							</Button>
+						</NotImplemented>
 						{matter.projectId && (
 							<MatterMenu
 								projectId={matter.projectId}

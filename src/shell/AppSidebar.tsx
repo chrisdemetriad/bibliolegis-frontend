@@ -39,6 +39,7 @@ import {
 } from "#/components/ui/sidebar";
 import { useAllMatters } from "#/matters/queries";
 import { currentUser } from "#/mock/data";
+import { NotImplemented } from "#/shell/NotImplemented";
 
 type NavItem = {
 	label: string;
@@ -153,14 +154,16 @@ export function AppSidebar() {
 						</span>
 					</span>
 				</Link>
-				<button
-					type="button"
-					className="flex h-9 items-center gap-2 rounded-lg border bg-background px-2.5 text-sm text-muted-foreground shadow-xs hover:text-foreground group-data-[collapsible=icon]:hidden"
-				>
-					<SearchIcon className="size-4" />
-					<span className="flex-1 text-left">Search</span>
-					<Kbd>⌘K</Kbd>
-				</button>
+				<NotImplemented>
+					<button
+						type="button"
+						className="flex h-9 items-center gap-2 rounded-lg border bg-background px-2.5 text-sm text-muted-foreground shadow-xs hover:text-foreground group-data-[collapsible=icon]:hidden"
+					>
+						<SearchIcon className="size-4" />
+						<span className="flex-1 text-left">Search</span>
+						<Kbd>⌘K</Kbd>
+					</button>
+				</NotImplemented>
 			</SidebarHeader>
 
 			<SidebarContent>

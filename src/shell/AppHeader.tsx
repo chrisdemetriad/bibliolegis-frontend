@@ -5,6 +5,7 @@ import { Button } from "#/components/ui/button";
 import { Separator } from "#/components/ui/separator";
 import { SidebarTrigger } from "#/components/ui/sidebar";
 import { useAllMatters } from "#/matters/queries";
+import { NotImplemented } from "#/shell/NotImplemented";
 import { ThemeToggle } from "#/theme/ThemeToggle";
 
 const labels: Record<string, string> = {
@@ -87,15 +88,17 @@ export function AppHeader() {
 			</nav>
 			<div className="ml-auto flex items-center gap-1">
 				<ThemeToggle />
-				<Button
-					variant="ghost"
-					size="icon"
-					aria-label="Notifications, 3 unread"
-					className="relative"
-				>
-					<BellIcon />
-					<span className="absolute top-2 right-2 size-1.5 rounded-full bg-warning-foreground" />
-				</Button>
+				<NotImplemented>
+					<Button
+						variant="ghost"
+						size="icon"
+						aria-label="Notifications, 3 unread"
+						className="relative"
+					>
+						<BellIcon />
+						<span className="absolute top-2 right-2 size-1.5 rounded-full bg-warning-foreground" />
+					</Button>
+				</NotImplemented>
 			</div>
 		</header>
 	);
