@@ -895,6 +895,8 @@ export interface components {
             error_message: string | null;
             /** Filename */
             filename: string;
+            /** Flagged Passages */
+            flagged_passages: number;
             /**
              * Id
              * Format: uuid
@@ -1369,6 +1371,8 @@ export interface components {
             id: string;
             /** Model */
             model: string;
+            /** Off Topic */
+            off_topic: boolean;
             project: components["schemas"]["QueryHistoryProjectOut"] | null;
             /** Question */
             question: string;
@@ -1413,6 +1417,8 @@ export interface components {
             flagged: boolean;
             /** Model */
             model: string;
+            /** Off Topic */
+            off_topic: boolean;
             /** Path */
             path: string;
             searched: components["schemas"]["SearchedOut"] | null;
